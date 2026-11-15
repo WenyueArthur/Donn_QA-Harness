@@ -1,0 +1,43 @@
+{
+  "schema": "qa-rebuild-handoff",
+  "created_on": "2026-11-15",
+  "meaning": "仅校验交付文件内容完整性，不证明产品验收、作者身份或真人可用性",
+  "files": [
+    {
+      "path": "01-rebuild-design.md",
+      "sha256": "3b0fe6591cb2cb675c605920914a201802964657d4ce88ed86ea32f9f9927a4c"
+    },
+    {
+      "path": "02-validation-plan.md",
+      "sha256": "1e6f533776f4ef850d07237f313f1bf97e301149a3b606b88168891dfeef8602"
+    },
+    {
+      "path": "QUICKSTART.md",
+      "sha256": "42e148ae6fafb0e6a9a70cfd752aa09fb920eab9c2ba9be15d9f2fd5cf8a70cb"
+    },
+    {
+      "path": "README.md",
+      "sha256": "58e85ec6d29dab4a3c0aceb993934544218559b6751fb7139cfe627a7a701b46"
+    },
+    {
+      "path": "acceptance-cases.json",
+      "sha256": "dc33e203f3520c80ae3cddf06121ada24a64664eb82c412d311921d3aafd166f"
+    },
+    {
+      "path": "check_handoff.py",
+      "sha256": "cec81de08cb50bacaecac0a3505b032fc33c48de43d9896169d5893d4ab00e28"
+    },
+    {
+      "path": "lab-fixtures.json",
+      "sha256": "40ec4ad2ceec6963ba9e7be3ca8d685c2377ab276ed3009fa23c21fb6481e217"
+    },
+    {
+      "path": "requirements.json",
+      "sha256": "1f3bf28b27fff9d1437e2d75a8e456eaef80d1b0e75726957acb618a7eb92f32"
+    },
+    {
+      "path": "source-baseline.json",
+      "sha256": "f50e0e80a1990e1847d2ea4db833a80cb4c6e75b464be81297a55b21d6e67027"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "schema": "qa.stage_registry",
+  "note": "阶段唯一注册表：CLI、Skill、报告与测试读取同一份清单，不另写阶段列表。",
+  "stages": [
+    {"id": "req_gate", "title": "需求质检", "inputs": ["source_revision", "quality_review"], "depends_on": [],
+     "validator": "quality_review", "requires_decision": "review_note"},
+    {"id": "tech_gate", "title": "技术方案质检", "inputs": ["technical_review"], "depends_on": ["req_gate"],
+     "validator": "technical_review", "applicability": "technical_material"},
+    {"id": "req_analysis", "title": "需求测试分析", "inputs": ["test_analysis"], "depends_on": ["req_gate", "tech_gate"],
+     "validator": "test_analysis", "requires_clarifications": true},
+    {"id": "test_plan", "title": "测试计划", "inputs": ["test_plan"], "depends_on": ["req_analysis"],
+     "validator": "test_plan", "requires_decision": "plan_approval"},
+    {"id": "case_design", "title": "用例设计", "inputs": ["case_design"], "depends_on": ["req_analysis"],
+     "validator": "case_design"},
+    {"id": "case_qc", "title": "用例质检", "inputs": ["case_quality_review"], "depends_on": ["case_design"],
+     "validator": "case_quality_review", "applicability": "case_qc_policy"},
+    {"id": "env_ready", "title": "环境与数据准备", "inputs": ["environment_check"], "depends_on": ["test_plan"],
+     "validator": "environment_check"},
+    {"id": "test_entry", "title": "提测准入", "inputs": ["entry_report"],
+     "depends_on": ["test_plan", "case_design", "case_qc", "env_ready"], "validator": "entry_report"},
+    {"id": "test_execution", "title": "测试执行", "inputs": ["case_attempt", "regression_plan"],
+     "depends_on": ["test_entry"], "validator": "execution"},
+    {"id": "test_exit", "title": "测试准出", "inputs": ["exit_report"], "depends_on": ["test_execution"],
+     "validator": "exit_report", "requires_decision": "exit_confirmation"},
+    {"id": "release_verify", "title": "上线验证", "inputs": ["release_check"], "depends_on": ["test_exit"],
+     "validator": "release_check", "applicability": "deployment"},
+    {"id": "retrospective", "title": "复盘与知识回流", "inputs": ["escape", "improvement", "knowledge_candidate"],
+     "depends_on": ["test_exit"], "validator": "retrospective"}
+  ]
+}

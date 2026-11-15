@@ -1,0 +1,867 @@
+{
+  "schema": "qa-rebuild-requirements",
+  "baseline_date": "2026-11-15",
+  "requirements": [
+    {
+      "id": "FLOW-01",
+      "title": "需求质检与可测性",
+      "module": "quality",
+      "contract": "quality_review",
+      "milestone": "M3",
+      "invariant": "原文只读；结论有出处；沿用已冻结的规则和分数计算。",
+      "html_step": "1",
+      "test_ids": [
+        "AC-001",
+        "AC-002",
+        "AC-105"
+      ]
+    },
+    {
+      "id": "FLOW-02",
+      "title": "评审与澄清",
+      "module": "review",
+      "contract": "clarification / decision",
+      "milestone": "M3",
+      "invariant": "答复绑定问题和原文快照；不把台账答复视为原文已修改。",
+      "html_step": "1.1",
+      "test_ids": [
+        "AC-003",
+        "AC-004"
+      ]
+    },
+    {
+      "id": "FLOW-03",
+      "title": "测试计划与排期",
+      "module": "planning",
+      "contract": "test_plan / effort_entry",
+      "milestone": "M3",
+      "invariant": "估算有方法、区间、依赖和确认人；估算与实际投入分开。",
+      "html_step": "1.2",
+      "test_ids": [
+        "AC-005",
+        "AC-006"
+      ]
+    },
+    {
+      "id": "FLOW-04",
+      "title": "测试点与准备度",
+      "module": "quality",
+      "contract": "test_analysis",
+      "milestone": "M3",
+      "invariant": "测试点双向追溯；受阻项不得进入可执行交接种子。",
+      "html_step": "2",
+      "test_ids": [
+        "AC-007",
+        "AC-008",
+        "AC-105"
+      ]
+    },
+    {
+      "id": "FLOW-05",
+      "title": "六类技术模型",
+      "module": "quality",
+      "contract": "technical_review",
+      "milestone": "M3",
+      "invariant": "流程、接口、数据、状态、规则、依赖按触发条件抽取并保留证据。",
+      "html_step": "3",
+      "test_ids": [
+        "AC-009",
+        "AC-010"
+      ]
+    },
+    {
+      "id": "FLOW-06",
+      "title": "技术方案质检",
+      "module": "quality",
+      "contract": "technical_review",
+      "milestone": "M3",
+      "invariant": "建模与质检属于同一阶段；明确方案缺失、不适用和未验证。",
+      "html_step": "3.1",
+      "test_ids": [
+        "AC-011",
+        "AC-012"
+      ]
+    },
+    {
+      "id": "FLOW-07",
+      "title": "设计与运行数据流",
+      "module": "analysis",
+      "contract": "flow_model / evidence",
+      "milestone": "M3",
+      "invariant": "设计流与实测流分别标记；知识检索不能冒充部署事实。",
+      "html_step": "4",
+      "test_ids": [
+        "AC-013",
+        "AC-014"
+      ]
+    },
+    {
+      "id": "FLOW-08",
+      "title": "基于改动的影响分析",
+      "module": "analysis",
+      "contract": "change_set / impact_set",
+      "milestone": "M3",
+      "invariant": "绑定 base/head、调用关系和搜索范围；不完整扫描不得声称无遗漏。",
+      "html_step": "4.1",
+      "test_ids": [
+        "AC-015",
+        "AC-016"
+      ]
+    },
+    {
+      "id": "FLOW-09",
+      "title": "测试策略",
+      "module": "planning",
+      "contract": "test_analysis",
+      "milestone": "M3",
+      "invariant": "类型、分层、排除项、自动化候选及重复执行条件均有依据。",
+      "html_step": "4.2",
+      "test_ids": [
+        "AC-017",
+        "AC-018"
+      ]
+    },
+    {
+      "id": "FLOW-10",
+      "title": "用例设计与修订",
+      "module": "cases",
+      "contract": "case_design",
+      "milestone": "M3",
+      "invariant": "设计用例不自动成为可执行脚本；修订产生新快照。",
+      "html_step": "5",
+      "test_ids": [
+        "AC-019",
+        "AC-020",
+        "AC-105"
+      ]
+    },
+    {
+      "id": "FLOW-11",
+      "title": "追溯与覆盖",
+      "module": "cases",
+      "contract": "traceability",
+      "milestone": "M3",
+      "invariant": "设计覆盖、脚本映射、执行覆盖分别计算，不互相代替。",
+      "html_step": "5.1",
+      "test_ids": [
+        "AC-021",
+        "AC-022"
+      ]
+    },
+    {
+      "id": "FLOW-12",
+      "title": "用例质检与预期确认",
+      "module": "review",
+      "contract": "quality_review / decision",
+      "milestone": "M3",
+      "invariant": "L1/L2/L3 与业务预期签字分别记录；关键预期未确认不能进入实际执行。",
+      "html_step": "5.2",
+      "test_ids": [
+        "AC-023",
+        "AC-024"
+      ]
+    },
+    {
+      "id": "FLOW-13",
+      "title": "数据和环境准备",
+      "module": "execution",
+      "contract": "environment_check / dataset",
+      "milestone": "M4",
+      "invariant": "准备方法与准备实测分开；目标环境、版本、数据集及清理结果可核验。",
+      "html_step": "5.3",
+      "test_ids": [
+        "AC-025",
+        "AC-026"
+      ]
+    },
+    {
+      "id": "FLOW-14",
+      "title": "提测准入",
+      "module": "execution",
+      "contract": "entry_report",
+      "milestone": "M4",
+      "invariant": "自测材料、实际冒烟、环境就绪及范围一致才可接收提测。",
+      "html_step": "5.4",
+      "test_ids": [
+        "AC-027",
+        "AC-028"
+      ]
+    },
+    {
+      "id": "FLOW-15",
+      "title": "自动化和手工执行",
+      "module": "execution",
+      "contract": "execution_run / case_attempt",
+      "milestone": "M4",
+      "invariant": "有真实执行器、独立断言与证据；每次尝试保留，未执行不算通过。",
+      "html_step": "6",
+      "test_ids": [
+        "AC-029",
+        "AC-030",
+        "AC-105",
+        "AC-108",
+        "AC-117",
+        "AC-118",
+        "AC-119",
+        "AC-120"
+      ]
+    },
+    {
+      "id": "FLOW-16",
+      "title": "脚本评审与 CI 入库",
+      "module": "execution",
+      "contract": "script_revision / script_review",
+      "milestone": "M4",
+      "invariant": "脚本绑定 TC 和提交；AI 生成脚本需评审、隔离运行和实际 CI 记录。",
+      "html_step": "6.1",
+      "test_ids": [
+        "AC-031",
+        "AC-032"
+      ]
+    },
+    {
+      "id": "FLOW-17",
+      "title": "不稳定用例治理",
+      "module": "execution",
+      "contract": "stability_assessment",
+      "milestone": "M4",
+      "invariant": "首次结果不可被重试覆盖；不同版本或数据上下文不能当同条件波动。",
+      "html_step": "6.2",
+      "test_ids": [
+        "AC-033",
+        "AC-034"
+      ]
+    },
+    {
+      "id": "FLOW-18",
+      "title": "回归执行",
+      "module": "execution",
+      "contract": "regression_plan / execution_run",
+      "milestone": "M4",
+      "invariant": "从影响项选择用例与脚本；必回归未执行或隔离不能计为通过。",
+      "html_step": "6.3",
+      "test_ids": [
+        "AC-035",
+        "AC-036",
+        "AC-117"
+      ]
+    },
+    {
+      "id": "FLOW-19",
+      "title": "根因取证",
+      "module": "defects",
+      "contract": "investigation",
+      "milestone": "M5",
+      "invariant": "区分已证实、推断、待验证；未知根因不阻止有完整复现的问题建单。",
+      "html_step": "7",
+      "test_ids": [
+        "AC-037",
+        "AC-038"
+      ]
+    },
+    {
+      "id": "FLOW-20",
+      "title": "缺陷创建和复测",
+      "module": "defects",
+      "contract": "defect / retest",
+      "milestone": "M5",
+      "invariant": "创建、附件、修复、复测和关闭是独立操作；修复版本与原问题证据一致。",
+      "html_step": "8",
+      "test_ids": [
+        "AC-039",
+        "AC-040",
+        "AC-105",
+        "AC-111"
+      ]
+    },
+    {
+      "id": "FLOW-21",
+      "title": "分级与证据关联",
+      "module": "defects",
+      "contract": "defect / evidence",
+      "milestone": "M5",
+      "invariant": "严重程度按已确认规则；附件必须回读验证关联到工作项。",
+      "html_step": "8.1",
+      "test_ids": [
+        "AC-041",
+        "AC-042",
+        "AC-111"
+      ]
+    },
+    {
+      "id": "FLOW-22",
+      "title": "异常状态与提醒",
+      "module": "defects",
+      "contract": "defect_event / disposition",
+      "milestone": "M5",
+      "invariant": "真实状态从平台映射；重复、乱序和超时均有处理；拒绝处置有产品依据。",
+      "html_step": "8.2",
+      "test_ids": [
+        "AC-043",
+        "AC-044",
+        "AC-116"
+      ]
+    },
+    {
+      "id": "FLOW-23",
+      "title": "修复影响与扩展复测",
+      "module": "defects",
+      "contract": "change_set / retest",
+      "milestone": "M5",
+      "invariant": "修复 diff 关联原 TC 和相邻回归；原用例通过不代表相邻功能通过。",
+      "html_step": "8.3",
+      "test_ids": [
+        "AC-045",
+        "AC-046"
+      ]
+    },
+    {
+      "id": "FLOW-24",
+      "title": "需求变更",
+      "module": "analysis",
+      "contract": "source_revision / change_request",
+      "milestone": "M3",
+      "invariant": "源变化使相关证据、审批和下游失效；重新估算排期，不覆盖历史。",
+      "html_step": "8.4",
+      "test_ids": [
+        "AC-047",
+        "AC-048",
+        "AC-106"
+      ]
+    },
+    {
+      "id": "FLOW-25",
+      "title": "测试执行报告",
+      "module": "reporting",
+      "contract": "test_report",
+      "milestone": "M6",
+      "invariant": "从真实执行和缺陷快照计算；缺失、过期、未执行单列。",
+      "html_step": "9",
+      "test_ids": [
+        "AC-049",
+        "AC-050",
+        "AC-105"
+      ]
+    },
+    {
+      "id": "FLOW-26",
+      "title": "准出与风险接受",
+      "module": "reporting",
+      "contract": "exit_report / decision",
+      "milestone": "M6",
+      "invariant": "使用冻结策略；证据不足为不可判定；人工风险接受不能抹去硬门禁失败。",
+      "html_step": "9.1",
+      "test_ids": [
+        "AC-051",
+        "AC-052",
+        "AC-105"
+      ]
+    },
+    {
+      "id": "FLOW-27",
+      "title": "上线验证",
+      "module": "release",
+      "contract": "release_check",
+      "milestone": "M6",
+      "invariant": "绑定部署标识、生产版本、时间窗和指标；测试环境或模拟证据不能作为生产证据。",
+      "html_step": "10",
+      "test_ids": [
+        "AC-053",
+        "AC-054",
+        "AC-112"
+      ]
+    },
+    {
+      "id": "FLOW-28",
+      "title": "回滚方案与演练",
+      "module": "release",
+      "contract": "rollback_plan / rollback_drill",
+      "milestone": "M6",
+      "invariant": "方案可行性与演练结果分开；默认在隔离环境演练，生产变更须外部授权。",
+      "html_step": "11",
+      "test_ids": [
+        "AC-055",
+        "AC-056",
+        "AC-112",
+        "AC-118"
+      ]
+    },
+    {
+      "id": "FLOW-29",
+      "title": "漏测分析与改进验证",
+      "module": "learning",
+      "contract": "escape / improvement",
+      "milestone": "M7",
+      "invariant": "归因须确认；关联缺陷、遗漏场景、修订与后续验证，不自动宣称改进有效。",
+      "html_step": "12",
+      "test_ids": [
+        "AC-057",
+        "AC-058"
+      ]
+    },
+    {
+      "id": "FLOW-30",
+      "title": "知识入库与下一需求",
+      "module": "learning",
+      "contract": "knowledge_candidate / knowledge_snapshot",
+      "milestone": "M7",
+      "invariant": "候选、人工确认、策略确认、应用和检索分开；有冲突或未证实事实不得自动固化。",
+      "html_step": "13",
+      "test_ids": [
+        "AC-059",
+        "AC-060",
+        "AC-105",
+        "AC-109"
+      ]
+    },
+    {
+      "id": "AI-01",
+      "title": "人工决定与职责分离",
+      "module": "review",
+      "contract": "decision",
+      "milestone": "M2",
+      "invariant": "决定绑定对象、范围、角色、有效期和证据；本地自述不冒充已认证签字。",
+      "html_step": null,
+      "test_ids": [
+        "AC-061",
+        "AC-062",
+        "AC-135"
+      ]
+    },
+    {
+      "id": "AI-02",
+      "title": "证据与事实分层",
+      "module": "evidence",
+      "contract": "claim / evidence",
+      "milestone": "M2",
+      "invariant": "规划、采集、核验和人工接受分开；无依据或来源矛盾不得断言事实。",
+      "html_step": null,
+      "test_ids": [
+        "AC-002",
+        "AC-063",
+        "AC-064",
+        "AC-110"
+      ]
+    },
+    {
+      "id": "AI-03",
+      "title": "运行来源与可重复核对",
+      "module": "evidence",
+      "contract": "run_provenance",
+      "milestone": "M2",
+      "invariant": "记录模型、提示词、规则、Skill、代码、知识、配置与输入快照指纹；缺项降级。",
+      "html_step": null,
+      "test_ids": [
+        "AC-065",
+        "AC-066",
+        "AC-110"
+      ]
+    },
+    {
+      "id": "AI-04",
+      "title": "模型输入最小化与脱敏",
+      "module": "security",
+      "contract": "sanitized_input",
+      "milestone": "M2",
+      "invariant": "采用允许字段和人工审阅；未知格式或未完成检查不发模型，日志不得泄露原值。",
+      "html_step": null,
+      "test_ids": [
+        "AC-067",
+        "AC-068",
+        "AC-110",
+        "AC-137"
+      ]
+    },
+    {
+      "id": "AI-05",
+      "title": "效果统计与比较",
+      "module": "metrics",
+      "contract": "metric_report",
+      "milestone": "M7",
+      "invariant": "数据不全输出不可计算；对照样本与适用范围明确，不以图表箭头表示提升。",
+      "html_step": null,
+      "test_ids": [
+        "AC-069",
+        "AC-070"
+      ]
+    },
+    {
+      "id": "AI-06",
+      "title": "结构与业务双重校验",
+      "module": "contracts",
+      "contract": "validation_report",
+      "milestone": "M1",
+      "invariant": "结构校验、跨对象约束、语义审阅和环境实测各自出结论，不互相替代。",
+      "html_step": null,
+      "test_ids": [
+        "AC-071",
+        "AC-072",
+        "AC-114"
+      ]
+    },
+    {
+      "id": "MET-01",
+      "title": "AI 用例采纳率",
+      "module": "metrics",
+      "contract": "metric_report",
+      "milestone": "M7",
+      "invariant": "以冻结的原始生成集合为分母；合并拆分按原始 ID 去重；未决定则不可计算。",
+      "html_step": null,
+      "test_ids": [
+        "AC-073",
+        "AC-074"
+      ]
+    },
+    {
+      "id": "MET-02",
+      "title": "人工修改率",
+      "module": "metrics",
+      "contract": "metric_report",
+      "milestone": "M7",
+      "invariant": "基于操作者和语义修改事件；人工指令下的 Agent 修改单列，不猜作者身份。",
+      "html_step": null,
+      "test_ids": [
+        "AC-075",
+        "AC-076"
+      ]
+    },
+    {
+      "id": "MET-03",
+      "title": "线上缺陷占比与确认漏测",
+      "module": "metrics",
+      "contract": "metric_report",
+      "milestone": "M7",
+      "invariant": "使用固定发布范围、窗口和有效缺陷分母；重复、无效及未确认归因分别处理。",
+      "html_step": null,
+      "test_ids": [
+        "AC-077",
+        "AC-078"
+      ]
+    },
+    {
+      "id": "MET-04",
+      "title": "经过时间与投入工时",
+      "module": "metrics",
+      "contract": "metric_report",
+      "milestone": "M7",
+      "invariant": "日历时间、扣除等待后的时间、人员投入分别计算；重叠暂停取并集。",
+      "html_step": null,
+      "test_ids": [
+        "AC-079",
+        "AC-080"
+      ]
+    },
+    {
+      "id": "SYS-01",
+      "title": "来源快照和新鲜度",
+      "module": "evidence",
+      "contract": "source_revision",
+      "milestone": "M1",
+      "invariant": "区分已提供、读取受阻、缺失、已读取和已过期；不可静默使用旧快照。",
+      "html_step": null,
+      "test_ids": [
+        "AC-081",
+        "AC-082",
+        "AC-116"
+      ]
+    },
+    {
+      "id": "SYS-02",
+      "title": "依赖和失效传播",
+      "module": "workflow",
+      "contract": "stage_evaluation",
+      "milestone": "M1",
+      "invariant": "输入、规则、代码、数据、审批等依赖变化均重新核验；缺服务不返回假完成。",
+      "html_step": null,
+      "test_ids": [
+        "AC-083",
+        "AC-084",
+        "AC-106",
+        "AC-131"
+      ]
+    },
+    {
+      "id": "SYS-03",
+      "title": "事务、并发和恢复",
+      "module": "storage",
+      "contract": "event / aggregate",
+      "milestone": "M1",
+      "invariant": "同一命令和预期修订只提交一次；崩溃后状态、事件和引用一致。",
+      "html_step": null,
+      "test_ids": [
+        "AC-085",
+        "AC-086",
+        "AC-107",
+        "AC-113"
+      ]
+    },
+    {
+      "id": "SYS-04",
+      "title": "结果来源与完整性",
+      "module": "evidence",
+      "contract": "execution_run / evidence",
+      "milestone": "M2",
+      "invariant": "验收器核对工作进程回执和证据；手填 pass、错误目标或模拟来源不能晋级。",
+      "html_step": null,
+      "test_ids": [
+        "AC-087",
+        "AC-088",
+        "AC-114",
+        "AC-115",
+        "AC-120",
+        "AC-125"
+      ]
+    },
+    {
+      "id": "SYS-05",
+      "title": "外部操作与不确定结果",
+      "module": "effects",
+      "contract": "action",
+      "milestone": "M1",
+      "invariant": "先记操作再发送；结果未知先查询核对，不盲目重发。",
+      "html_step": null,
+      "test_ids": [
+        "AC-089",
+        "AC-090",
+        "AC-107",
+        "AC-109",
+        "AC-111",
+        "AC-120",
+        "AC-130",
+        "AC-140"
+      ]
+    },
+    {
+      "id": "SYS-06",
+      "title": "授权绑定和失效",
+      "module": "review",
+      "contract": "decision / action",
+      "milestone": "M2",
+      "invariant": "授权绑定操作计划摘要；内容、目标、环境或范围变化后必须重新授权。",
+      "html_step": null,
+      "test_ids": [
+        "AC-061",
+        "AC-091",
+        "AC-092",
+        "AC-106",
+        "AC-109",
+        "AC-111",
+        "AC-131",
+        "AC-134"
+      ]
+    },
+    {
+      "id": "SYS-07",
+      "title": "环境隔离与原文保护",
+      "module": "security",
+      "contract": "capability / resource_policy",
+      "milestone": "M2",
+      "invariant": "默认离线和本地受控目标；禁止写受保护原文及其副本，未知目标拒绝。",
+      "html_step": null,
+      "test_ids": [
+        "AC-067",
+        "AC-093",
+        "AC-094",
+        "AC-108",
+        "AC-112",
+        "AC-119",
+        "AC-122",
+        "AC-128"
+      ]
+    },
+    {
+      "id": "SYS-08",
+      "title": "配置与适配器发现",
+      "module": "adapters",
+      "contract": "adapter_manifest",
+      "milestone": "M1",
+      "invariant": "能力有探测和明确错误；不按机器目录猜路径，不自动回退环境或凭证。",
+      "html_step": null,
+      "test_ids": [
+        "AC-095",
+        "AC-096",
+        "AC-119"
+      ]
+    },
+    {
+      "id": "SYS-09",
+      "title": "备份、恢复与保留",
+      "module": "storage",
+      "contract": "backup_manifest",
+      "milestone": "M1",
+      "invariant": "备份含数据库、有效引用证据和销毁记录；恢复后核对，私密数据不进入普通导出。",
+      "html_step": null,
+      "test_ids": [
+        "AC-097",
+        "AC-098",
+        "AC-113",
+        "AC-115"
+      ]
+    },
+    {
+      "id": "SYS-10",
+      "title": "安装与独立运行",
+      "module": "packaging",
+      "contract": "package_manifest",
+      "milestone": "M8",
+      "invariant": "支持从任意工作目录执行；发布包锁依赖；最终运行不依赖旧仓库或个人目录。",
+      "html_step": null,
+      "test_ids": [
+        "AC-099",
+        "AC-100"
+      ]
+    },
+    {
+      "id": "SYS-11",
+      "title": "流程图与真实能力",
+      "module": "reporting",
+      "contract": "capability_report",
+      "milestone": "M7",
+      "invariant": "分别展示设计、实现、自动验收和真实接入；不使用静态填名比例充当完成率。",
+      "html_step": null,
+      "test_ids": [
+        "AC-101",
+        "AC-102",
+        "AC-116"
+      ]
+    },
+    {
+      "id": "SYS-12",
+      "title": "继承验证与迁移边界",
+      "module": "migration",
+      "contract": "parity_report",
+      "milestone": "M8",
+      "invariant": "冻结已确认规则并逐项比较；旧历史产物只读，不复制安装镜像作为真源。",
+      "html_step": null,
+      "test_ids": [
+        "AC-103",
+        "AC-104",
+        "AC-114"
+      ]
+    },
+    {
+      "id": "UX-01",
+      "title": "面向任务的日常入口",
+      "module": "task_service",
+      "contract": "task_view / task_request",
+      "milestone": "M3",
+      "invariant": "日常仅需开始、继续、待确认、查看/交付四类任务；默认中文，不要求内部 ID 或 JSON。",
+      "html_step": null,
+      "test_ids": [
+        "AC-121",
+        "AC-122",
+        "AC-123",
+        "AC-141",
+        "AC-143"
+      ]
+    },
+    {
+      "id": "UX-02",
+      "title": "离线首次引导与上手指南",
+      "module": "onboarding",
+      "contract": "demo_session / task_view",
+      "milestone": "M4",
+      "invariant": "安装后可用合成实验开始，不索取真实凭证；实验结果始终标明来源与未验证范围。",
+      "html_step": null,
+      "test_ids": [
+        "AC-124",
+        "AC-125",
+        "AC-126",
+        "AC-143"
+      ]
+    },
+    {
+      "id": "UX-03",
+      "title": "角色分工和渐进配置",
+      "module": "configuration",
+      "contract": "project_profile / setup_report",
+      "milestone": "M2",
+      "invariant": "管理员维护项目配置，测试人员复用已核验配置；缺真实能力时明确受阻，不自动回退环境。",
+      "html_step": null,
+      "test_ids": [
+        "AC-127",
+        "AC-128",
+        "AC-129"
+      ]
+    },
+    {
+      "id": "UX-04",
+      "title": "自动编排与中断续做",
+      "module": "task_service",
+      "contract": "task_checkpoint / action",
+      "milestone": "M3",
+      "invariant": "系统维护命令 ID、修订和检查点；同一任务重复继续不重复副作用，也不跳过原门禁。",
+      "html_step": null,
+      "test_ids": [
+        "AC-126",
+        "AC-130",
+        "AC-131",
+        "AC-132",
+        "AC-143"
+      ]
+    },
+    {
+      "id": "UX-05",
+      "title": "业务化确认与授权复用",
+      "module": "review",
+      "contract": "review_item / decision",
+      "milestone": "M3",
+      "invariant": "问题说明业务影响、依据和范围；同一有效范围不重复询问，内容变更后重新核验。",
+      "html_step": null,
+      "test_ids": [
+        "AC-133",
+        "AC-134",
+        "AC-135",
+        "AC-144"
+      ]
+    },
+    {
+      "id": "UX-06",
+      "title": "可操作的错误和恢复提示",
+      "module": "presentation",
+      "contract": "task_view / error",
+      "milestone": "M1",
+      "invariant": "给出当前状态、具体原因、已有结果和安全下一步；不泄露凭证，不引导绕过硬门禁。",
+      "html_step": null,
+      "test_ids": [
+        "AC-129",
+        "AC-136",
+        "AC-137",
+        "AC-138",
+        "AC-143"
+      ]
+    },
+    {
+      "id": "UX-07",
+      "title": "分层展示和明确交付",
+      "module": "presentation",
+      "contract": "task_view / report",
+      "milestone": "M3",
+      "invariant": "默认摘要供日常使用，详情/机器回执供排障；导出与远端归档分开，不夸大结论。",
+      "html_step": null,
+      "test_ids": [
+        "AC-123",
+        "AC-132",
+        "AC-139",
+        "AC-140",
+        "AC-141",
+        "AC-144"
+      ]
+    },
+    {
+      "id": "UX-08",
+      "title": "独立新人可用性验收",
+      "module": "usability",
+      "contract": "usability_report",
+      "milestone": "M8",
+      "invariant": "用未参与开发的使用者验证任务完成、恢复、确认理解和求助；无实测不宣称易上手。",
+      "html_step": null,
+      "test_ids": [
+        "AC-138",
+        "AC-142",
+        "AC-143",
+        "AC-144"
+      ]
+    }
+  ]
+}

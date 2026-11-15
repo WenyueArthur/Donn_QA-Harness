@@ -1,0 +1,11 @@
+{
+  "schema": "qa.rule_set",
+  "id": "lab-rules",
+  "notice": "合成实验规则，只用于验证框架行为；不是旧项目的评分权重或及格线，真实项目须使用冻结的旧规则。",
+  "stages": {
+    "req_gate": {"fail_if_severity": ["blocker"], "testability_fail_blocks": true},
+    "tech_gate": {"fail_if_check_failed": true},
+    "req_analysis": {"require_ready_test_point": true},
+    "case_qc": {"levels": ["L1", "L2", "L3"]}
+  }
+}

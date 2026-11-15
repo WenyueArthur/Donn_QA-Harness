@@ -1,0 +1,84 @@
+{
+  "schema": "qa-rebuild-source-baseline",
+  "captured_on": "2026-11-15",
+  "scope": "current-working-tree",
+  "git_commit": "07488e54c661dd12c790f2c2e364c26a60271c19",
+  "worktree_may_differ_from_commit": true,
+  "repository_files": [
+    {
+      "path": "docs/ai-test-process-gap-analysis.md",
+      "sha256": "69488f7a1f291e165f5951cf89bb396a914db06f43e3478b9ca439bf739ae201"
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/pipeline_core.py",
+      "sha256": "29599a6a025eb14239314df3c3c00fe870371ec8e91dfbe1c13d48b32b01ecfe"
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/pipeline_api.py",
+      "sha256": "54f46d993b38c0f5cd2a18dbec9d90066b9ea8f72eb0d12064c25cedbb98d66f"
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/pipeline_bridge.py",
+      "sha256": "e4500884e44591704084de4d33562116e03c9f0946af26af5e90e2190ea857d3"
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/clarify_ledger.py",
+      "sha256": "9e66898c8f0c2f5e57112308c7ff27b77cc986261a2523b333a39ff60a33f3ea"
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/qa_skill_paths.py",
+      "sha256": "35162870c001046c7e882fa8593b9fc1e48268a7cb199a11b6802d4a229097f7"
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/validate_analysis.py",
+      "sha256": "cec3a66c0a7dfe2fe29bd6e463f8c61f1d77851959a91b541c0ad9efe2ec7a9f"
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/analysis_decision.py",
+      "sha256": "bf1c79550e96b62d5b4dc4bb9807911a208994583da8e02193d25db751a18caf"
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/validate_traceability.py",
+      "sha256": "f78f7b295a20299144dd858a352f4427d4eadf1c5b52b689cebda7880138ae3e"
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/finalize_feishu.py",
+      "sha256": "4aa5abb9ea63bd17d145dcccbf4fa4e06e498b6456a4ef9e7bb9b566c42a4657"
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/delivery_layout.py",
+      "sha256": "e953f27a2ba293d54fe699ca24c14b48ebe3840e7ec6e4cfdbb9844159e026fb"
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/scripts/validate_tech_gate.py",
+      "sha256": "04752e086949421b6c6eb3a7a01a10e6c344f2dda8b17384c271583526d1fa77"
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/scripts/validate_qc_report.py",
+      "sha256": "aea9f931a862616d87929bb5b250d6aac93fe924d84877b5069a445117c1c956"
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/prepare_story_kb_bundle.py",
+      "sha256": "4f1b7f6ad889aebd8d4fdcf96d5e53b2a077238a857e9be97e1cc9597f2e0186"
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/lazy_confirm.py",
+      "sha256": "589441c02a1a9a8f33be1de64db9ea260ba0103dcc72771a55e94bc6802370e4"
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "sha256": "bf2bd90c979c99449573845cfdfa999371dd4be425dacfa10433306bde00329e"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "1d0420be7962dea0cf3a9963bd9c11100734acbe30ff78adb694be70afba5fd6"
+    }
+  ],
+  "external_references": [
+    {
+      "title": "AI 测试流程 HTML",
+      "path_at_review": "/Users/donnie/PycharmProjects/Playground/ai-test-process.html",
+      "sha256": "1a0c67a68b1afe533517194917ddbb8852b1e7da666f435d80933342c1e4216c"
+    }
+  ]
+}

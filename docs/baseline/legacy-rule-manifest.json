@@ -1,0 +1,4233 @@
+{
+  "schema": "qa.legacy_rule_manifest",
+  "captured_at": "2026-11-15T07:22:43Z",
+  "legacy_root": "/Users/donnie/PycharmProjects/qa-skills",
+  "git_commit": "07488e54c661dd12c790f2c2e364c26a60271c19",
+  "worktree_dirty": true,
+  "note": "冻结的是工作区字节摘要；工作区可能与提交不同，不能只凭提交号复现。不是完整源码备份。",
+  "validators": {
+    "req_gate": {
+      "script": "qa-mainflow/requirement-quality-gate/scripts/validate_report.py",
+      "args": [
+        "--json"
+      ]
+    },
+    "tech_gate": {
+      "script": "qa-mainflow/tech-design-quality-gate/scripts/validate_tech_gate.py",
+      "args": [
+        "--json"
+      ]
+    },
+    "req_analysis": {
+      "script": "qa-mainflow/requirements-analysis/scripts/validate_analysis.py",
+      "args": [
+        "--json"
+      ]
+    },
+    "case_design": {
+      "script": "qa-mainflow/requirement-test-case-design/scripts/validate_traceability.py",
+      "args": [
+        "--json",
+        "--coverage"
+      ]
+    },
+    "case_qc": {
+      "script": "qa-mainflow/test-case-quality-review/scripts/validate_qc_report.py",
+      "args": [
+        "--json"
+      ]
+    }
+  },
+  "files": [
+    {
+      "path": "qa-mainflow/.pytest_cache/.gitignore",
+      "sha256": "3ed731b65d06150c138e2dadb0be0697550888a6b47eb8c45ecc9adba8b8e9bd",
+      "size": 37
+    },
+    {
+      "path": "qa-mainflow/.pytest_cache/CACHEDIR.TAG",
+      "sha256": "37dc88ef9a0abeddbe81053a6dd8fdfb13afb613045ea1eb4a5c815a74a3bde4",
+      "size": 191
+    },
+    {
+      "path": "qa-mainflow/.pytest_cache/README.md",
+      "sha256": "73fd6fccdd802c419a6b2d983d6c3173b7da97558ac4b589edec2dfe443db9ad",
+      "size": 302
+    },
+    {
+      "path": "qa-mainflow/.pytest_cache/v/cache/lastfailed",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "size": 2
+    },
+    {
+      "path": "qa-mainflow/.pytest_cache/v/cache/nodeids",
+      "sha256": "6d5f2bd3f3188a41348df9dfaa49b64d2fb6488b32cf94090f26e25872caed02",
+      "size": 55592
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/CHANGELOG-kb-synthesis.md",
+      "sha256": "0d60e4948ed0bf4cfc6d037ec6834d1489896fe0788c3591ec04c12b7070c62e",
+      "size": 1337
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/ONBOARDING.md",
+      "sha256": "681040eead773c98a65fb0eee298e35fdeede9fb8e64248252cad97f3a74ff68",
+      "size": 2391
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/QA-知识地图-指南-完整版.md",
+      "sha256": "e7392ffcb3e1d3d4299cf9ffb5c856044fce334c090eff36647bb09e48e627ca",
+      "size": 74991
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/QA-知识地图-指南.md",
+      "sha256": "1a23ec71ab5f15f3e7fb35191c62e3b3bc3201785b0cd3b07ff533a22e31d261",
+      "size": 2086
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/QUICKSTART.md",
+      "sha256": "82479859f2ac9fd64ac5ef0e430614df2b7fd5e99d4fb094c9224b5bc2411caa",
+      "size": 7460
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/SKILL.md",
+      "sha256": "b0025b5ff240f9a1d6fa781802e05e1820e249c965f962ab39ba738a8f887603",
+      "size": 9828
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/USAGE.md",
+      "sha256": "dcb90a2024a5e77b3082598fcbe061efa630de7e9933d71e299201fa9eb9becd",
+      "size": 5513
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/README.md",
+      "sha256": "1ae57cf464768263021f146f00379096e5a697c230903020e4fa569f4208f0fd",
+      "size": 1969
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/config/README.md",
+      "sha256": "d9206dbe1a71678b8a6628d7d2f53e48d998e983d85bd912a0af72eaf6b4bb2e",
+      "size": 1014
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/config/install.ps1",
+      "sha256": "5be3d73fc770fd1da71be9f6f6849392745b28d728b1b565f12fbd0aa45505c0",
+      "size": 260
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/config/qa-kb.absolute-path.example.yaml",
+      "sha256": "9b406d9f7819e6e4654ca7b8b1c3a7d864e06d6d42d915d099b227ed8155b02b",
+      "size": 212
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/config/qa-kb.yaml",
+      "sha256": "65b68e1b36298451b95498445a6f74186dedb56b1ade79adea66e5b9cc8141ba",
+      "size": 160
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/examples/crm-gbd-cancel/precedents.yaml",
+      "sha256": "fbd8188ca58105133669ae9970fd19e58f46a7619e3e7d69855de78bc889f719",
+      "size": 642
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/examples/crm-gbd-cancel/qa-domain-map.yaml",
+      "sha256": "3453fda4d0272ed864389c86cf4b76e4fe93d4993c2935648fe4d9e47f73fe11",
+      "size": 1705
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/examples/crm-gbd-cancel/qa-scenario-bridge.yaml",
+      "sha256": "15ef58ff6cb4a0bcab0da7dfaa2cc61ac36aeba61d48472a4834099c99ead158",
+      "size": 2010
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/examples/crm-self-order-optimize/README.md",
+      "sha256": "481b4b8147c635dede8b394ea3c7bfaf278afada45b53520a255c3a8a27f2c65",
+      "size": 2479
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/examples/crm-self-order-optimize/domains/crm.yaml",
+      "sha256": "5793a617c22fb6f35335780018455959030eeb9fb63f6253ed0a9ae769b7201b",
+      "size": 10493
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/examples/crm-self-order-optimize/precedents.yaml",
+      "sha256": "b68a7dfc55be457b5ea6f0e1be99e9f6249951a8a7e54a69fc62f1e9d0c70989",
+      "size": 6101
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/examples/crm-self-order-optimize/qa-domain-map.yaml",
+      "sha256": "4657d190d4c36001fe519853d2f6861221615df11feb677aeed469c5344edcba",
+      "size": 65
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/examples/crm-self-order-optimize/qa-scenario-bridge.yaml",
+      "sha256": "6475f54fac8f51a7807e167a0cab3a0c72376de0bcc44740739b49b0670b7176",
+      "size": 5872
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/examples/crm-self-order-optimize/qa-topics.yaml",
+      "sha256": "8130a9f6b088f3c2b74bdc139e49fdc2ce440ebffb8b4bf0672a62f66343d430",
+      "size": 412
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/examples/crm-self-order-optimize/qa-wiki-catalog.yaml",
+      "sha256": "c1c12afe25ed20125ace76b6646e0987653c8d1d988a8ed9d2343842aaa80a95",
+      "size": 2496
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/qa-kb.config.yaml",
+      "sha256": "1b607492f921ccd2500fac6e5919565f136791eb20031f74095ead659c5d310e",
+      "size": 169
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/templates/kb-query-intent.template.md",
+      "sha256": "e404ddd0d6321c9e94048e08bd3e771f5dc34521c3b16694a8dfa7a554e7784c",
+      "size": 2167
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/templates/precedents.template.yaml",
+      "sha256": "d47b88612c0b6eb9c3f3b230b494955c9b7ba7281a68e9c42065ea22f226dc6e",
+      "size": 525
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/templates/qa-domain-index.template.yaml",
+      "sha256": "7cbb1f9d7b43d055474ef9307e87b891f14a936570c38b3c0af7619ba99653fb",
+      "size": 1188
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/templates/qa-domain-map.template.yaml",
+      "sha256": "f933b16f49894ea7331a7284061ed55abf416f8f761235fa8bc0d20e1a2abad2",
+      "size": 1912
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/templates/qa-scenario-bridge.template.yaml",
+      "sha256": "620b4610d604e0c3662942c81323750844ebed5aeca92903a3c6d1ca2754a6d8",
+      "size": 849
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/templates/qa-topics.template.yaml",
+      "sha256": "694db2e1a5225fc7a1a4853df7ef905a1681a789658458e9f9850e23a5db5457",
+      "size": 447
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/templates/qa-wiki-catalog.template.yaml",
+      "sha256": "5a3d15df064a5560a7ee06600b3b42b96c9ed7f0fdd79909243f0655ef39e437",
+      "size": 956
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/templates/retrieval-tuning.template.yaml",
+      "sha256": "d8c7e81bca05ed2b3acf0eb507eecc8ba0bfa9af42cffc5ea45fe15ca182a7bc",
+      "size": 1011
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/templates/system-signals-index.template.yaml",
+      "sha256": "0f20880d4d6516c4ad9c2faac741ba9a91d119264a629befdac070ab6fd3ec42",
+      "size": 209
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/templates/system-signals-product-line.template.yaml",
+      "sha256": "821b94fface0014372777f093f4bc4fdc5b003eaaeff967bfaacbf5e0f030862",
+      "size": 140
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/assets/templates/system-signals.template.yaml",
+      "sha256": "39cc7c6935283d3a69dfb3beea991fe25eaaeb235071379b2d986c2289860b29",
+      "size": 820
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/qa-kb.yaml",
+      "sha256": "65b68e1b36298451b95498445a6f74186dedb56b1ade79adea66e5b9cc8141ba",
+      "size": 160
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/agent-principles.md",
+      "sha256": "76408266f5b5b654fc2ea26381862b8f3633b1c5176da7fdf76557529dc575dc",
+      "size": 5645
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/analysis-playbook.md",
+      "sha256": "772c05e64c33829ca117152e24ac58fdffaa108dd224c08636d2739ca5d0a80e",
+      "size": 6569
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/capability-routes.yaml",
+      "sha256": "c9c70f3bae34343641e7bbc40438b74600466f7866152af9ccceae08368761a8",
+      "size": 2252
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/command-words.md",
+      "sha256": "3d7e621207e4d84f52d852e873ba7f6640b5ec4e90906967f6d3a7dd95d619db",
+      "size": 4473
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/domain-index-guardrails.md",
+      "sha256": "36ba094231c58a666c4b469abb369c58cc1c19a8859070e59e3f03475e3e6d0c",
+      "size": 8450
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/feishu-whiteboard.md",
+      "sha256": "750cfa0ac604ef22ba92effee621da68da59f3311fcc554cdd03bf41ee6157a6",
+      "size": 6843
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/hub-ingest.md",
+      "sha256": "fbb04dbccb4e025acf82c643b39ce8141ced417a95271ec85f5497c3ff51bfde",
+      "size": 530
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/hub-query.md",
+      "sha256": "1e590a0e9cb2fe52412065820ebfb8ac3d26c2ff05d27b241c1f777d646bea28",
+      "size": 851
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/hub-resolve-adoption.md",
+      "sha256": "4816a5cf19d59cd47d01f2bb3cb29a8d9db8d4f50494125bd0b115244d3d1695",
+      "size": 487
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/hub-story-bundle.md",
+      "sha256": "a021780485540297e826dacf1dae2b9201de2533327f31c3bb24f761f595cf77",
+      "size": 574
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/human-flow-brief-example.md",
+      "sha256": "6d85f754127337567bb14d95af1f70aa0de84e6abbb2245fa09e797c34dc4af5",
+      "size": 2796
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/ingest-ch4-ch12-profile.md",
+      "sha256": "4cd818e2fa2de381bc1c25cd37ba79fa88b8adc8ba8e31e582c21fc01bac69e7",
+      "size": 2984
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/ingestion-playbook.md",
+      "sha256": "47a963d8fc6bbd0e8207d122969976b85031207ca4ecca5f5f12d8f5238b6ee5",
+      "size": 61476
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/kb-adoption-ac-tier-v3.md",
+      "sha256": "0176ce23881b0ce15b5cf8db46ffc39921e86a4d34202ce72bb96aa7b63f1d26",
+      "size": 3490
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/kb-adoption-criteria.md",
+      "sha256": "0712f317a334dd3cb846d563dd83a0334d416f08686898aa92dc43fb08d449d5",
+      "size": 6527
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/kb-downstream-integration.md",
+      "sha256": "3d77fba2666d1f968510ffde1e2bafd0dbb1223ec190e5f8b04757d4ef5f5cf6",
+      "size": 2316
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/kb-downstream-pack.md",
+      "sha256": "902763de8eaabb474d6c0817ebe820853b43d86399f71e5cfa7d6572b31543c7",
+      "size": 810
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/kb-downstream-safety.md",
+      "sha256": "bfdb93de62b1c682892f4e94b27e565881ae44c6563e4aa55e2e05acddd8a946",
+      "size": 4127
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/kb-hit-precedents.yaml",
+      "sha256": "ffaf569a709152d9e760ed9f92b0afd559db34e32a45d8166335c8e7312df63d",
+      "size": 693
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/kb-hit-schema.md",
+      "sha256": "5f6e2f751611335a5b0944017d139b9233502b16e8c495056766b4f187f59bf6",
+      "size": 3904
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/kb-intake-synthesis.md",
+      "sha256": "417982a1d566acfc936c2c439a3f5b6438f1b3764255d16762165af652e8fb15",
+      "size": 6206
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/kb-layout.md",
+      "sha256": "a71002dad5338886eb812b637b67f78c77d534f52ec904a104d56d23867ebe53",
+      "size": 17444
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/kb-query-intent.md",
+      "sha256": "c0137b420b85a4cfa0b5fe5d2a1686676f2c1b512d5fdd4136bbb343544a441e",
+      "size": 9284
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/kb-root.md",
+      "sha256": "bc6c2b61f8fff5efe430061efa2af3200a5732b47a95f1475e8f0efa93d5a00c",
+      "size": 5824
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/kb-scope-lines.md",
+      "sha256": "cc41466aeb6ed6df5e821851d7399d11effc9b317927e9e36b96d11aa4f7cb10",
+      "size": 1298
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/output-format.md",
+      "sha256": "876f6d082e37357a17c76e8d07cf15046aa69f841e88f482da901a174f6f0526",
+      "size": 6330
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/plain-flow.md",
+      "sha256": "014fc68d9fa9836348262be9f74d583331cb0f9261caa95065d81d1fb40bb190",
+      "size": 6027
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/prepare-story-bundle.md",
+      "sha256": "fb53955f9b2aa5a8bbd44b03ab13591be6f2fbfeb967993bc9ab39dd2b63e00c",
+      "size": 4355
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/query-agent-fastpath.md",
+      "sha256": "0a9633898d05947ab3de6fe488f3816af8efbf3e2cb933e06973465f017525a6",
+      "size": 11023
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/query-playbook.md",
+      "sha256": "9821e83b15a4f47f35d11bf5f245a4c6f94ee988cef50f26c657e0ad45fd5302",
+      "size": 8253
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/rtd-handoff.md",
+      "sha256": "d6d7ef30424274b3095468d57ab98d28aef995b9181f4733e8cd29a2967aace1",
+      "size": 5682
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/signal-self-check.md",
+      "sha256": "dc80b1ce307d8b4fd27052d485d635d9a9c9a4f437f29812f1be5baccadb7176",
+      "size": 11248
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/split-playbook.md",
+      "sha256": "7c2b83ce64797a4a498d2e863970263705c8b1459f7df332d830804bee2e50b8",
+      "size": 13525
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/standalone-flow.md",
+      "sha256": "41ed9a4f2cfc185cfb325816f7cbbab430867608220d1b69e54e37ec63068397",
+      "size": 3501
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/story-bundle-paths.md",
+      "sha256": "49838fea7e94b06ef927b0d3f0f55949f71a86d5d5dd9088fdae794110d91fdc",
+      "size": 1783
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/story-scope-narrowing.md",
+      "sha256": "8d6e44ea861aeb41d569f29c25fe3a24fd2825cab170de8d41b9f5ebceb42471",
+      "size": 9606
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/taxonomy.md",
+      "sha256": "ba79cbefc4335e33eb0da0f36612e807a4ed29de3ad10dc97f310dbfb5fd18df",
+      "size": 11138
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/references/topic-self-check.md",
+      "sha256": "073ca5bd8b381a4c03f0da3a61ef450aff34ba48d4361d5658266da3bc21fc09",
+      "size": 10517
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/.pytest_cache/.gitignore",
+      "sha256": "3ed731b65d06150c138e2dadb0be0697550888a6b47eb8c45ecc9adba8b8e9bd",
+      "size": 37
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/.pytest_cache/CACHEDIR.TAG",
+      "sha256": "37dc88ef9a0abeddbe81053a6dd8fdfb13afb613045ea1eb4a5c815a74a3bde4",
+      "size": 191
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/.pytest_cache/README.md",
+      "sha256": "73fd6fccdd802c419a6b2d983d6c3173b7da97558ac4b589edec2dfe443db9ad",
+      "size": 302
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/.pytest_cache/v/cache/nodeids",
+      "sha256": "48532023d888f3e06955474da5c5e4aa10b9b7699291d672ae678ebb970b16f5",
+      "size": 36009
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/build_qa_context.py",
+      "sha256": "5179c531d490dd020cae2471bc4a3e4cb5e8d56333331f19d18f8bc55e43cb43",
+      "size": 23240
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/bundle_retrieval_quality.py",
+      "sha256": "0851cb4f235e0b4aab29d1917527ab2b8ea3a87a696fd40097360726bf3e770a",
+      "size": 1881
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/catalog_io.py",
+      "sha256": "ec033de68fcc65f5a5ba3a4116fd6d8bdcc3bf2908cd2f7c1ced23642e37bc03",
+      "size": 10566
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/catalog_remediate.py",
+      "sha256": "af4726ee7fb6780459e8e9eccff5adc1618ff6742b03e424ad41246282bd2ca6",
+      "size": 14155
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/chain_hints_util.py",
+      "sha256": "7ccffd9dd3d0f29be78521b51a64c79612fdc153d992d695326c1aeb3fc47a29",
+      "size": 6230
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/ci_knowledg_gate.py",
+      "sha256": "6d7d4290acb4a4c7e2696d5bf38a89c35740013c6b8acd948e1f59ecb334232a",
+      "size": 3714
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/command_flow.py",
+      "sha256": "83572a471dc2d58fd05b1d7d16a34f8f746d4b479b4086d2fb1f1752186863fc",
+      "size": 6795
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/confirm_retrieval_noise_ingest.py",
+      "sha256": "da061db049a5e69cc68af020a1373350e41afbd6e13a667894ae82134ff82cf4",
+      "size": 2375
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/design_summaries_pack.py",
+      "sha256": "cb96417798e1f470038ba698d0872b7507e4e48f957cd3953ec60a43299a0b75",
+      "size": 1073
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/domain_granularity_lint.py",
+      "sha256": "19b9dd0de8d54f53228e3eb2ab1cb056fd89b89a1cca12576aaaf8cebe72e591",
+      "size": 15135
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/domain_lifecycle.py",
+      "sha256": "7fe1ece868b6fa6648944492750fb67f655301e260def034eebdaf363264dc6c",
+      "size": 5121
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/domain_map_io.py",
+      "sha256": "90505f4ce238e2724358f17b7dce0718790aa46d8be00aad6a390b925d10e4a6",
+      "size": 25050
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/enrich_kb_downstream.py",
+      "sha256": "1c71a12a03901cd53a5cd1ec94b31b2bf631f055dc6704c7f1b85754c9152b08",
+      "size": 6734
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/extract_whiteboard.py",
+      "sha256": "668c1f9345728463ca2b8cf0956e449225e15c69916a37ffda3bf4a708bef6f8",
+      "size": 2624
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/feishu_whiteboard_lib.py",
+      "sha256": "378f8aaa771052dbbc663913b5d091f6111e6414c9d060cd35ccd2a66f711904",
+      "size": 8607
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/gen_domain_alias_ingest.py",
+      "sha256": "1ae4745a447dcea8fcf91234f68cf9eca03c1b5a16b9254b742da1dbdce77b66",
+      "size": 8251
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/gen_retrieval_noise_ingest.py",
+      "sha256": "020d66aa749b13fbe7edff140bb5afb3946e5bad3bc73e2bbf8db190a387456f",
+      "size": 1833
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/gen_topic_alias_ingest.py",
+      "sha256": "11e9e4bf4f53ea275bb48b6044f252342fcc3eb1073d83926b83053dfa06e39e",
+      "size": 1481
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/ingest_checks.py",
+      "sha256": "b5b20d00065e368e0f00e0b79015a240ab58b41643b84605000e03c7adb38b7b",
+      "size": 21187
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/ingest_draft_archive.py",
+      "sha256": "00f7d8c5df1f98d97c1db50fd5e74846ca10973163abd01f7a8bbdea3ab6bee8",
+      "size": 10448
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/install_qa_kb_config.py",
+      "sha256": "4800d56879c1c0c15b756c107ddd72a58eb16bbd76726871b3017509a98a8bcb",
+      "size": 4017
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/kb_bundle_consume.py",
+      "sha256": "5c76e898a0b5d385486cd87fbdc12e035b4b90cfd2d2ef886e5e9b038bd4568d",
+      "size": 14244
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/kb_capability_regroup.py",
+      "sha256": "909e92c98031b635e12374abd6f7b14a46e65c3b000a80a9f06a9fa6e56adb81",
+      "size": 10979
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/kb_cold_io.py",
+      "sha256": "0b217948a2dcc22b6a941c23aebc3b868e56a1820971456eecc5aac198cfd892",
+      "size": 6085
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/kb_domain_precheck.py",
+      "sha256": "4dd5dadaeed79cdaef193fabc9ef0be7b42161db739bdbb1a6c316f12a4cc5ab",
+      "size": 7726
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/kb_domain_split.py",
+      "sha256": "d9c0ff0ea9bdb691c666d72dd3715d5c21de7e40498989b8324006f5b3fe84b8",
+      "size": 43219
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/kb_downstream_pack.py",
+      "sha256": "aaf4dd16077a85b0182274e9f567fb700d75e94aa6e50c43bd2089bfd0ea40f2",
+      "size": 11861
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/kb_golden_expand.py",
+      "sha256": "d029577c6debe5f948023b87a9eb3f1926c9902ab6f79e3521603889e4a537be",
+      "size": 9633
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/kb_health.py",
+      "sha256": "94f46b9d590435a446729ad0e52950e4db48fbaed9586d0dab48c035cc94ddef",
+      "size": 7122
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/kb_hit_alignment.py",
+      "sha256": "c2002849976c97bd2d3174d158587872904affe8a1567d1b76e9fde909feab9f",
+      "size": 13546
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/kb_hit_dual_footprint.py",
+      "sha256": "348cb9cef6deca06849b6dd2a0c2a9cbac367e05baffc1309815991a5fae6cd6",
+      "size": 8288
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/kb_hit_learning.py",
+      "sha256": "f63cf5513b9a5f3dfdd7b344f15da4fba7d4533ba8c563610eaa600e9f297c8a",
+      "size": 2194
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/kb_hit_resolve.py",
+      "sha256": "4e00e121fe0fe9fa2a86eff2a20965d6c91e7f9443f183b7a266909a4f7da959",
+      "size": 4093
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/kb_hit_resolve_lib.py",
+      "sha256": "6c8f7aa925c6ae1c33552dc57ea61552fd943247fa490c3d00b9744b52235ac1",
+      "size": 50269
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/kb_impact_filter.py",
+      "sha256": "4be41a60581d733812482c04063e5b4cb5f5726fa791e6ac4874490906387765",
+      "size": 6121
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/kb_layout_consistency.py",
+      "sha256": "67a517406cddfe3384ff3d970f867307fc17109d8e1b8a18d39dbec520a9c5e4",
+      "size": 12174
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/kb_meta_io.py",
+      "sha256": "5808527a85b8fa255c3d3b135ec47069308c32d334b6e231c86d6af7112aec14",
+      "size": 15470
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/kb_probe_from_intake_brief.py",
+      "sha256": "d9f2041054ede22c03a5fa60a46ac9065d2910471b828bcf89ac1f1f1d5343b7",
+      "size": 17305
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/kb_queue_layout.py",
+      "sha256": "2e917d0697e3b4ed66ff0a84a7eda3f3ff238470f82800b9f63fa564d86b2f6d",
+      "size": 10632
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/kb_search_golden_check.py",
+      "sha256": "36a3dcc8e55c736b2d05e34eb252fbdb5d8e8f18ed42dfd08b2082b5a60a38b0",
+      "size": 1402
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/kb_search_golden_lib.py",
+      "sha256": "207c0fe5fffa9a38415a5911e99bf45bfc5a7d6260578df0f068ea5d40e918dc",
+      "size": 2919
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/kb_size_guardrails.py",
+      "sha256": "3075ea5d8994f28d0b4924bf2cf1bf4e9cb196a694db67caf8e6b7ed72477be7",
+      "size": 5629
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/kb_split.py",
+      "sha256": "fab70252641ab8db318d216d8603b23d695d3934f2e1fa761ab1d0981f093216",
+      "size": 33779
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/kb_split_propose.py",
+      "sha256": "1932fa5cbf54cad93c69d590c7b35c73f4ae8fe30306cd8b0e7c2e3eac8dd7ef",
+      "size": 9372
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/lazy_confirm.py",
+      "sha256": "589441c02a1a9a8f33be1de64db9ea260ba0103dcc72771a55e94bc6802370e4",
+      "size": 9206
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/link_candidates.py",
+      "sha256": "d8e76ed4d22baf780f525865405fb572ab1ddd5c867135588c83c269ead9320f",
+      "size": 9701
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/lint_retrieval_index.py",
+      "sha256": "d9be7abfa84aa8167dd101994d9e5d98ec59da2234e3cec933a90b7c8c10815f",
+      "size": 1302
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/narrow_qa_context_scope.py",
+      "sha256": "83ea4cdc4321364f7b3e6bdd553f43d9d7abe4ffd3dd318e57997e2b2ecb6e10",
+      "size": 3472
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/plain_flow_pack.py",
+      "sha256": "aedc2de75bf53aea15b05baca7266940f21b13cb0e5879779216b054e233d1e1",
+      "size": 3817
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/precedent_io.py",
+      "sha256": "7b8f038b0848812a39d7761e525746043a233904e77ec7a131c9e8d7937598d8",
+      "size": 30521
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/prepare_story_kb_bundle.py",
+      "sha256": "4f1b7f6ad889aebd8d4fdcf96d5e53b2a077238a857e9be97e1cc9597f2e0186",
+      "size": 12995
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/qa_kb_ingest.py",
+      "sha256": "f25e12b60943bd08093fc0713a7d1acca1ecf8ef02ef810dbd2d41c381b3e7f7",
+      "size": 85533
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/qa_kb_ingest_lib.py",
+      "sha256": "7620de0a4431e186dcf6c0de51acf52c875bb734d464915b756f221392d875c4",
+      "size": 55407
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/qa_kb_lib/__init__.py",
+      "sha256": "6f38a8dbad95138a0935a13bcc9bb4bced35dc0adf3def84b9debe7bdb6b1d61",
+      "size": 1232
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/qa_kb_lib/bundle_meta.py",
+      "sha256": "c8fca23387a28d2ec9bbdf3306223f7b2288602692999b45ede2545359749227",
+      "size": 1051
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/qa_kb_query_pack.py",
+      "sha256": "be8b83c87e8f7dd98ce61919889fe5eb7b462264bad130a5919ec76f683b2dc7",
+      "size": 40076
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/qa_kb_query_profile.py",
+      "sha256": "16c93d2ceebda42b6e0b6d0d2f5bd651e7d44d015496adda904bcf9d1b3a328f",
+      "size": 12132
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/qa_kb_search.py",
+      "sha256": "1e5b0cb07c52b27e9e4880b63690bad82e924f2192b31eb19d6d4b814897a52c",
+      "size": 5795
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/qa_kb_search_lib.py",
+      "sha256": "298ecee0c26c66e3892f63f83d4970cfcc4512f9aff09a9679d788f59572c83e",
+      "size": 38632
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/qa_kb_stdio.py",
+      "sha256": "89eb03e4e1b114a437d37c388165bbc85b318c9925ad1ca5aeea7e700911ad62",
+      "size": 1811
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/qa_kb_yaml_utils.py",
+      "sha256": "22bc56bc21e5da4b348f3305a78f37ca2deec016fceb3e64204677867c722406",
+      "size": 21396
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/query_seed_from_intake_brief.py",
+      "sha256": "8ebe6c6d12dd368e9ccaf2d148a1450df68525d1534e09013f2476b48f1db7c4",
+      "size": 13300
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/queue_cold_io.py",
+      "sha256": "a89c3a6acb9194a435cb1944641fdb06922e0ad0b82510e556e73cff81718155",
+      "size": 28302
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/queue_migrate_v2.py",
+      "sha256": "0adfa8683ec8c4f7a74e5df22843198c10f87a3241fb0c3557bc12c4c7474963",
+      "size": 3335
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/queue_reconcile.py",
+      "sha256": "687b686078f8251bd48e5828d54813c56872dcabb0b1cf0933ee859c4eb4941c",
+      "size": 11811
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/render_kb_query_intent.py",
+      "sha256": "3c60e7d24189835af80847a1705294743dd5bfab3ec16a6457de8c989b11c84e",
+      "size": 12957
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/resolve_qa_kb_root.ps1",
+      "sha256": "c4a392578ae893c0681f78907fa38dc968eb9c2dc2b3877474fc486e91fdaaf8",
+      "size": 174
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/resolve_qa_kb_root.py",
+      "sha256": "d5e583af25390b50ea74174f9a245294e36f08a84d5a0e508f99dacbd94f3594",
+      "size": 9862
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/retrieval_index_lint.py",
+      "sha256": "0bda422fdf5a82b8d9308bec05d82f93073c2057a9ed46d83ebc28484e86f650",
+      "size": 4357
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/retrieval_noise_autofix_lib.py",
+      "sha256": "aab00c4c016f6663985ef513f46376e915dc48eba97b8287367fa28b34ab021f",
+      "size": 3736
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/retrieval_policy_io.py",
+      "sha256": "7bf920356194cfcee7eae788903c0986a7ac9060ef7d9a442ecc500dbe1a6763",
+      "size": 4611
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/retrieval_rank_prior.py",
+      "sha256": "8f6f735ffc743d110c2877a6d0b9853b90b9ec8c8ec5888d66c77e17490e0cd0",
+      "size": 4912
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/run_retrieval_ci.py",
+      "sha256": "b338721c267d8dca4c66d34d876e73b7dcd1ac14b122212100e89145795e0c15",
+      "size": 2120
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/scenario_bridge_io.py",
+      "sha256": "12e4b1a575a5d8ed2f9d461e68046dc18a5a70af4e3f40f655c9d663a26c0f45",
+      "size": 17231
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/scope_lines_lib.py",
+      "sha256": "aca668be241371216a79447e4d44a6fb2db03b6df815c83ec61b3deaa276cd83",
+      "size": 4945
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/signal_audit.py",
+      "sha256": "5338949ca31c1e1ea5584b381b298d90383312aea8dacfa726ec96086fdc76b3",
+      "size": 15003
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/signal_batch.py",
+      "sha256": "91cda13eb285f8c2b4512c6ac03455c01bf554d63777c3bd3be8cba86ec2c645",
+      "size": 5248
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/signal_propose.py",
+      "sha256": "948020130b7c54697e79125e7ff8890035527128a26fb2a81663eae2d52373a6",
+      "size": 24104
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/signal_suggestions_lib.py",
+      "sha256": "e11912f4271a77ed82fd97be856d375dbc694e3b691cc4398255660268ff080b",
+      "size": 17395
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/story_scope_pack.py",
+      "sha256": "0f05b6067735004044900f92cf376ece1b28b773c14aea997b1ea456c0dbe14e",
+      "size": 7984
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/suggest_retrieval_noise.py",
+      "sha256": "f47bbbd47d1cfe57255549d25278e5f1a307eca8295a6150970b7118fea1d47a",
+      "size": 1754
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/sync_product_lines_only.py",
+      "sha256": "b394806c068ee4419e538bbd35fe5b174a7d2b67ab56d4b7355ec7e8e9df9d91",
+      "size": 2511
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/system_boundary.py",
+      "sha256": "14d3e603090d66ab1bc8aacdef430fd58999173e864854e38507109bc3444354",
+      "size": 5721
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/system_signals_io.py",
+      "sha256": "cbb2c910d359d9c827f6ac34c30b8d4a4cfbd70f6611f0e92a785cf83c81c4c5",
+      "size": 9182
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/conftest.py",
+      "sha256": "d55833f40ba591390c584b6ec54f8ab58c51b0e62dc01ae3d6de050e29e3a804",
+      "size": 782
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/fixtures/kb_search_golden.yaml",
+      "sha256": "5d3466545860c8ad01b90c42eac2e02aac0993214c1fea830bbc8e3e0f1b2965",
+      "size": 1687
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_apply_post_validate.py",
+      "sha256": "393a37dd26a969a4138890bd2b9d2f4f694235749f3474bdf1fbc1fa06de8a77",
+      "size": 2688
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_bundle_strict_retrieval.py",
+      "sha256": "70186f1bb6b3312fdb44c77c1943b937ebe8d6dfd0abe5a361ecd84a676c8ae2",
+      "size": 1418
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_catalog_io.py",
+      "sha256": "07c9ad1eca9ec248d07efa62fb71e9b5e2d0d79ab16357ff2809bea8db2e9410",
+      "size": 2913
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_chain_hints.py",
+      "sha256": "f6021590bf5b98802d2147bccfd355b64139e72692dfad75b7acd3b56d2350b8",
+      "size": 1684
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_cli_kb_write_guard.py",
+      "sha256": "b55519c68531abf9d7ad198a9764c84ce92215f9a33593fc48271adfb00c2111",
+      "size": 2649
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_command_flow.py",
+      "sha256": "a886cacb2e3cde1d5f123dffd39fad0f6613202b461ac2a846f0ac95350e3906",
+      "size": 6354
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_command_words.py",
+      "sha256": "42297ea20cc862dbea346ea7b82beacfbaea21dea9904d58a88fb5d5d9ed4d16",
+      "size": 2986
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_design_summaries_ingest.py",
+      "sha256": "65442b7b3a2c0450cc7513b70c1a08244869d3a50e9b599a788f725620e42d9e",
+      "size": 941
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_design_summaries_pack.py",
+      "sha256": "8efee909b038e232a56983eb1052e38876cdeff609192cfced9dc89091663dda",
+      "size": 627
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_domain_cross_rules.py",
+      "sha256": "a31c94de6ab9d543cb3a035f3540b1bbac28789090577b2bfd28ae1d4364da0a",
+      "size": 6170
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_domain_granularity_lint.py",
+      "sha256": "1d4b7d394fc1461e55c63ddab95304a83443059befa6b0c097007f91aee657f6",
+      "size": 2792
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_domain_guardrails.py",
+      "sha256": "5a1c2acc7bb610ab2b1d865411c18e7a74ef3df9f1ff283a5f86c5c3bdf5a7e1",
+      "size": 5346
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_domain_index_lint.py",
+      "sha256": "a093f5e09c8b1ed85bf10c1f0e790f519cfc8a8aafb7d7c401da75ed7f713960",
+      "size": 5172
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_domain_index_manual_split.py",
+      "sha256": "f4784d9fa37b4a5f2797940dede38effb4a27713eb6b4a5c6a1bd556e601d6da",
+      "size": 5196
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_domain_lifecycle.py",
+      "sha256": "435fbf508aa7cbaf26385e7c41da0dfb4086982e248632bd7469eefe1854a599",
+      "size": 4861
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_domain_map_io.py",
+      "sha256": "9e7c4a0d9eae5955cf7e57cfc9387257fec5213b85903f4aec0bb340fafcbbc2",
+      "size": 7020
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_gen_domain_alias_ingest.py",
+      "sha256": "fb3d60da6c0c0e2d5bbbc9ad128a94634fc6bc7addc778f3612e2428e90d018c",
+      "size": 1957
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_ingest_checks.py",
+      "sha256": "96c8c263853189b6ab40bdd1b01957de2c5fb71e72f8a4556d48bd11d79819f0",
+      "size": 10263
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_ingest_draft_archive.py",
+      "sha256": "7e0f1f9c021b4c0a961483bd69350a86506c92b21136ed36dab3ff75724324e7",
+      "size": 3124
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_ingest_read_coverage.py",
+      "sha256": "5cb75a9bf70b7d58cd64c243e436a9d7384ea1f1cff2196dda0a739c5b5dc0e8",
+      "size": 5934
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_kb_bundle_consume.py",
+      "sha256": "58146689383feea65bfa87e8d22df8c2364ecdc620c0607928a120071c593cd0",
+      "size": 3507
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_kb_capability_regroup.py",
+      "sha256": "b4f6b4f8591b1403721370a765b7c299e49595d651ad198f4c7473556eae81d6",
+      "size": 4551
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_kb_cold_io.py",
+      "sha256": "49cf133a6683d955c84fd59da20b1a6f6e4fd50f956ffc5e89eec04e08e40997",
+      "size": 1373
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_kb_domain_precheck.py",
+      "sha256": "bd0d522f5faba64997319c54755ce4e9c42d024e9e82f6e4011f6034dfbfcc6d",
+      "size": 2747
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_kb_domain_split.py",
+      "sha256": "b380f788618be6791d4285e8af6ba12bfde43c287a1f4136ecea09ba140e8423",
+      "size": 21257
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_kb_golden_expand.py",
+      "sha256": "505b0b5bb5b6751abe73126217fc8e0902e72079ec11d151a72c6745eee667bb",
+      "size": 3428
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_kb_health.py",
+      "sha256": "a4f9a338f47d7ac97cbb1ebc1d38223e3294cc86100f07cb600b39f2d52113b7",
+      "size": 2231
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_kb_hit_dual_footprint.py",
+      "sha256": "273bc53f2b755787bf5a92c30ff510a09225cb29a5975c07729528f266aaf8e4",
+      "size": 4441
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_kb_hit_keyword_noise.py",
+      "sha256": "ed4863a572a0e87f2b51b7bf05e14d73d4a57fdff33ca5305f2f7137454effcc",
+      "size": 1912
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_kb_hit_resolve.py",
+      "sha256": "617ead982d46ea93288ab6e98962aa20c4b62c5cdd3dca36542ea1023ce20063",
+      "size": 12397
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_kb_impact_filter.py",
+      "sha256": "f09accd4d0410a41a7a248e0ca344a9225accbe1905f48b83504eadbbaec363d",
+      "size": 2556
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_kb_meta_io.py",
+      "sha256": "91a09d7f14f6bcc2c77a22e4791e5b985fbc435c2aa0b23f68d7913d6337a87a",
+      "size": 9421
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_kb_probe_from_intake_brief.py",
+      "sha256": "daabba3411b20e0adde7a5a14783d1e1da1e3a0f371fd7be344aef4063c751eb",
+      "size": 2729
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_kb_probe_tianping_story707.py",
+      "sha256": "b57bde42af1da3e89e8d6de422693d876dccd433b30cdd11c0612cb6f32e2bd7",
+      "size": 1671
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_kb_query_intent_render.py",
+      "sha256": "7f143e5ba712d042f4352dc1de62d41e2ad28713350df6d49496179857ab91ac",
+      "size": 2918
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_kb_search_golden.py",
+      "sha256": "161f75fd63425fb20e0967cff780cdf3a358de9c3c06f43985a78b67e9ce7bac",
+      "size": 1167
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_kb_size_guardrails.py",
+      "sha256": "38481e847343e9254204b371f2a3e1d1fc0bae657dcbf53a785db6b54d15f341",
+      "size": 3518
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_kb_split.py",
+      "sha256": "4a7bbe9a0b8e2691636739ed99d28b0a3eb0207f31a2a2fd28b78b18784b6926",
+      "size": 24977
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_lexical_rerank.py",
+      "sha256": "8fbb309728b9707369d2b5421d3cf9ba33f639209c98e5562c2de9c39cbf7115",
+      "size": 783
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_link_candidates.py",
+      "sha256": "644a8abc96b2be15b0a983cae7e34c015d9c75968a9aa11c5ba2970e43189d84",
+      "size": 7034
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_plain_flow_pack.py",
+      "sha256": "2d250aeb8e87b9a51b7742da4b365939fa76f5ba4991ed980dde4e8ecce32503",
+      "size": 1751
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_precedent_io.py",
+      "sha256": "06e5527d27c325be24ad0f9d9622a27ad7a4111048c241d6ef8d7b8d0eb66296",
+      "size": 10245
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_prepare_bundle_retrieval_meta.py",
+      "sha256": "914a4649a883ce7a881cc0710856a082bd8f7f30102d6f7a99a976b75edf9306",
+      "size": 1665
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_qa_kb_lib_import_smoke.py",
+      "sha256": "67dd88569679e585c97c9c1b04c5ed0e25ae6c771c5da37e18a648cb727bdb9b",
+      "size": 439
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_qa_kb_query_pack.py",
+      "sha256": "5ad9080f1292f12bbe3e4c14c70a3886ff24e6004369ba740ec521d02f604608",
+      "size": 8540
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_qa_kb_search.py",
+      "sha256": "1d871c57c2b46feb5ff0ed7193967342ecd8115c873d662428c8814d5f6695bb",
+      "size": 8033
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_qa_kb_stdio.py",
+      "sha256": "8355bdf22cd76bd82bdf7170c1636b7868a6a3bc94574a548f5e58fa7407d475",
+      "size": 723
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_qa_kb_yaml_cache.py",
+      "sha256": "9740ad918d183993123cb736357ea56e09476f014b1f36d6054dcbc3aaa35172",
+      "size": 1850
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_query_seed_from_intake_brief.py",
+      "sha256": "f6e33de898ee7a412b3d980ec29e8dc732fe6f25e653b1c9276e6f33d83fc886",
+      "size": 4092
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_queue_cold_io.py",
+      "sha256": "358e5c582a618113207f32659f7c83aa762a42923c33e46416e49431913e0ee9",
+      "size": 3344
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_queue_generated_rebuild.py",
+      "sha256": "d8e4134eed60ce30759f0ddf43bbd81481ec0959a29fdbd627dfb85e488de52b",
+      "size": 1979
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_queue_migrate_v2.py",
+      "sha256": "78ab5140589ac612da9ce80a34c1be2ab062931e18cf0670d7b8dd1b3540acf7",
+      "size": 3628
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_queue_reconcile.py",
+      "sha256": "f16889d64a1d90f8375c747338498952f6314827f64d2d051bc501db784963e2",
+      "size": 3574
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_retrieval_index_lint.py",
+      "sha256": "0abcef586827dc49d854c36a5eb758c4fecd765e47ca6afbe9bdd2643f9bad4a",
+      "size": 1804
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_retrieval_noise_autofix.py",
+      "sha256": "654836d32f46ab44dbc0c46ed7fe8ce8fee9f86a2aab04d5cb96088527a7fc59",
+      "size": 1301
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_retrieval_policy_io.py",
+      "sha256": "22096b85e0070cace7fd7f0726a79883a0aa684088c90df2b5d511cedda00a61",
+      "size": 959
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_retrieval_rank_prior.py",
+      "sha256": "3e526e64be4419785eac669f3ae361136a71f300b5308a48b3ec75c61d0a62bc",
+      "size": 2874
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_rrf_merge.py",
+      "sha256": "4a28ec8e8844c4ccd6c3ee111b0adf481764ee5f9394d41dd176ada4480ce804",
+      "size": 658
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_scenario_bridge_io.py",
+      "sha256": "9a05a1063bf02e4c432003f2f0bb4d44d397de6913b6f1115f9ecb557d1c0c57",
+      "size": 5216
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_scope_downstream.py",
+      "sha256": "345f603a84699dfff50321415bede36bfb745c64a14c91b5f7bdf91609728918",
+      "size": 1480
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_search_index_enrich.py",
+      "sha256": "71d98b935c5c669f4037449380dcc8964298cde91cde17293d4737ab95ac070a",
+      "size": 6369
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_signal_apply_dry_run.py",
+      "sha256": "ef7f8ae5002df8f017d7e3531ac3a61f8ec788f69c9afcc5cfed2e0436e89ada",
+      "size": 2971
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_signal_audit_footer.py",
+      "sha256": "14d5127fc375c76b2d27a4019b488d898e5a68c6f81abeec148c83e985988350",
+      "size": 1500
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_signal_batch.py",
+      "sha256": "0d080c9891ef03a088435fd362a23915bc56e19b030cb519d89fb00d78fa9678",
+      "size": 4317
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_signal_propose.py",
+      "sha256": "1d682953e0da8d4e5d587437c10fe806be891f1df1ccecd28b57e207c95d8fb7",
+      "size": 11993
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_story_scope_pack.py",
+      "sha256": "768bd9907dadcf735d7b7a29a354a786b5cfe5ff33c2132947af909b82930496",
+      "size": 1560
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_system_boundary.py",
+      "sha256": "b837c9f4b7e914605ca1eedf2268be4b9c90922084f18212ad90e42e32b708fc",
+      "size": 3013
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_topic_audit_footer.py",
+      "sha256": "d9b9912f577af8b3b9c23ed18133c463a14931c08ac9219de49435c40c40422e",
+      "size": 1467
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_topic_dedup.py",
+      "sha256": "e7533587a830c28424301e73a3b998a64409c83c88d71f53eacb7154a7dcf700",
+      "size": 2330
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_topic_propose.py",
+      "sha256": "d4ab55e9e72cb51eb4c1b7001d2afd1dd6bdc4120dab9c16d622e61b8b110993",
+      "size": 3658
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_topic_scope_adoption.py",
+      "sha256": "485227ec155bd35ba3b8f923df8afcedce3d0f11dba4b769757c4f96522c4d77",
+      "size": 2730
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/tests/test_yaml_fast_loader.py",
+      "sha256": "2a58e5bdf04eda464a4a15b28f62ddff494d5cb6b6635eed26819c3c502580b2",
+      "size": 1909
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/topic_alias_sync_lib.py",
+      "sha256": "1c8271a374ed299cde23d67f6b86566a08d5cbe99860aeded78e8f36c3009983",
+      "size": 2286
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/topic_audit.py",
+      "sha256": "1e7ad66bcc328fd9b64ab65a3016a12ef7b4f4c8582c23ea51ec74e69d16b5e8",
+      "size": 12043
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/topic_propose.py",
+      "sha256": "73e5d8b2e0630cda404661b1e2c6df891aa09c1fc227aa72066feb2f868b66c5",
+      "size": 9577
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/topic_suggestions_lib.py",
+      "sha256": "982190d8f8779bb4a70acb266cbb177eeca95636ff47fab59cdcfd1778b4b49f",
+      "size": 18806
+    },
+    {
+      "path": "qa-mainflow/qa-knowledge-map/scripts/validate_kb_hit.py",
+      "sha256": "a851ac558424abd32acf8d02839eae5a0800e2b94c52621770e8c7b97e3b5669",
+      "size": 3278
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/.pytest_cache/.gitignore",
+      "sha256": "3ed731b65d06150c138e2dadb0be0697550888a6b47eb8c45ecc9adba8b8e9bd",
+      "size": 37
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/.pytest_cache/CACHEDIR.TAG",
+      "sha256": "37dc88ef9a0abeddbe81053a6dd8fdfb13afb613045ea1eb4a5c815a74a3bde4",
+      "size": 191
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/.pytest_cache/README.md",
+      "sha256": "73fd6fccdd802c419a6b2d983d6c3173b7da97558ac4b589edec2dfe443db9ad",
+      "size": 302
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/.pytest_cache/v/cache/nodeids",
+      "sha256": "6360a5ce521b5662eb4348e4ece7d58abfcb6087757c1e4dc9020a9e617ea090",
+      "size": 1168
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/SKILL.md",
+      "sha256": "0867a34d685d7d597da28a02581cb35b9e5180726644e0170c2879d2ce770e5e",
+      "size": 3696
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/docs/README.md",
+      "sha256": "168531c8f7ff1508e23a98f769957d212e6c68cc51bedf355c61df5a28de55f7",
+      "size": 734
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/docs/archive/README.md",
+      "sha256": "3328f72125e40f4c1ecc051ba9431a00e9a31455f7bbe8dcdc48ded340d05f15",
+      "size": 2112
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/docs/archive/qa-mainflow-remediation-plan.md",
+      "sha256": "88c98d36dc1d07f862727e7bae06958de41d77d273bdd84955c36561c2b24b1f",
+      "size": 147519
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/docs/archive/qa-skills-unused-content-inventory-2026-09-09.md",
+      "sha256": "13cc8be3a3ef98a7d3157f9910308deefb4bb9300fa5f28e2094608f7e9baae1",
+      "size": 7365
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/docs/audit/baseline-audit.md",
+      "sha256": "41dd07b5b11b88dd973c27e38b4a890bef0a3ca8cd72a33e9ccc6150095fdc21",
+      "size": 117881
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/docs/cursor-enable-skills.md",
+      "sha256": "c6d875b8a7ed16ad85ba0236b3696cab9aa68af02a9b56147f2ddedfa312dc99",
+      "size": 1580
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/docs/machine-setup.md",
+      "sha256": "ffebed0f2e22606ef6350ef7e43c3b381038c3ffb3c8a2db03d0a67200416c98",
+      "size": 3160
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/docs/mainflow-package.md",
+      "sha256": "b07e039bf90b7c2a24d95aebf49ad71e8cc0e5e8fad10791b289bac475c4ca33",
+      "size": 6406
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/docs/plans/2026-10-10-qa-skills-slimdown-all-tiers.md",
+      "sha256": "21e54f01128a48f9846e9bddd82ddca47a630677ad80ebcb13984c6c3b736060",
+      "size": 5436
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/docs/plans/2026-11-09-clarification-ledger.md",
+      "sha256": "567a9f46fe4e77524d007d2bb83ab564b8b599fcf3370d8838febd1a0d06c72b",
+      "size": 20885
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/docs/qa-pipeline-redesign.html",
+      "sha256": "adfad9a6be09d4ab87cbc5ebfbee5b54df225acf8bf057edcec8a67e2b2bbc3e",
+      "size": 60584
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/docs/skill-canonical-root.md",
+      "sha256": "375fa0b4c5a3ad7175123d5bd830a3dcd5b19cc50507a11174670bef4cc197c6",
+      "size": 2203
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/examples/golden-chain/.cursor/rtd-paths.json",
+      "sha256": "34e4507cd42f29e2aedfc1b72adb01b0fcc61ebfe646ce13b203328d89faf534",
+      "size": 92
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/examples/golden-chain/README.md",
+      "sha256": "e85beccefb49a2fb702d90536461c27aea6ea36a3988ca41202c9fc2396cbadd",
+      "size": 6625
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/examples/golden-chain/build_golden_chain.py",
+      "sha256": "b0fa657cc57588a66508e3719c5405d7c1043aa9d11450490f2f5df9a48667e7",
+      "size": 16347
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/examples/golden-chain/docs/订单取消优化/02-qa/sample-prd.md",
+      "sha256": "13ecb4aaa60bf2decc0e87e30b9109389e0860ac90d4b4859d9d64837036fd05",
+      "size": 683
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/examples/golden-chain/docs/订单取消优化/02-qa/sample-remote-snapshot.md",
+      "sha256": "16d90159b4efd5593f7b3dac0a5245736aa23669ea1c07935ec23f1c104e1657",
+      "size": 389
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/examples/golden-chain/docs/订单取消优化/02-qa/订单取消优化-kb-bundle.manifest.json",
+      "sha256": "989615720a7fdfb32302399f6057218aabafad8cb6ae54e1853e7af41ae1542d",
+      "size": 799
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/examples/golden-chain/docs/订单取消优化/02-qa/订单取消优化-kb-hit.yaml",
+      "sha256": "d6a75228118eeedb3188f151ecf10847d67b17d05f6ab5a761ceb1d72699dccd",
+      "size": 582
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/examples/golden-chain/docs/订单取消优化/02-qa/订单取消优化-kb-query-intent.md",
+      "sha256": "60b07a152f63a90d585c7c03c92f63ea791c72e75cfaed340ec604ab439709d6",
+      "size": 483
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/examples/golden-chain/docs/订单取消优化/02-qa/订单取消优化-qa-context.yaml",
+      "sha256": "3b9451a31674cb2dcdcf0bc8ac618d3352eb2bf02c9781ad0d7eeec4e6f3e126",
+      "size": 954
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/examples/golden-chain/docs/订单取消优化/02-qa/订单取消优化-技术方案质检.json",
+      "sha256": "ddfee47f473aa943d9c03b8f65985a8c6205a71bef7616b7c3f6d2512cc6bfda",
+      "size": 87731
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/examples/golden-chain/docs/订单取消优化/02-qa/订单取消优化-需求测试分析.json",
+      "sha256": "c632e7f5200e596c98f9ea7ae714dc9ba2093a6b4d6a75172cdd9a0c591c79fc",
+      "size": 27489
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/examples/golden-chain/docs/订单取消优化/02-qa/订单取消优化-需求质检报告.json",
+      "sha256": "fbf2d2ad8072bc4c88ad58dcf5ce82a0d80e00740129e94d62f2bfd52e90ca14",
+      "size": 8449
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/examples/golden-chain/docs/订单取消优化/订单取消优化-delivery.json",
+      "sha256": "86124d990c75dd4f4e7f4bae176f7c24be835e00f8039933c96b8d547f12d933",
+      "size": 15024
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/examples/golden-chain/docs/订单取消优化/订单取消优化-feishu.md",
+      "sha256": "3773f0e1dd39353a0ba89b5c920114104f6dbc4aba92a1b673e49a2986b33505",
+      "size": 20244
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/hooks/qa-guard.py",
+      "sha256": "d131e8518c86eca6f9162de4f15ab448041c4e6151430d3302c7795fa024f552",
+      "size": 15014
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/references/escape-schema.md",
+      "sha256": "0e9061299f0b8bd23414b73fdfab4a285a7f8138f0c22c69b044fba7bb8e3768",
+      "size": 2475
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/references/html-report-style.md",
+      "sha256": "ecae3944d117ea911d900c82efa069788440a2d24c3bb9e510f63c1eed1a27a6",
+      "size": 3183
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/references/html-style-inherit.md",
+      "sha256": "baa89c40b26e82c8419875084a729be78f76cc00dfbb56a8a0c7d7b2bb9e84c3",
+      "size": 542
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/references/skill-agent-index.md",
+      "sha256": "76697fe99717b5deac3070066d3676d1e01d198265fd876cf25b6afb6f94d0f9",
+      "size": 18250
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/references/story-slug-resolution.md",
+      "sha256": "21f62e299ba8eca39d814a8b1b1d68f19c83b84d13b8f361626b774b099ef5fc",
+      "size": 2954
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/.pytest_cache/.gitignore",
+      "sha256": "3ed731b65d06150c138e2dadb0be0697550888a6b47eb8c45ecc9adba8b8e9bd",
+      "size": 37
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/.pytest_cache/CACHEDIR.TAG",
+      "sha256": "37dc88ef9a0abeddbe81053a6dd8fdfb13afb613045ea1eb4a5c815a74a3bde4",
+      "size": 191
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/.pytest_cache/README.md",
+      "sha256": "73fd6fccdd802c419a6b2d983d6c3173b7da97558ac4b589edec2dfe443db9ad",
+      "size": 302
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/.pytest_cache/v/cache/lastfailed",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "size": 2
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/.pytest_cache/v/cache/nodeids",
+      "sha256": "8011a33c9faa6920f0957f764b3a6c618e3aba641ecb5b70f34924225803d0a5",
+      "size": 23889
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/_split_thin_skills_once.py",
+      "sha256": "251bb6f36f834aea2d9c4a1df33da06401dce81b8092384c2bfdb9aa1cbdba2b",
+      "size": 4149
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/clarify_ledger.py",
+      "sha256": "9e66898c8f0c2f5e57112308c7ff27b77cc986261a2523b333a39ff60a33f3ea",
+      "size": 29789
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/doctor.py",
+      "sha256": "c93e8eb0671c68a715e855926d104b9e5f4092367b601c75ee39db5986f7010a",
+      "size": 5764
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/hook_install.py",
+      "sha256": "40b1e68609e7d2633c79da70c070f8a18804fe11af0afcc59b5954603a62b7ea",
+      "size": 9611
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/install.py",
+      "sha256": "b2df62aad9526da6a66b3be0dee63f863f5740358c895a912fcf97a1a3760c68",
+      "size": 13122
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/pipeline_api.py",
+      "sha256": "54f46d993b38c0f5cd2a18dbec9d90066b9ea8f72eb0d12064c25cedbb98d66f",
+      "size": 6491
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/pipeline_bridge.py",
+      "sha256": "e4500884e44591704084de4d33562116e03c9f0946af26af5e90e2190ea857d3",
+      "size": 2455
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/pipeline_core.py",
+      "sha256": "29599a6a025eb14239314df3c3c00fe870371ec8e91dfbe1c13d48b32b01ecfe",
+      "size": 74969
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/qa_pipeline.py",
+      "sha256": "b9896d7911dcdeef83f9bcd28167d63b91f7de64acfb46ee468a9b1ef7818ea4",
+      "size": 32683
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/qa_skill_paths.py",
+      "sha256": "35162870c001046c7e882fa8593b9fc1e48268a7cb199a11b6802d4a229097f7",
+      "size": 3864
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/repair_handoff.py",
+      "sha256": "ba0e9a2aeedb2570973288e14d1b5bccd4c91da1073612dfe09ede5e2cd52d72",
+      "size": 3829
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/resolve_qa_paths.py",
+      "sha256": "8e9480b6fdbcb49367532ca329ed180cd2a00a4cf66079a10ba1a44c405679bc",
+      "size": 2563
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/run_mainflow_tests.py",
+      "sha256": "89243b263de163b4ca0113b5db476e750fe31b624ed485572c297647ff8818e5",
+      "size": 1886
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/setup_machine.py",
+      "sha256": "1e561cc98e454fcdd685a5abb82ef5898a76f795517a52134e42569d61cedc3e",
+      "size": 7264
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/tests/test_backfill.py",
+      "sha256": "0ccef5e81234eee595c282b0fbdbce17ac3a12cd5d04962b43292be7c383afaf",
+      "size": 7182
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/tests/test_clarify_ledger.py",
+      "sha256": "edfee24bc4d85b7a35ef0043361eb9fa89d1ae49ac7c1d78c6c01e0c6469b5d7",
+      "size": 21512
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/tests/test_doctor.py",
+      "sha256": "27c652860085939be6a04ad0da2c4a048a49fa2be5349c7b8632351f45c932e2",
+      "size": 3692
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/tests/test_e2e_mainflow.py",
+      "sha256": "c8ab47f1ea579879059c918beba5a38761ca0a0051e4b0593689ef30b07a1430",
+      "size": 10240
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/tests/test_enter.py",
+      "sha256": "c46f5bcf5e728421be7ec583ebbcd3ecb6ecedd7ae254b915d099a7b29b531f2",
+      "size": 8760
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/tests/test_escape.py",
+      "sha256": "4157a92f390f4b23b829c45fa34a484c08c886c1bd79f4f3824fbce8c2ca4b6a",
+      "size": 4757
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/tests/test_hook_install.py",
+      "sha256": "58c00657b6916f2c4abaf229a501bc73feab04a1ac4746431823df1ada2fd811",
+      "size": 8345
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/tests/test_install.py",
+      "sha256": "132ecb2237848fa94a25b61c64badbc4204df0f23fdd7e6eed5e16b240561589",
+      "size": 10108
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/tests/test_mainflow_package.py",
+      "sha256": "bdae4b112a5ff7ab1d82e0d6f34f8e8c28c99975c5fb05d756b1b0fe42708d6e",
+      "size": 6985
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/tests/test_pipeline_api.py",
+      "sha256": "597bd7ce1a134e40d30ed5e4f41100879f72ec6dbb2ae8b361ac0fdbec5f8239",
+      "size": 7582
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/tests/test_pipeline_core.py",
+      "sha256": "0324ef0df995e8e66151f4682796cedcbe045fa3aefd412a0c35f5852d503ba4",
+      "size": 47332
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/tests/test_qa_guard.py",
+      "sha256": "8b8cf670defd4c0ca7ad0670f53d18e83d8f157cfb639b486cbdafed65a4bec3",
+      "size": 10752
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/tests/test_qa_skill_paths.py",
+      "sha256": "e1f6297a069aaa2b5eec51fce75b3c64957bbb0247dca27b80567e1ece22a5be",
+      "size": 5020
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/tests/test_setup_machine.py",
+      "sha256": "480c01616808d4b69fb22c30e692a0adf1ae9a8097b7fd7793667a26eb06cdfa",
+      "size": 6518
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/tests/test_skill_doc.py",
+      "sha256": "6de9742555bac2797e24604bcd9e9a6788095b409b9f08199bd773514b1c6dcc",
+      "size": 2256
+    },
+    {
+      "path": "qa-mainflow/qa-pipeline/scripts/tests/test_stage_contracts.py",
+      "sha256": "63a1df997930c751a15112ee1d7d957268455898baa7ba621672c3347ed28863",
+      "size": 6831
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/.pytest_cache/.gitignore",
+      "sha256": "3ed731b65d06150c138e2dadb0be0697550888a6b47eb8c45ecc9adba8b8e9bd",
+      "size": 37
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/.pytest_cache/CACHEDIR.TAG",
+      "sha256": "37dc88ef9a0abeddbe81053a6dd8fdfb13afb613045ea1eb4a5c815a74a3bde4",
+      "size": 191
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/.pytest_cache/README.md",
+      "sha256": "73fd6fccdd802c419a6b2d983d6c3173b7da97558ac4b589edec2dfe443db9ad",
+      "size": 302
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/.pytest_cache/v/cache/nodeids",
+      "sha256": "190a947ee2ff75e50407eec821f5f8162ebaa7319edc0296e338ad4af763c787",
+      "size": 7418
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/SKILL.md",
+      "sha256": "df0d001a495903ddd408c8d3aef8fb2918be7e2604620e2124d4170f943d0aba",
+      "size": 4199
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/assets/qa-report-shell.html",
+      "sha256": "6f35ae6b1ea33bd23f10b0826d7ba4e963c7e4af61886f98f7eb22bd41e22035",
+      "size": 22719
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/examples/README.md",
+      "sha256": "f95783ef9ecff705ff9ea187ce0473074e0d18dbc255e4311168793c7f309738",
+      "size": 2150
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/examples/generate_examples.py",
+      "sha256": "932f9d7bd775a6d85082fd888e5e26dcc33b6db444ba9e2cdb2d093126ab0e97",
+      "size": 21121
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/examples/order-cancel/rq-gate-STORY-100.html",
+      "sha256": "54615aff5060b908153721fa741a6b8370a7c4db514976210c9be2a1b4bdc17e",
+      "size": 55942
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/examples/order-cancel/sample-prd.md",
+      "sha256": "a44512ee1be600cce588cddc4c468f079f22bdef016a6f2ff9ed52c204518976",
+      "size": 1141
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/examples/order-cancel/订单取消-kb-hit.yaml",
+      "sha256": "d6a75228118eeedb3188f151ecf10847d67b17d05f6ab5a761ceb1d72699dccd",
+      "size": 582
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/examples/order-cancel/订单取消-kb-query-intent.md",
+      "sha256": "60b07a152f63a90d585c7c03c92f63ea791c72e75cfaed340ec604ab439709d6",
+      "size": 483
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/examples/order-cancel/订单取消-qa-context.yaml",
+      "sha256": "3b9451a31674cb2dcdcf0bc8ac618d3352eb2bf02c9781ad0d7eeec4e6f3e126",
+      "size": 954
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/examples/order-cancel/订单取消-需求质检报告.html",
+      "sha256": "54615aff5060b908153721fa741a6b8370a7c4db514976210c9be2a1b4bdc17e",
+      "size": 55942
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/examples/order-cancel/订单取消-需求质检报告.json",
+      "sha256": "b77b0bbc207170532aa82fcb79570cef94de97bd5b59c08f220f66096f6eeda4",
+      "size": 25493
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/baseline-comparison-verifiability.md",
+      "sha256": "cdb9a318be09ab48749bd70855a2a8c8d8bd0533116d01c32cbafa915a7e3422",
+      "size": 4456
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/broad-sweep-guide.md",
+      "sha256": "43617ff0c448f33f97e49a192c14afcd94b7d415df67dfed1dd0f0009fca0799",
+      "size": 4733
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/business-context-gate.md",
+      "sha256": "8b719844ae977283637b7bd9ccf0e1d3d3e73f70fb4064619b6957fc9502b1e9",
+      "size": 2484
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/chapter-intros.md",
+      "sha256": "4f3b3cd94352a6a15cb2f6b4f16d1b0e465e2fd3564631904dcd026175e649ba",
+      "size": 8474
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/conflict-matrix.md",
+      "sha256": "54344013fc7d9cea0de4709b4dc2628dcbb5506cea7f5f2d7af45c912a9d4d07",
+      "size": 2436
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/defect-taxonomy.md",
+      "sha256": "1c94aea2d35f981d69ec48fb77182c386ac40a322b87c0112a9e512502976d5b",
+      "size": 8575
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/delivery-checklist.md",
+      "sha256": "145f24880056a9ebeed1a5f48e00b2f490017974db698fa544f84fe285ddb6eb",
+      "size": 7694
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/dimension-mapping.md",
+      "sha256": "208c6d2ca53efa276d5b854c6a36ff5685a29e749c634c2a4173928ab985a72e",
+      "size": 9055
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/domain-context.md",
+      "sha256": "90f84735e8d2a1625c9153d70ebcdf67fd9444ca0252989e414ba7beb582b69f",
+      "size": 2446
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/enum-image-monitor.md",
+      "sha256": "9d324118b7b513ce892362cd304cc2a042b49f98d2021d4c23d40b9026da2823",
+      "size": 2156
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/handoff-open-items.md",
+      "sha256": "337bac81e56e51a83e2addc9279c17fcdfb1c2cfc1e31cd445cb249888e3e6eb",
+      "size": 2836
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/html-link-rendering.md",
+      "sha256": "ccb772aeb88578066651afcfc20be9e374025fe2896d855fc087cb4dc057893a",
+      "size": 3518
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/hub-agent-index.md",
+      "sha256": "904272b19d7dfee95118bd23b851a527a1750fcc39ea6da07ee70f2b3bc4b2bb",
+      "size": 1792
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/incremental-scope.md",
+      "sha256": "2d866ad2eba17130e9785b102eeff6f78caf93bb3753858d4f8c467a98aca698",
+      "size": 1076
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/input-intake.md",
+      "sha256": "1782fc480ab05c76922513c40e48e01244365b2a42d28a4edcfc1d02e1a13d37",
+      "size": 3909
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/kb-gate-probe-playbook.md",
+      "sha256": "0c0fba50cc2e2e3140a560eda6edfc9a78435216e431bd8c33ded0cb27c6bf87",
+      "size": 13495
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/kb-prose-humanize.md",
+      "sha256": "b90971feabfcb7a8237f802cfe43ebd4626ac6778fb619c3d5b87a9000ad4ac2",
+      "size": 4301
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/qa-knowledge-map-hook.md",
+      "sha256": "9cdf65addd45c55a935b973a0b6a8b7b450c3395ec7d5b742c10b28226279d7b",
+      "size": 2381
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/quality-rubric.md",
+      "sha256": "9ada525d09f73be63f37d25450501386d735c149f3925bfa10e61c7079edd40b",
+      "size": 15701
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/report-schema.md",
+      "sha256": "699c1d45a527fd6c8e79c607cddd7d17e6348b0c9a2352e8eb2742642dc30722",
+      "size": 16389
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/report-style.md",
+      "sha256": "ab1e3aa7375445633206172e53e697c5cf60522db9878f87c3e3ba9b64706d14",
+      "size": 7358
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/reverse-logic-monitor.md",
+      "sha256": "5d1542cf7de3fcaef9f1c6952db03e6fb90b8d3077e9d3c54e77e7ccb52904f6",
+      "size": 3058
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/review-scope-exclusions.md",
+      "sha256": "288d3a3e6c53ea9584f6e82eaa9e787d62c4a968f8cb4beee249ff0e10f0bfe6",
+      "size": 5754
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/skill-agent-index.md",
+      "sha256": "c2430ee1550f4053769dacb7f12874999fc81761e76db787ca9eb650bbd00155",
+      "size": 8105
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/statement-role-taxonomy.md",
+      "sha256": "ebfb8b5accec56141244826b837622b8a3683a2435226875993bd57ac7d17a75",
+      "size": 7514
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/thin-story-checklist.md",
+      "sha256": "277d002de9e77c3cc6a1bd3540482cd7cbee04726d11ec09a91d9852fddcbf39",
+      "size": 1659
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/time-anchor-monitor.md",
+      "sha256": "d465073a9e0e82d721de7e110474438369c0a57e496f120ee68db01b15247ffd",
+      "size": 1855
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/references/unanchored-baseline-oracle-patterns.md",
+      "sha256": "6cbc729d89bcecdeb8ba68b8085c15886d7ebf497feb7686884d7eed1c1ced7c",
+      "size": 7587
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/scripts/calculate_scores.py",
+      "sha256": "3a56923e324bad2362e9027443e5bb5e6cf43ed5a3b8cef28b95ff04ac836fe2",
+      "size": 24059
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/scripts/ensure_story_kb_bundle.py",
+      "sha256": "687449574f2741f28545577b2c8fcf71bb2e0245add641246a0a25b00d533535",
+      "size": 11635
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/scripts/finalize_report.py",
+      "sha256": "b7528f22a2ff020193b1bd5516ca879f35eaa625d2a8955569963504a6da1c69",
+      "size": 6205
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/scripts/humanize_kb_prose.py",
+      "sha256": "fe35d199a8c2db041ac7ba9a25cd645063ca2934ebec6aafbe6a71df8594e3de",
+      "size": 17074
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/scripts/kb_hit_util.py",
+      "sha256": "86637ac085170fd56ff74f983d736db2d61c2fa752d53783bd09bfe3f69d9ac0",
+      "size": 23087
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/scripts/kb_probe_for_gate.py",
+      "sha256": "ea1e371a7ef77f7d3d4c4540b2b70ee4ef8efcfc76b951b6079dff03065a07f6",
+      "size": 9686
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/scripts/link_util.py",
+      "sha256": "ecd2dace4fc7c1a5ff9302527e29959ee17db9c6eeab1d3f88ff2038f5766f34",
+      "size": 4792
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/scripts/render_rq_report.py",
+      "sha256": "39baa1e93bff2506a56a00726d46c1435381a1782f175a52591b7e11d4a6084b",
+      "size": 41692
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/scripts/tests/test_calculate_scores.py",
+      "sha256": "a70db7eb0edb16a54dc37749fc80cd1cff666f790b114f7587929ff9093fc63f",
+      "size": 11280
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/scripts/tests/test_finalize_report.py",
+      "sha256": "21f8164f4d62d3976ac198b33f982b35ff52b8ce29533a179ab5312eaf111c38",
+      "size": 7312
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/scripts/tests/test_gate_adoption_filter.py",
+      "sha256": "e9bc4e023533ee2596d00ec93674efb847a8d5d581356265608d302211ced894",
+      "size": 2803
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/scripts/tests/test_humanize_kb_prose.py",
+      "sha256": "6fc5091994afe21313b3d029afa40f62eb4d59da41b43ec7dcb98e01292adf4f",
+      "size": 2015
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/scripts/tests/test_json_output_contract.py",
+      "sha256": "e4146b95ee6cb2681de1f744ebac6518235cb15a9be50442bffb2676de88832b",
+      "size": 3246
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/scripts/tests/test_multi_project_quality_gate.py",
+      "sha256": "7b486e1672cfde16c54e1412ed6515d5ec341ca39463bb756048701ea842efcc",
+      "size": 12129
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/scripts/tests/test_render_rq_report.py",
+      "sha256": "a1418d4d3826567ea954241f39cc5e632cc86cca6c5f49abffb0ecc6d196e237",
+      "size": 5793
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/scripts/tests/test_statement_role_gate.py",
+      "sha256": "03d83e56016f588f9b729974d426df3da329c2e8b30d728976bad7adb1a305b9",
+      "size": 11165
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/scripts/tests/test_validate_report.py",
+      "sha256": "3448d6dfa954d4925902bce36f41836782ee642ca17b6ded041311fc76b541d0",
+      "size": 5780
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/scripts/tests/test_verify_rq_html_humanize.py",
+      "sha256": "f9a24cde8042966b17b61c93bce109f0c2debe6c9239bf8f53d7f1dd792308d1",
+      "size": 956
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/scripts/validate_report.py",
+      "sha256": "29be021861768b20365c4ae070bbf46a82fc488e55816407a8a35848d1f84381",
+      "size": 28052
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/scripts/verify_rq_html_humanize.py",
+      "sha256": "c47b3c7fb661867a17e460070528aeb969ef7c76437f3c0a337ea89dfb0a649d",
+      "size": 2579
+    },
+    {
+      "path": "qa-mainflow/requirement-quality-gate/使用指南.md",
+      "sha256": "63b493dac5ed013e9c37ebad4283d8462a70f8e691866b3f3425ad184041afdc",
+      "size": 21138
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/.pytest_cache/.gitignore",
+      "sha256": "3ed731b65d06150c138e2dadb0be0697550888a6b47eb8c45ecc9adba8b8e9bd",
+      "size": 37
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/.pytest_cache/CACHEDIR.TAG",
+      "sha256": "37dc88ef9a0abeddbe81053a6dd8fdfb13afb613045ea1eb4a5c815a74a3bde4",
+      "size": 191
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/.pytest_cache/README.md",
+      "sha256": "73fd6fccdd802c419a6b2d983d6c3173b7da97558ac4b589edec2dfe443db9ad",
+      "size": 302
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/.pytest_cache/v/cache/lastfailed",
+      "sha256": "0a45ab2f7615d77065d47d0e8e3b24f08f15821a2e4f51ee2f6b133fe11f756a",
+      "size": 376
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/.pytest_cache/v/cache/nodeids",
+      "sha256": "a78b5c5d2c1f4b4df2121bb51ff8dc2308dd6dbb335a368cf33e1531e672445c",
+      "size": 29974
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/SKILL.md",
+      "sha256": "4cf8be1291a58f0004db65f6af39ebeb2893872388faafaedf2c078930d99c6c",
+      "size": 3887
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/archive/examples/README.md",
+      "sha256": "839837efdce105a3ddd1918320930cd029972fa7154a858967fe768bce7a3e44",
+      "size": 473
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/archive/examples/ch12-demo-complete-feishu.md",
+      "sha256": "1434b30cc9a5101261e184033e446c87461010d630f790e62618fb4a295211fb",
+      "size": 12051
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/archive/examples/ch12-demo-draft-feishu.md",
+      "sha256": "aa5aeacc03025987ee3d39a88c80ad7cfda1c81b51714f05e67809e2f8e54723",
+      "size": 11796
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/archive/examples/ch12-workflow-preview.md",
+      "sha256": "674d29ba92c34af9df40626a9932d93ae0c00b0ed7c8a1d3c25ab00ab684915a",
+      "size": 2810
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/archive/examples/cross-system-matrix-subscription-7075005777.md",
+      "sha256": "5fb0fb654d40fa2cd2745791027febe52080abd51969f91d9e81a6aefa688044",
+      "size": 11359
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/assets/delivery-shell.html",
+      "sha256": "40847f834d5c91cd51c2df798d862e5abd9ac05373ba859bb8a9e7d0a528be77",
+      "size": 40058
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/assets/samples/feishu-style/00-hero-and-ch1.md",
+      "sha256": "9fcefec159927e334a12b26ef97f402dd7a1d25da6dbd01ef50c5fa5ee910eb3",
+      "size": 841
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/assets/samples/feishu-style/02-06-tables.md",
+      "sha256": "abec33e47bd2c8005ff6951d7f4892f0ead40f2f7b8705634a953574ef9675a5",
+      "size": 1431
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/assets/samples/feishu-style/07-case-card-draft.md",
+      "sha256": "3b14efaecbf835c479057b7a1d2712c352e30ff015a3370188a20ff128088db4",
+      "size": 328
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/assets/samples/feishu-style/07-case-card.md",
+      "sha256": "f397a73f032cadfb82dd98cc12aa839bd73b7d1f3fb9aeaccb5bf4e134163fac",
+      "size": 1972
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/assets/samples/feishu-style/08-10-tail.md",
+      "sha256": "db0ca0ad46df80026ade0e4cd65ed884629555c88e116e59438e513dc5414442",
+      "size": 2006
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/assets/samples/feishu-style/12-cross-system-map.md",
+      "sha256": "1d6110dbd6c4c9a0948ec06708aa2651ada3d4b476be27c3d66bd5c1b837f4f5",
+      "size": 6089
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/assets/samples/feishu-style/README.md",
+      "sha256": "36511eca246da428427735d3167c0ed57f8600f87848320b5f540d886bf21b35",
+      "size": 840
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/cursor-hook-template/README.md",
+      "sha256": "b011e9df9f2a5ae964223d59b419fecd27a71883b52a296eaa5460061ce0588e",
+      "size": 4276
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/cursor-hook-template/hooks/rtd-guard.py",
+      "sha256": "9f3278424b8149bdb8f6bbe7ec8ad81a9b07aa8de3f1ab774f3642eb6038d823",
+      "size": 30289
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/cursor-hook-template/hooks/test_rtd_guard.py",
+      "sha256": "33d49df9e348d9e563f967f40b74923f28b89b81cf5a2354caa856ee1dd4bb03",
+      "size": 10320
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/cursor-hook-template/hooks.rtd-guard.json",
+      "sha256": "1918c7fc5216478ebf0e1b48618f530a20c488e0178e138ef41bf67719bc82b0",
+      "size": 851
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/cursor-hook-template/rtd-guard.config.example.json",
+      "sha256": "2e54470fa03f67a3b038b6a71a14cfa4cf004f84445816df72a3bc833a7cd8ae",
+      "size": 595
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/cursor-hook-template/rtd-guard.config.json",
+      "sha256": "4e0489baf4f7eead3a8f26f4cfce5ff93316f7d6e4a3722dac17fcad5db0b5cc",
+      "size": 328
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/project-template/cursor-readable-md/README.md",
+      "sha256": "bab0e45c7fe2cb72a66cc03ec97eaa5bd8bf0a9baaa9a8418c67e378ecc43cc1",
+      "size": 1036
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/project-template/cursor-readable-md/extensions.json",
+      "sha256": "56a708cdbb72241c5f4edd81c26126ee14b82607781c9feb0d201d88a270a937",
+      "size": 172
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/project-template/cursor-readable-md/markdown-navigation.md",
+      "sha256": "e3c1de69a60dc555827ade2e5c6e50808d2807aac99fdf32726ec60e65f713be",
+      "size": 1621
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/project-template/cursor-readable-md/prettierignore.snippet",
+      "sha256": "607b39f0b3f023f2aead1e046dbd6c3a269075904182dd4a5b5ce6f9b2391510",
+      "size": 29
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/project-template/cursor-readable-md/render_readable_testcase_md.py",
+      "sha256": "794aa76b792e5b3406e601d721a355768a0286b288dd96985496dc2ef78a7351",
+      "size": 10012
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/project-template/cursor-readable-md/settings.json",
+      "sha256": "fd1f504f16acfa82bdcad83a7a93fef8fccfd73e723cec1f5ac5f15b0b62edde",
+      "size": 808
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/_manifest.json",
+      "sha256": "486a9d4f33c7cf658136d528279e9c2b16ee744a484595bc79c1810f22a4fac1",
+      "size": 4281
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/ad-gap-coverage.md",
+      "sha256": "eef0a3e3aac8b64c8f00d0eb06e28a4d51dd9c85338b6797bedd27455d6b2c77",
+      "size": 8118
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/ad-matrix-review-checklist.md",
+      "sha256": "5ae309c53e7da66eb94d0f97ec281eb3b9d030826f92452e54d5c9d61b0d8ee3",
+      "size": 1362
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/app-c-end-checklist.md",
+      "sha256": "70bec44e05c191e5f9b46f884509517454d54a8ba55bae8e13bc6c03004b69a4",
+      "size": 7902
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/archive/design-context-economy.md",
+      "sha256": "1e4526e880403e7e029cf5fb3f07bda2c31f9cd275c3d0a1ffd1f54b66f516a6",
+      "size": 263
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/archive/design-steps/00-common.md",
+      "sha256": "067836847c959f2e281ffc197ee5cdf2f99b6017264cc20b75862e18aced9b67",
+      "size": 79
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/archive/design-steps/01-overview.md",
+      "sha256": "08a7196a26e0ec654c7692b436231b8c0450ff703be4fc31c568cd147fc95207",
+      "size": 89
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/archive/design-workflow.md",
+      "sha256": "7ffb68d65da2a0a5356ae730f093070ebb765fec82b3d2a1581c0b774267d81c",
+      "size": 291
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/archive/revision-protocol.md",
+      "sha256": "0c81f81169c363fe728c5e610a4c4c2c3e929ba19398a032726dbe0af32c1e25",
+      "size": 421
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/archive/token-economy.md",
+      "sha256": "e6302fc4af8fc1ec03b6c6fc0424d930f7b504193e09e5906278a741142b0265",
+      "size": 409
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/bibliography-template.md",
+      "sha256": "f77331902f45e44f3f9e26813b1479de727d6c5e50d916ec08c76e653f570a32",
+      "size": 2609
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/case-body-presentation.md",
+      "sha256": "02408e2fff29326e4fa920890017def6e95ce8c31bdfca4355eae1fd004cca94",
+      "size": 6770
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/case-organization.md",
+      "sha256": "6c50d631b0ecb15d09e2596b4417be4755402194929b4ed2b552188501340cbf",
+      "size": 6649
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/case-template.md",
+      "sha256": "4463e40e2149993adec3b5d74b690247428fac3de924d1af56fc3bd87a54046c",
+      "size": 14206
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/case-title-clarity.md",
+      "sha256": "8cd75526d8c47f1d20c679852a28eb1359cc505fc12b8ac661b941feb4f97224",
+      "size": 5862
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/coverage-audit-guide.md",
+      "sha256": "3351d2bbdfa05f4ad846289fe085ef3b6afbc1cbed7ea05b58d07432a23071c5",
+      "size": 12838
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/cross-system-boundary-ch12.md",
+      "sha256": "44bf11104ae0998c4019fd16357e3cf9cb6e871aee9af6bea8fc4f40948c2d19",
+      "size": 22461
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/design-philosophy.md",
+      "sha256": "7a0be6c7955ec4dc2e9d02cf144d5fba6f19349edf8a852121591f23e32f97fd",
+      "size": 1319
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/design-steps/02-step-01-scope.md",
+      "sha256": "b5b82769093433e96c7eb2c72088a6872c262e7f1e2f6c52153a9ad780540ab9",
+      "size": 2786
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/design-steps/03-step-01_5-images.md",
+      "sha256": "3e699d4fc3d0eff6923834d2dc00604445f587e90b768c7115f3e2c5af892b06",
+      "size": 1337
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/design-steps/04-step-02-glossary.md",
+      "sha256": "ce73db44a157279ee8d3d364ed858fe3a0f16bec5a95f5568e5dc7f3b728f037",
+      "size": 1866
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/design-steps/05-step-02_5-supplementary.md",
+      "sha256": "0a6befa6a7c90555629ac255469e3d838c2b8533460304ec304d262ffbebd54e",
+      "size": 2287
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/design-steps/06-step-03-requirements.md",
+      "sha256": "a4f45bf0f10917f04445b95582b92e446e3a71361d4cc59bb0b6f3dce14ecec1",
+      "size": 2584
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/design-steps/07-step-04-specialty-scans.md",
+      "sha256": "ea57cce271be3df78b4c263c4243e3fe492007f7c6615ccef62a68ac41822f55",
+      "size": 6886
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/design-steps/08-step-05-matrix.md",
+      "sha256": "ff38ec10f6fad841dcab5a818f721cab568e0c33781ebd9fec74cc9e484a9999",
+      "size": 11451
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/design-steps/09-step-06-implicit.md",
+      "sha256": "35a9fa2dec00b828fbcc2d1dd53ec643913ef6a3e7f29a61d72ce4103f73bbb3",
+      "size": 1910
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/design-steps/10-step-07-draft-delivery.md",
+      "sha256": "387d6c2e698b0603b97286a999d35fc541662b756f5a0b7f2437a38099a2172c",
+      "size": 1813
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/design-steps/11-step-08-final-cases.md",
+      "sha256": "2788fa00e6f44fbc0f598708e6a464458a3cca2164d0cb5c201582b84cd3a986",
+      "size": 3800
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/design-steps/12-step-09-final-render.md",
+      "sha256": "ca4660a0fbf8d4ae6f129a5b785a9c8bc00bdc981654d74ae0b2a046760daa9a",
+      "size": 1804
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/design-steps/15-fast-path-after-confirm.md",
+      "sha256": "8476419b374710fe7443ab78463f05d8b962b83f4151d62707ac12a33de278d9",
+      "size": 7214
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/design-steps/99-resource-index.md",
+      "sha256": "11a975ea9a4e882c7d44f24d7973b043ee866d2578fcf5e54abf4a6c6b47b0e1",
+      "size": 5539
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/design-steps/design-entry.md",
+      "sha256": "0f8f7a05e0af90f4afe250093000d24dc97d9597e77b2926352ca70688faea71",
+      "size": 5257
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/design-techniques.md",
+      "sha256": "d02abde0505f221a6b761d8b9100625133ecc6ae29aaa2a11751a3d5d60a352a",
+      "size": 7088
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/domain-checklists/crm-order-triad.md",
+      "sha256": "bd3bd7bc903097d0d2e80d23c05e27c68877cd2cb05303c391a9c29e789782b7",
+      "size": 2587
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/draft-matrix-review-checklist.md",
+      "sha256": "d33768e8423cccf75e0ab96be7a81b2e227fa5fec9c2af01e147c302e068117a",
+      "size": 3334
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/engineering-lexicon.md",
+      "sha256": "a8fcfccdff803a6829878364ce2a44d746e5bc88a8606aa39cdf7bd955fd7d25",
+      "size": 1957
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/examples/README.md",
+      "sha256": "9d8cd8382367ccedbcad6c5c0220831a635852fb6cbec1ff8d3061d60b879867",
+      "size": 1043
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/examples/ch12-subscription-walkthrough.md",
+      "sha256": "1d6a019dd6b228e58d15d3e729a74c627b1f8d3067b3a146bf479d5ff87e2eab",
+      "size": 1409
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/examples/domain-case-body-vignettes.md",
+      "sha256": "bc21de6e8aba8a966f19a33c808cf63956a3c66ad124931afebeec94ecc45715",
+      "size": 1038
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/examples/domain-case-title-vignettes.md",
+      "sha256": "286448c1fc194e09662468e88901c8f5a29762f7657a86430893f35f04682cec",
+      "size": 1813
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/examples/domain-lexicon-subscription.md",
+      "sha256": "eb19fb8d4f2d45623594889732276ff5a6d68cedfa05eb5fba3096e9faadff72",
+      "size": 1318
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/examples/domain-lifecycle-vignettes.md",
+      "sha256": "48d5c7d0e4775e48382632927d6cb004b0639099a3c48c9d005796ea4b5b9ae0",
+      "size": 879
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/examples/domain-nld-vignettes.md",
+      "sha256": "aa126b89f304570c5f38c3e051faf7f2d1152e62c36eaf596ad0eea6d39cb612",
+      "size": 3276
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/feishu-case-template.md",
+      "sha256": "b05d6727e474254f7f09708229e8acc2b924247bf865f58d79da57d51b984df5",
+      "size": 18673
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/feishu-sync-policy.md",
+      "sha256": "6a782998e554e6850230930f7748d08c80437e5580aee5e65dd1b1e348c4454c",
+      "size": 5329
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/flow-state-checklist.md",
+      "sha256": "2c32379789e72d2f94907d3da445a8617dc99fb641c52968d861cd319d45dc9e",
+      "size": 14885
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/gap-imp-confirm.md",
+      "sha256": "d4a4ccf811131b6f969b399647196575b804160c46d2dc12114f163a508ee68e",
+      "size": 6170
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/gate-policy.md",
+      "sha256": "a54e826daf5d8a3d2a21b221093369e94a9226084c54f0df0044d0d2eeeff7a4",
+      "size": 8702
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/glossary-guide.md",
+      "sha256": "b2508cad0440571c68315f8764acbec46b51ff49413071ce3067a09fcf760824",
+      "size": 1982
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/html-delivery-guide.md",
+      "sha256": "19667db767067dff3cc7d23dcea7059ceeaffa1ffad8ea02bfc6379d564a87e7",
+      "size": 7875
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/hub-design.md",
+      "sha256": "f30851c50291222ef0406f935b9793bd466b418941dc7bd79b3da337af885751",
+      "size": 4407
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/human/README.md",
+      "sha256": "eb06ec13a5a963b5975da7f1c5c2ea19cff8ddd665dfac2a6eab6454433d8ccb",
+      "size": 792
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/human/cursor-md-preview-guide.md",
+      "sha256": "755ae9d1ef59747114d8049261767be46c491ebd1c00b02eac485727bd671691",
+      "size": 8231
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/human/review-and-revise-quickref.md",
+      "sha256": "db50a4c65ccd10dc0eb54e731e31c017be69787f6f6ca05a1acc37f31d6990b1",
+      "size": 4818
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/human/rtd-three-pillars-hardening.md",
+      "sha256": "3e711cb7233da43f662d0cd4b77d4ad334e7062e126625dd1b244b06317d846b",
+      "size": 13252
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/human/token-economy-guide.md",
+      "sha256": "63ade46598fbe1cee529ffabcbe43489ff34f2f03a76b9019b1038e5e35ee4b6",
+      "size": 6279
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/human/使用指南.md",
+      "sha256": "e30be2b8b052c2e1d79f9e9db35fb1d613ff13e047bc3f73430b29b8b70c4626",
+      "size": 42515
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/image-intake-guide.md",
+      "sha256": "4f099953c2c8f7efeb9b26feccf562580f510fb043a611e1f1e8774ae21b1123",
+      "size": 7383
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/imp-sup-natural-language.md",
+      "sha256": "756ad8bc5bc118740904b8c928be23296e721923bb9b1087ddf22d50601fe414",
+      "size": 2198
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/implicit-requirements-guide.md",
+      "sha256": "44b53bdf354cbfcbe4221b2f3244935c3eed39405f0f4ee00122558226689b81",
+      "size": 7512
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/incremental-delivery.md",
+      "sha256": "b74155a9a3e69cd42d1f1cb5727e0ceafb9022cdd9e717dc7f5ea029629d59d9",
+      "size": 913
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/intake-gates-agent.md",
+      "sha256": "5c26025e863b94cc4f73797af2863e546c6efb7e2880d3417a6a36c22dd7c35f",
+      "size": 4482
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/intake-gates.md",
+      "sha256": "a488bf1fdd815824f6e28e676347cac0c74049a3defba9b4497935bddd41f958",
+      "size": 5717
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/kb-domain-exclusion-workflow.md",
+      "sha256": "5ad29e23aac41cd3cbb2d45d3562d76e8cbf124f9bf2b7d9dab4d0ae80adc4c4",
+      "size": 3283
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/kb-impact-export.md",
+      "sha256": "58f4a475d687dd4abfab21f196076e3df539df72f99e9ff8dc5a54637123d1c1",
+      "size": 4206
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/kb-into-design.md",
+      "sha256": "b5937c71d3a5fc74dcd9601c11ad7bc6c8c5fa33e9f4327a10f23b05ca78f4cb",
+      "size": 5801
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/kb-map-matrix-reconcile.md",
+      "sha256": "a74cceb39f5538ce43ad70829b753b3693223750ddac16cdd3c5ae6fdcd7ef01",
+      "size": 2861
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/kb-provenance-summary.md",
+      "sha256": "9c91c0db124118e199f6b35f80cfb8607819b1a3327867125f2ddfa09d5498ad",
+      "size": 7407
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/legacy-dependency-checklist.md",
+      "sha256": "836c1c905608abfd29a33a6b61c54b19bbf85de3dae2fd89c6fb3cf51673a966",
+      "size": 4033
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/legacy-index.md",
+      "sha256": "01c94e0ea2ca5f0fd0888b3a15d4ac1095d7acdc38d4c9e39ac3fe59f161e93d",
+      "size": 892
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/local-delivery-layout.md",
+      "sha256": "0ee057147de44970604f34bc14381d14cd11f91b1bb5714452bdaf6fc9ae6f1d",
+      "size": 2344
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/local-readable-md.md",
+      "sha256": "cb52b09dc11f2681cf32ef155c19ab5f1d15fe2d11992f9da3ff9ed80db4f535",
+      "size": 8284
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/matrix-module-invariants.md",
+      "sha256": "a31bea11d6678b9c02a3b738a5d68a7b44f88090cae5d26b297f810a0d4c1fc4",
+      "size": 8618
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/matrix-seed-design.md",
+      "sha256": "b411f9f152828c635330be441ca3d00c1ece6d4aa7b16c496ad38dcabe91ec84",
+      "size": 12818
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/md-delivery-guide.md",
+      "sha256": "5d6abdf6ebdbc8257f884566a224e06556c4a8e86e2f2e9a6f59548bd7aa0572",
+      "size": 4603
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/mindmap-chapter.md",
+      "sha256": "6724de6aab84ca5352e6751fd5e22fef6bb3032794b10139e73ece1367bb6f37",
+      "size": 8707
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/module-partitioning-guide.md",
+      "sha256": "4b385e775123937e94e910f9978b7762a09d3c560a5b6beea6e309e4f184e8eb",
+      "size": 8312
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/natural-language-delivery.md",
+      "sha256": "b0fcf30b46192844485d012a430be22c14ba22149aacf7d86517f6d7b2ba70f1",
+      "size": 32012
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/performance-checklist.md",
+      "sha256": "055b851b8ed6b5197f7700057f2b93c8bd516ec145c6ee630672ee458cae2f40",
+      "size": 4512
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/positive-case-merge.md",
+      "sha256": "22bb930cdbfc07cebacd8ab863562736f584616aba6e79a5e631bb34327bc2e6",
+      "size": 9164
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/prd-intake-template.md",
+      "sha256": "0779fd8db4e26b8821e2cd88a0905423c8e4122b3f6673363a30d1ea4613affe",
+      "size": 3901
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/protocol-check.md",
+      "sha256": "e7439e8d35947675ab1d39fa18b49f86c9452eab8f832056d09edfb8f4fb5a74",
+      "size": 4097
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/protocol-design-paste.md",
+      "sha256": "ee2f51ece5f625e03f5cc78c92b79d348b70d147d9ccef727d3af902a85f3ff3",
+      "size": 5427
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/protocol-design.md",
+      "sha256": "bd4b81d95ba08fd6d8cd8e339caf380f56ae38ba934c2fc140d40298b7df2ba0",
+      "size": 8031
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/protocol-retrospect.md",
+      "sha256": "876758d07c398b37f74d49e4f5b86058b521b6b7bacf974ddc2f1b24a6fd260b",
+      "size": 4255
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/protocol-revise.md",
+      "sha256": "2537abb370d299bffbb054fe0626ef803c2e53fced8f76a308b45f86b2a853c5",
+      "size": 12449
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/protocol-seed-matrix.md",
+      "sha256": "fffaaacac5f3dad39e629ab3c8087e5928d75ad5bdacc621a554666bcfa21d75",
+      "size": 3494
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/qa-knowledge-map-hook.md",
+      "sha256": "0dcaf58b1881debeb29e582409b9014ab79605b9701f4b166705d80f50fb7848",
+      "size": 3016
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/reverse-event-checklist.md",
+      "sha256": "5e80a16292487a57aa900976fe44be6e3131f3faee29b7194ab0fe450f541b0d",
+      "size": 6328
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/rtd-hook-uninstall.md",
+      "sha256": "10205951b73a4d638896bb4810127af57631a0d071254e10ec82e5c808412277",
+      "size": 2314
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/rtd-story-lifecycle.md",
+      "sha256": "200639a9d998c529c49c913de583a4ea5f9e36e0817c39710f60a27334071fc8",
+      "size": 7878
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/rtd-story-phase5-archive.md",
+      "sha256": "7f92ff184d38db1b357f05eeae6676db578a1a08445fbf6d7141442d106d74d7",
+      "size": 1404
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/scope-exclusions-agent.md",
+      "sha256": "427521da8b1fb098867c463fa6f72fd6faed8d34417678aebf49cb331cdb56a0",
+      "size": 2060
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/security-checklist.md",
+      "sha256": "936b89adf788e0ad8fe86c38a8877c822e031c2e229584ac6255b127328fe6e6",
+      "size": 3069
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/skill-agent-index.md",
+      "sha256": "6602529c9a7589a26643b9f53f7ba0964f9dce7a6277be53fd5b7a8f7bc8a951",
+      "size": 7753
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/specialized-checklists.md",
+      "sha256": "9020dbf21aa37483d41acfbb8110e7a4835324e2e20cf2c55c43f5b3122be744",
+      "size": 1425
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/story-bundle-paths.md",
+      "sha256": "e7d0fd8d87e50d9a114f9c4fcbbb14489e4d299d3f25f882bd4213169298e188",
+      "size": 1885
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/supplementary-knowledge-guide.md",
+      "sha256": "c0e3ba4d52f12662aa0f0d5766dc3ecfaea79cbe4f9fa1743995f88a07f51d4c",
+      "size": 5868
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/tech-doc-intake-template.md",
+      "sha256": "929177d2a1a7cdcf9c822b493827bc2dfa41c9a00511b8182d41ee881729a801",
+      "size": 3544
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/theme-samples/明亮主题对比样例.html",
+      "sha256": "ce5e372ae360375df38f027eab09f421368d975f450752a6ba38e9643add45c1",
+      "size": 14429
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/timezone-clock-checklist.md",
+      "sha256": "d9bfa8a30e82177e85ddf2b40eb8d5e67e84e7a8101aeb325e389bb2c1d0e286",
+      "size": 6039
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/tracking-event-case-guide.md",
+      "sha256": "8e53c146acf2e8fea06369f063dca23128f6758fc208fd9a52bc5be11f52b2b5",
+      "size": 6631
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/user-input-vocabulary.md",
+      "sha256": "6f5b5915b3fe1d9a2a524a0f09a7be16529b4e139cf71d0f6ce8933230f2ccd2",
+      "size": 12907
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/references/user-quickref.md",
+      "sha256": "d4a98bda222108961ea10556e03d82a28b89c64a7aa54ff75bf9e04d50ee2938",
+      "size": 5878
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/.pytest_cache/.gitignore",
+      "sha256": "3ed731b65d06150c138e2dadb0be0697550888a6b47eb8c45ecc9adba8b8e9bd",
+      "size": 37
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/.pytest_cache/CACHEDIR.TAG",
+      "sha256": "37dc88ef9a0abeddbe81053a6dd8fdfb13afb613045ea1eb4a5c815a74a3bde4",
+      "size": 191
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/.pytest_cache/README.md",
+      "sha256": "73fd6fccdd802c419a6b2d983d6c3173b7da97558ac4b589edec2dfe443db9ad",
+      "size": 302
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/.pytest_cache/v/cache/lastfailed",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "size": 2
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/.pytest_cache/v/cache/nodeids",
+      "sha256": "134d1ddbe16b5f2066fc5fa9ec2094a0044d101aeb0788615d9ffc455b2d7e4b",
+      "size": 26693
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/_fixtures/cross_system/subscription-demo.json",
+      "sha256": "93b5ee1786c5eb4a3e2d47f90f66ff6004459e4042083b2db8ad480991600b84",
+      "size": 6029
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/_fixtures/cross_system/subscription-mini.json",
+      "sha256": "3eaf7a31976f5a2e29a9b294850ae0730f70117104f040f4f102450d0e6dc0e8",
+      "size": 2968
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/_fixtures/image_assets/pending_delta.json",
+      "sha256": "922983f2d6b6501d1dfe1b0101a79f188d7f7d0252eca1e5eacdeee0dadc4908",
+      "size": 1264
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/_fixtures/merge_hard/fail_abnormal_multi.json",
+      "sha256": "462a2ac68e80a0dd72b1b7e17f8f78b314e0f2bcf935efd90b51c9adb4333dbd",
+      "size": 1227
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/_fixtures/merge_hard/fail_cross_nf.json",
+      "sha256": "0a704c62d71f57271d479e7e3f936de9f9650f3bee60698c35b3e967a27b3ffb",
+      "size": 1281
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/_fixtures/merge_hard/fail_happy_includes_abnormal.json",
+      "sha256": "bd6f9d8766b8967d1b09156ea8d2f66158670e469209a3a1267f452ef883affd",
+      "size": 1227
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/_fixtures/merge_hard/ok_allow_exception.json",
+      "sha256": "875c32ad57117194070a7efe11f02921282f5a2dd4047044177e7dc23eda9d1c",
+      "size": 1328
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/_fixtures/merge_hard/ok_happy_only_allowed.json",
+      "sha256": "31205671dc84d81e5a9bb262a8458a3682a1d5eb178f073779832143d8b76607",
+      "size": 818
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/_fixtures/special_hits/hit_missing_flow.json",
+      "sha256": "1d73f8636bdc2f43adcb9a538614c7c23a8dd5e44d98d46f77387013b49b4805",
+      "size": 1080
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/_fixtures/special_hits/hit_with_exclusion.json",
+      "sha256": "29e53d3cc14bbb63f9c3dc8e0cf5a4a516c836d7f41721de5771c56b27b15fa6",
+      "size": 1200
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/_fixtures/special_hits/hit_with_flow_module.json",
+      "sha256": "1bcd36fa83aece061d4e019cc3ab39d16b5a0cccb8516a3d3d0c47a33dec8023",
+      "size": 1090
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/analysis_delivery_crosscheck.py",
+      "sha256": "cbae80fb678b36c9ac4bee13e42bd0f76297e6c44b9d7a3a982ae2d4583e2c6c",
+      "size": 7117
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/analysis_patch_gate.py",
+      "sha256": "c2c4d2bea64301bf96058fc92de81ee74be055aa310c5e25d4409a6c6a27b76b",
+      "size": 5478
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/apply_intake_reply.py",
+      "sha256": "c872835926ce5bcc7e98e7da8154a77a99f1bb855c2abd5fab2e0f820f31b44c",
+      "size": 3664
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/audit_agent_read_budget.py",
+      "sha256": "ad93fe95d54c51e6f5e9519cb653a63b109cb2b66ad1fc6dd3935a0a00fb6cd3",
+      "size": 5088
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/bibliography_util.py",
+      "sha256": "da8dcfc1a47a8806751a5ae68a14029de6e24edff5d742f88e265980899c3101",
+      "size": 1285
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/build_intake_brief.py",
+      "sha256": "cb8a5406850761ef2b3ed4d4e89524727de25c55c5a0f56ad79b8d1d4a3fc507",
+      "size": 15643
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/build_references_manifest.py",
+      "sha256": "a09fe6f5d7862d7077a429cd9a73f58f3f706f5eb5ab4c9c8d89de3bf23fefcf",
+      "size": 4661
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/case_body_presentation.py",
+      "sha256": "263dd025daf74c017cfbb2f0e4e251dd4443792c28b8da4feb3c1925d29094b0",
+      "size": 6967
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/classify_story_bundle.py",
+      "sha256": "c14484261f73ecc9c4cbdb5089956c2884330dda9732eba9ca43cfbf9d0f17d2",
+      "size": 6810
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/cross_system_map_lib.py",
+      "sha256": "b6e0d344082cc6dfaa12019e3e692429dd92e1ad7e0d7f50b8e438015476f237",
+      "size": 26206
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/cs_map_packs/__init__.py",
+      "sha256": "73eb0953b5f5fc563596a52ddb8a847d65954631d18963ca3635623bf3ce7909",
+      "size": 4501
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/cs_map_packs/subscription.py",
+      "sha256": "709a4b152bacf8812f213e063b14dcc1d897977f56d21d4bff51b62a975c7090",
+      "size": 918
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/cursor_readable_md_setup.py",
+      "sha256": "320b021168639c2e5873e5b1f1d1f8cd8c83228a8a163001d45c8bc1bdb84f86",
+      "size": 8079
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/delivery_layout.py",
+      "sha256": "e953f27a2ba293d54fe699ca24c14b48ebe3840e7ec6e4cfdbb9844159e026fb",
+      "size": 23887
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/delivery_phase_gate.py",
+      "sha256": "47856c6937af5006131c4dad54b4b67c5306a4c2dd85864e41d551150e17897f",
+      "size": 9270
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/diff_delivery.py",
+      "sha256": "3ee6728b993b0a6b50846f0ed9914a75624342da7352f144eee3867d640bb4ba",
+      "size": 11083
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/engineering_lexicon.py",
+      "sha256": "18f1aaa4b08d884e2349dec8d7222a9e0a38d126f4369e7bb0395f4002552014",
+      "size": 5116
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/expand_cases_from_matrix.py",
+      "sha256": "d86d8d4e6ef92cda787be9808e6f0afb5332290be17cc33b2d3f4094dddb2494",
+      "size": 27333
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/export_kb_design_context.py",
+      "sha256": "e452900e1b5869bd72c1daed1a7c905fb0c309ef393ba2c4bc306de849ad25a4",
+      "size": 6100
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/export_kb_impact.py",
+      "sha256": "8275da6f83c2c98d5e1f37063fdb0a926c22f7c1ffaa9d4a3c26c0b16903fac7",
+      "size": 22250
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/feishu_backend.py",
+      "sha256": "142296dc06ce2b57509180c006fc71674b2e085cd9128a0f7f2422c018311f69",
+      "size": 5256
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/feishu_lark_backend.py",
+      "sha256": "f33df2cc985a966254f912ceae32f04918e1623ff2db2991cee6ae3107b2080e",
+      "size": 14449
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/feishu_local_md.py",
+      "sha256": "f6b7da8adad350c214709285cdf7cfa0851eca05b9b0ce07731422a505c2313e",
+      "size": 1470
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/feishu_mcp_backend.py",
+      "sha256": "2649b61f3f1483da2aced5ff1899df5959c504c04f630ecd1d6a5cc2ca41db3d",
+      "size": 7584
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/finalize_feishu.py",
+      "sha256": "4aa5abb9ea63bd17d145dcccbf4fa4e06e498b6456a4ef9e7bb9b566c42a4657",
+      "size": 12753
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/findbug_ack.py",
+      "sha256": "976a569749fdef5e1c82de1328032e433ae1547ed4f195c9ccac909970a60982",
+      "size": 4757
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/gap_fields.py",
+      "sha256": "af10f5bbb757e69cdaa5e79b0600852c80f8d20f2e809f78653fbcdbff152403",
+      "size": 3931
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/glossary_fields.py",
+      "sha256": "befcbf6300c675625d4d8075164583719dd4bcd3ee7493d8c8f5faadf6a838fe",
+      "size": 3033
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/html_slices.py",
+      "sha256": "01217a81946f7ba4ccb855eac940a33e4dcbc7f454e641e648abe8984c8090c1",
+      "size": 13205
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/humanize_case_body.py",
+      "sha256": "735e47a83c162513e1ebc01e70a59de458d73e46cded1713428678c47cf29336",
+      "size": 1252
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/implicit_fields.py",
+      "sha256": "6c9814757af4d997bad02af0a15304a43754d09be93f5a1fff21a6275e07946b",
+      "size": 3281
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/import_analysis_ref.py",
+      "sha256": "bdde5b0225b6eb21616f50f324ff4af81562039eff654afdfe0ad2af50765d49",
+      "size": 3969
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/import_analysis_seed.py",
+      "sha256": "3921672691c9da27d8ba29dbb137b291ca61a0a3c52bec1819b3b738e55b2081",
+      "size": 22948
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/import_ledger_answers.py",
+      "sha256": "f82e7dddd657a83099a366eea341c4b2905c32b80e4dcffd930b2584779ed99e",
+      "size": 2258
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/import_preflight.py",
+      "sha256": "3086d7582971c10a81cfd1101653916852c45b9eef29ce03c71506ba03d7b4ef",
+      "size": 7414
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/import_qa_context_seed.py",
+      "sha256": "427b0ac97a44c91d9286c746644c86e9b267f326b62d429bcebef15a4b9c9163",
+      "size": 19202
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/import_skip_ack.py",
+      "sha256": "c8c5f53f76d584f0c5348f032555b53913f95e3a2f0f8232f779f2e02daad993",
+      "size": 5003
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/import_tech_gate.py",
+      "sha256": "239125fbf10d18fbee45a1d40e72b60c1a845903963ca72ff032379cf99ef96c",
+      "size": 9320
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/intake_gates.py",
+      "sha256": "bc55c4a1bcaaa755344446d28e7e7260c77c69d28731b3458e919aa0b49d7b85",
+      "size": 33960
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/jargon_packs/__init__.py",
+      "sha256": "1703842df69942e5f6b8b11275449f3280f2d113b5969d4feb4832d347b5b0aa",
+      "size": 2427
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/jargon_packs/automation.py",
+      "sha256": "bd749b5116904267ba4acff4447f86cf93d9002558549159d7411d490d59bc99",
+      "size": 603
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/jargon_packs/subscription.py",
+      "sha256": "c0ab73ba7425214e8835e0cd42e080fd1e48e392e1866a2509e08e9feb6a1f33",
+      "size": 405
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/kb_provenance_gate.py",
+      "sha256": "702e2d9713eae535f00362bd7702d49cc49540ad7924b7c36eb4fd5afdb5b28d",
+      "size": 7116
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/kb_provenance_util.py",
+      "sha256": "fb15ac41823db863b7c2824dd5e057201612e73853e28c74debbc1102b9e0e86",
+      "size": 26539
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/ledger_link.py",
+      "sha256": "cec45908b67f6cb38bcf6d14300007b3ca1ed6ee2dd301efa860515b51c1c114",
+      "size": 6163
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/lexicon_packs/__init__.py",
+      "sha256": "c4b628d97d8772d263acd93ae7cc382dee1856c8f47050a923e220ceb84976ec",
+      "size": 3049
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/lexicon_packs/subscription.py",
+      "sha256": "f953d7dcd9edc781821a2ca1f75bc87425fe87ded79974b5aa814b894f365531",
+      "size": 1087
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/local_delivery_render.py",
+      "sha256": "79148ccb96c30332840506e41365efa83df0ababa0a74760b1e86efc1c5db971",
+      "size": 7832
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/migrate_story_bundle.py",
+      "sha256": "16db99380cade87a16d5cf5055dfc3319db0af24e7aa82cb34e9973d68968162",
+      "size": 4660
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/migrate_story_bundle_all.py",
+      "sha256": "a70999912103e79f7068c0c1af3be8a28c3aaa5e948ca6672b59e9b08c5e7335",
+      "size": 4659
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/mindmap_util.py",
+      "sha256": "cc89f9487c58b0614d62f2c057d25d1141a542d3bd69c17d22697469a33f148c",
+      "size": 23981
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/modify_ack_delivery.py",
+      "sha256": "c46b25b077d57846085f56e4119a38e6a164d31c1f25dc91fd6626ec3f7be49a",
+      "size": 1956
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/natural_language_lexicon.py",
+      "sha256": "d33089eefca7731916fc29c23e9bcc63570b47d707ed271cfd5e4b96e77f90f4",
+      "size": 7107
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/patch-analysis-ref.json",
+      "sha256": "98118cf9772216aa9fe317e12d7eb08453c550ff5f190b7de21e5bb6c6de646a",
+      "size": 635
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/patch_delivery.py",
+      "sha256": "babe60ce868d0ab60af3a5073ae50e0cd849ec65796cd351ad3fe1c1205bcb8e",
+      "size": 26135
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/peek_delivery.py",
+      "sha256": "da218f849b1812f2250d2e5e770ac280867f4dd1fc2170be4c29b96e51f57ec3",
+      "size": 4340
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/pending_confirm.py",
+      "sha256": "46954f5ec636b74ce09b42e858c64f87efb95bc2bd2aa823b5c0adb0d60f39a1",
+      "size": 5298
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/preflight_delivery.py",
+      "sha256": "f60257f53efe3f3c32b89ea5596136222ba401b8775b9c30f13b83e0242c9db5",
+      "size": 11415
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/prepare_kb_bundle_bridge.py",
+      "sha256": "326e3de909e3e88565345ef707d84dc75e9fa0b64d0514ab8bd1e79f2ab92afe",
+      "size": 676
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/publish_draft_feishu.py",
+      "sha256": "15cc1208a8d489cec859c408d5e208d63aeb2e6062f1a041e60bb381bfb9f4e3",
+      "size": 4718
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/qa_map_script_bridge.py",
+      "sha256": "8c2042f2df7b7e0cc97dc2e34905acfcbb9408a6dee9a952d03bd52663b84366",
+      "size": 574
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/reinstall_project_rtd_guard.py",
+      "sha256": "d905578eab9115ab6fbfc3abcf4b2ecea55495afda0da32bc64d97a98aec022d",
+      "size": 3915
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/render_delivery.py",
+      "sha256": "d66cde87206bffef461644500db0dca4877685a0149e15c6386e732847c81756",
+      "size": 65073
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/render_feishu_cases.py",
+      "sha256": "4e14f9d3eefc6080fb1c0a02cbf0cfa156e243ffdbffda6bae2868bae37c2ec0",
+      "size": 71787
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/render_feishu_local.py",
+      "sha256": "461ec3525557fad604ed6dbdc398a477207be5f21509c4c087d13a50fc4ea266",
+      "size": 2774
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/render_readable_testcase_md.py",
+      "sha256": "794aa76b792e5b3406e601d721a355768a0286b288dd96985496dc2ef78a7351",
+      "size": 10012
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/resolve_delivery_paths.py",
+      "sha256": "89c1571bc26ba89b75a647f8e53c53bbd2801f2620d245ab3f8fcbacacacc7e5",
+      "size": 2323
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/resolve_kb_hit_bridge.py",
+      "sha256": "09957893f34c2198e0acb790c705bcb1fa9400267fb813a97afcac57f2e60a4c",
+      "size": 666
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/rtd.py",
+      "sha256": "4ffb07d09534f1441277cfa040a458a2b82e9512036378b2c879821a13f3e344",
+      "size": 7594
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/rtd_guard_project.py",
+      "sha256": "f9aa009ea98c37b31ed5a707d93a793e3b1fe59321c05e66d791698e857f46d8",
+      "size": 15294
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/rtd_hook_uninstall.py",
+      "sha256": "438f3c278332974070312785c6b7ffa384f59607addcca7f210214e0b50b1faf",
+      "size": 11869
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/rtd_preflight_state.py",
+      "sha256": "4319b9a31cf466d023af9a9383c52aaad5fc8d8ccdf04fd2f4234dded886f6b3",
+      "size": 6142
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/rtd_supplementary_ack.py",
+      "sha256": "c34d51d23dbbd85934feefa3491d3eb9014df91c67fb3af2c91add6e056b807e",
+      "size": 12911
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/scaffold_draft_delivery.py",
+      "sha256": "7264474e44e914fd6700e30ca8e8cae1298be41b38088b3424b4c0ac2941e0b2",
+      "size": 17621
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/scope_exclusions_checks.py",
+      "sha256": "06c2d26d00f6aeef56a6c3608d65bc19ff283c593489bbef7ef946a5129bca29",
+      "size": 4648
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/seed_matrix_from_brief.py",
+      "sha256": "2969b89e12294e4decd6936556d53eb59323b8a0579acf8bb41230077040a0df",
+      "size": 19655
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/show_glossary_review.py",
+      "sha256": "f89208af10539dd0de2f5781f067dcf5eabd2f99c5f72036c40a0598fd475549",
+      "size": 3314
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/show_pending_gaps.py",
+      "sha256": "8418199312143d7aa5b696c640e8237b0521eb11888b6b8129bb4e372fb2a7cf",
+      "size": 1393
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/slice_workset.py",
+      "sha256": "8a6cc0f10605ee8a371e67056db15d4a414ba20cabe2dda443fd77eb4603de2b",
+      "size": 8776
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/sweep_qa_orphans.py",
+      "sha256": "e9babcde8141be5586fe1c538e038da2e347a288e5240695c82de97c7fb868d4",
+      "size": 2018
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/sweep_story_orphans.py",
+      "sha256": "7b1a6b083d1adb4ab8908f86130e4c3131367fa40ea1511132a24f93acb69dd4",
+      "size": 2214
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/sync_cross_system_map.py",
+      "sha256": "4f2385c98eb0ef79410b732c1e9775c2ee38eebccd45ccd9b3afcd383ec1c591",
+      "size": 3914
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/sync_kb_provenance.py",
+      "sha256": "e4e358f2f28d3d0ef294499cbc1b98e17f1ac76adafbf9608d2b8be971c89ddd",
+      "size": 4406
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/sync_project_rtd_guard.py",
+      "sha256": "4d4b54ae4a7b90b9f5bd377c99da9ca0146622208b42bd9915bdd13e032e393a",
+      "size": 2534
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/templates/delivery_input.example.json",
+      "sha256": "05e13bae423d213e2acbf89841b41175bd6673471dd886cfbbae31b8ff41ef04",
+      "size": 4924
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/templates/patch-ops.example.json",
+      "sha256": "90fdb59b20c3018e7cd24b3b0e98da5b7abc2f4ab09b42224300fb4b2bde731c",
+      "size": 366
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/templates/script_template.py",
+      "sha256": "435dfba1e832adeb0895fe270ee3219192b46d87b4cb2d7f6bc9c88695cd6d5c",
+      "size": 1095
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_analysis_delivery_crosscheck.py",
+      "sha256": "90045822a01d47720671accb2c5bd0b855a3b21a07d814744e96622e29072a23",
+      "size": 3035
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_analysis_none_waiver.py",
+      "sha256": "2e10cefcfe179b8cb95fd0632a236cfb735d3f35b7305a74c1dd1879f044ac27",
+      "size": 1243
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_analysis_patch_gate.py",
+      "sha256": "a68034dac017a9511b2031ea214ac1eca82778bcf3f83a7643891d8bb82e1927",
+      "size": 2504
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_bibliography_util.py",
+      "sha256": "3c5e4f56b707a8cd6d3c8323501508eacede5b2de6c21c06dad9d7932bce8f3c",
+      "size": 1137
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_case_body_presentation.py",
+      "sha256": "34f0cde8990da505ee9d080d108e5b5d58d0d70ca78ed149761a0d0b5898dfad",
+      "size": 3105
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_case_concreteness.py",
+      "sha256": "6d4352d7850a5a0f6449e645173987e64daec0ff36fd29178013363a77a12372",
+      "size": 5800
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_case_lifecycle_causality.py",
+      "sha256": "3ebd1cc5d2d8e2d1eb8f515250747354fb08e3b50e3053d8398bc876159cdd4e",
+      "size": 3134
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_cli_help.py",
+      "sha256": "574f7ccba9472c363e48026b6b595d8580282c0b94107882f464cee5c5c77247",
+      "size": 1557
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_cross_system_map.py",
+      "sha256": "528e470a78fe57942dbb6a6591996d8d70d9977c5f2589cbc3501420dc14dd95",
+      "size": 6478
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_cursor_readable_md_setup.py",
+      "sha256": "d30dbc5df5c4f83884bbc4ad3a9d81a63b8f0660157ec34e71424c78a2c19b43",
+      "size": 1907
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_delivery_layout.py",
+      "sha256": "9d908d23b027b11994ed1d0087be06b895c87c1649f4ad7a68a74d185eacdafd",
+      "size": 5007
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_delivery_phase_gate.py",
+      "sha256": "433111a3fc85d41b5ee472f696554c9c33e908d47f8b414a01bfc34ccca2c1f1",
+      "size": 2839
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_doc_lifecycle_consistency.py",
+      "sha256": "24d098dacc826618fe91d109e66f323b9e115a0932d001ff0cc4d2fdef23a7f0",
+      "size": 5226
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_expand_merge_v2.py",
+      "sha256": "1af9780a12359e01b73180e408ca06cc7ac07921752476c3707ba92464552e02",
+      "size": 7799
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_export_kb_design_context.py",
+      "sha256": "a54011d042d9be9705312faa18cb8791bc912fa15b27e20644ba6747b0f8ab2b",
+      "size": 2105
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_finalize_pipeline.py",
+      "sha256": "7cda3872471d2b382af849d4150653c60d20bbecc000c42d3663e43b542c4a25",
+      "size": 5476
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_findbug_gate.py",
+      "sha256": "344e0a54aee7f24e4eb25afc38b1c3b8394fd8947f3824581197fa8edbf05be3",
+      "size": 8319
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_implicit_requirements_gate.py",
+      "sha256": "f7468608d1ca984983f3cc1cae577b5930cfcc21fbebad70dce3f1a1a0b3aee3",
+      "size": 2411
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_import_analysis_ref.py",
+      "sha256": "7597b831eb72c463be124cc1c0f4510cb18f2153c3dada2c2f8f283019406d3e",
+      "size": 3851
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_import_analysis_seed.py",
+      "sha256": "ddf9aaada8f45786678fc71563e203e695c8f4956b90a2a68f59b1e488d07937",
+      "size": 15981
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_import_preflight.py",
+      "sha256": "84a6cec8676709bae4a3fd8d3076986739bfe449927fbb83b873bb22f9f12ddd",
+      "size": 5648
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_import_tech_gate.py",
+      "sha256": "213c72db6a32b75d905b471d67fe81093bd9d6b64c635f28034ae7af251b6089",
+      "size": 8093
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_inject_terse.py",
+      "sha256": "448f74a6fdbdd1ba10b171639f0be9b64bcf0583dce828faa5343f1cc5da1167",
+      "size": 1741
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_intake_ch3_confirm.py",
+      "sha256": "2a1f6b83ca15bf89e2f2b36de3125cbb662359b0176a0fa1e9e23a3846e66921",
+      "size": 5201
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_intake_ch4_confirm.py",
+      "sha256": "642c11bd8a7dde2177baaeb71a4c6abd6209a222749d27903435e12dcad014c6",
+      "size": 3562
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_jargon_packs.py",
+      "sha256": "01cc5025ca4358df21a99886e8d3fac4b480c70874bb4328d05983e1789c6e0b",
+      "size": 1391
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_kb_provenance.py",
+      "sha256": "f429fdb7d0d94c8fdd81125a703accac3f4a056d02feec820b0e961a8b9df624",
+      "size": 8398
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_kb_provenance_gate.py",
+      "sha256": "7ab625b183ca59d68f0ea370cc4bb79b805f49c0160dbd3c8b223e650aa88fad",
+      "size": 2275
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_ledger_link.py",
+      "sha256": "b923f4362ab2cd6f9bbd2187310694fc7ad8cacc04d35c510a1e6e94ffea3d85",
+      "size": 7136
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_local_delivery_render_env.py",
+      "sha256": "9fbed9c82256c47ef6fffa9e1f3750907aeab4bb6259d41227e7538b37f9ea61",
+      "size": 2737
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_mindmap_flowchart_lr.py",
+      "sha256": "ee0a2d378aedf3314eee3455d27ae14da78c69740bd0f61c0e9885cc20f863ab",
+      "size": 4007
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_natural_language_lexicon.py",
+      "sha256": "4e49896129ee3f5185f67fd13bfd17d720a301024293ced025bd9e0dab86b46b",
+      "size": 2606
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_pending_confirm.py",
+      "sha256": "0217c2890aaf2426476ac8ce1677348926e8ebf95754da8e61f5fb199ae5f806",
+      "size": 3319
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_preflight_gate.py",
+      "sha256": "c16633141ce4f1756f3cd27cb1730ab363adde60ab1c3ca9c81fe5378862abe9",
+      "size": 1746
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_readable_structure_index.py",
+      "sha256": "e12df7ff57273d91ec1ea24e8ee6727b57a2d4939b37c3b62a5a0be8114e43bf",
+      "size": 1906
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_render_delivery_shell.py",
+      "sha256": "d664e71b158fc8e46a204a51fdddf9db5981ae156ad1c9571610d54bd702dddd",
+      "size": 2402
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_render_feishu_body.py",
+      "sha256": "76d745a906deadcef82dfca5ae2441c771c3e85faf496c9f0c197ce69ef326f3",
+      "size": 1757
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_review_confirm_mark.py",
+      "sha256": "ee711a6b0b7ed8d7f9bb42947baa62e16207348d321145fdb6f2a1911dc6c741",
+      "size": 1548
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_rtd_guard_project.py",
+      "sha256": "bc2143b958066aa8db28bb11bbb386dcf051775c1c5db03d0ca29109ef131db5",
+      "size": 3124
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_rtd_guard_shared_config.py",
+      "sha256": "45ca52346f111b7b2b6ba69356ba92d7c9dfd7f4f9fae6a8f9d5ed430df15edc",
+      "size": 2713
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_scope_exclusions_checks.py",
+      "sha256": "609b9fd775f387e4c140497905b8440dbb5c2bb8f15a4d94ae702ec0b5bfe4aa",
+      "size": 1425
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_seed_matrix_from_brief.py",
+      "sha256": "db396310536419f0acdb8545701cddec0c5d81952320266f73d8883772e5da5d",
+      "size": 2844
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_supplement_guards.py",
+      "sha256": "22c42603678ab750164db50f92fc724896f351d0b62e08b0a677496699f435c0",
+      "size": 5524
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_uninstall_rtd_hook.py",
+      "sha256": "e207aaa80754882ff38937154772d085b797fe1b3749d4e92a84264e69d9ed0d",
+      "size": 3494
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/tests/test_upstream_import_gate.py",
+      "sha256": "e07891765688272738b4f1acc551834adc77635faf5e1619fa8842c32e578f62",
+      "size": 9442
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/uninstall_project_rtd_guard.py",
+      "sha256": "b5ef5415fbc0c6fdbe129537809d13b581f9c8cfc773ef57e31a3b2c4528cf3b",
+      "size": 3607
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/upload_feishu_ch78_safe.py",
+      "sha256": "74dbdc511f2fd59fc83974bde8d411356db75a23c61c3b9c4d12fe1349028df8",
+      "size": 23308
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/upload_feishu_doc.py",
+      "sha256": "79375259912ab796eb464af4caf2fbc0939fcc2df5e08ab712cb8446f8bbc520",
+      "size": 29580
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/validate_traceability.py",
+      "sha256": "f78f7b295a20299144dd858a352f4427d4eadf1c5b52b689cebda7880138ae3e",
+      "size": 77834
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/scripts/whiteboard_raw_util.py",
+      "sha256": "1c7146db85727c6b56764c31e0916c7d21b38529b15923c39bac3c7888b4f663",
+      "size": 7990
+    },
+    {
+      "path": "qa-mainflow/requirement-test-case-design/tests/fixtures/delivery.json",
+      "sha256": "79f95919b2ea9b292638ea7e7ecfe4e38388b873124ae608237fd9fbd965b944",
+      "size": 2078
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/.pytest_cache/.gitignore",
+      "sha256": "3ed731b65d06150c138e2dadb0be0697550888a6b47eb8c45ecc9adba8b8e9bd",
+      "size": 37
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/.pytest_cache/CACHEDIR.TAG",
+      "sha256": "37dc88ef9a0abeddbe81053a6dd8fdfb13afb613045ea1eb4a5c815a74a3bde4",
+      "size": 191
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/.pytest_cache/README.md",
+      "sha256": "73fd6fccdd802c419a6b2d983d6c3173b7da97558ac4b589edec2dfe443db9ad",
+      "size": 302
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/.pytest_cache/v/cache/lastfailed",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "size": 2
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/.pytest_cache/v/cache/nodeids",
+      "sha256": "b4d16bd9f29117c1a8e5f8c132610b0d7cc40704f9778a40d8fe9182e5e312db",
+      "size": 37110
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/SKILL.md",
+      "sha256": "061ccba1cfb2e8d1387872ef458af2c351b816a6bdac8030f7519dd4d9b87bcf",
+      "size": 3782
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/assets/analysis-template.md",
+      "sha256": "a21cdc24fe15ed8a089e6f348b8dabb170d0bcccf0e1959194aee50aa2a926c0",
+      "size": 8797
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/assets/qa-analysis-shell.html",
+      "sha256": "13bed7bbbc852392d865a2375c0c5e90bc72bb1fe25c48cd97069899f9a5fbb3",
+      "size": 21513
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/examples/blocked/sample-gate.json",
+      "sha256": "91348962e24b2a8c5fc427e2e3e1d3297a4da87a6e2af82d80d7745547137c55",
+      "size": 25517
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/examples/blocked/sample-prd.md",
+      "sha256": "13ecb4aaa60bf2decc0e87e30b9109389e0860ac90d4b4859d9d64837036fd05",
+      "size": 683
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/examples/blocked/sample-remote-snapshot.md",
+      "sha256": "16d90159b4efd5593f7b3dac0a5245736aa23669ea1c07935ec23f1c104e1657",
+      "size": 389
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/examples/blocked/需求测试分析.html",
+      "sha256": "ea7a6a5d9b52d78db259d9b1a47b5edb6c88da2edbfbaf4ce45533c4c6c8aae2",
+      "size": 55309
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/examples/blocked/需求测试分析.json",
+      "sha256": "a6f71c5268a413e7e08ab504523a2a037381b0c6b1e1d2c7067a864e9e1d607a",
+      "size": 27364
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/examples/blocked/需求测试分析.md",
+      "sha256": "be2363214c36575e7423e74c1e835ac9fd5d2a6dace695ade9c23476ae988611",
+      "size": 20148
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/examples/conditional/sample-gate.json",
+      "sha256": "b77b0bbc207170532aa82fcb79570cef94de97bd5b59c08f220f66096f6eeda4",
+      "size": 25493
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/examples/conditional/sample-prd.md",
+      "sha256": "13ecb4aaa60bf2decc0e87e30b9109389e0860ac90d4b4859d9d64837036fd05",
+      "size": 683
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/examples/conditional/sample-remote-snapshot.md",
+      "sha256": "16d90159b4efd5593f7b3dac0a5245736aa23669ea1c07935ec23f1c104e1657",
+      "size": 389
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/examples/conditional/需求测试分析.html",
+      "sha256": "ac323c61542a2d71b0f9d44395586ab19f91a195bfdfec994cb565df05ed614f",
+      "size": 53279
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/examples/conditional/需求测试分析.json",
+      "sha256": "165eff50843ca1d6ec1c113772e9339210d549d6cc11cc5d393a5464c1e769a5",
+      "size": 28554
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/examples/conditional/需求测试分析.md",
+      "sha256": "a20873492953af14ce9c0e0c7fc0f2cc036a0e9d6eaf698eaa1e7a014ae1b246",
+      "size": 17587
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/examples/generate_examples.py",
+      "sha256": "f23dc01d2521084dffb67362661adb324c894e9d55b023c9fd526dd92159a3c1",
+      "size": 28707
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/examples/ready/sample-gate.json",
+      "sha256": "fbf2d2ad8072bc4c88ad58dcf5ce82a0d80e00740129e94d62f2bfd52e90ca14",
+      "size": 8449
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/examples/ready/sample-prd.md",
+      "sha256": "13ecb4aaa60bf2decc0e87e30b9109389e0860ac90d4b4859d9d64837036fd05",
+      "size": 683
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/examples/ready/sample-remote-snapshot.md",
+      "sha256": "16d90159b4efd5593f7b3dac0a5245736aa23669ea1c07935ec23f1c104e1657",
+      "size": 389
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/examples/ready/需求测试分析.html",
+      "sha256": "fd3679437aed9e08964df6ec1853ff514ea42b2322cdea3cc9cd75b1bdbc5e15",
+      "size": 49921
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/examples/ready/需求测试分析.json",
+      "sha256": "5634837d4f78661526bebdaeec5644143da0d483c4d2827c3616db46f4678eb0",
+      "size": 25830
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/examples/ready/需求测试分析.md",
+      "sha256": "b99d71738db988ce64d69fd57301451ad75a9ce0c76022cd326b443544dcc5a0",
+      "size": 15610
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/examples/sample-gate.json",
+      "sha256": "fbf2d2ad8072bc4c88ad58dcf5ce82a0d80e00740129e94d62f2bfd52e90ca14",
+      "size": 8449
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/examples/sample-prd.md",
+      "sha256": "13ecb4aaa60bf2decc0e87e30b9109389e0860ac90d4b4859d9d64837036fd05",
+      "size": 683
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/examples/sample-remote-snapshot.md",
+      "sha256": "16d90159b4efd5593f7b3dac0a5245736aa23669ea1c07935ec23f1c104e1657",
+      "size": 389
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/references/analysis-baseline-traceability.md",
+      "sha256": "92111d3fd06064f918f9eddef6bf9535e87e042992db587c88e79fd229ff1308",
+      "size": 4078
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/references/analysis-decision-table.md",
+      "sha256": "f7657806855ede1ecc9784c4eafaaf262159cfe4b28577626e3316908713eeff",
+      "size": 11442
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/references/baseline-comparison-verifiability.md",
+      "sha256": "6486c9dceed79a4f7bed32ce339743c53893ea3f5171c7a798492e645b56100f",
+      "size": 3167
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/references/delivery.md",
+      "sha256": "404ba860360852c4b3f09fd467ead6a32aaa43b2acbba33143d190115041ec8d",
+      "size": 8614
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/references/execution-planning.md",
+      "sha256": "ee7f5c6fac59f800b628095a022bf211448850d4058a58f3ce8fe72f665f1ee2",
+      "size": 10716
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/references/gate-intake.md",
+      "sha256": "275c464f64babbf54687261047ae9c543a5cefc811725151afce172c1153497f",
+      "size": 21111
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/references/hub-agent-index.md",
+      "sha256": "7446bd0833b10642f7ea2a19f2bd4e9f8bcc887b09d06de6099a4bbaebe0715a",
+      "size": 4834
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/references/impact-regression.md",
+      "sha256": "46d921b1c898559affd76e4b25f94efc467790e4dfe069ff8f53df44251811f3",
+      "size": 5965
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/references/kb-adoption-prose.md",
+      "sha256": "591618a6afc09f5f082919d135def56f56e30910eada0a0b07181b1260147671",
+      "size": 2380
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/references/materials-and-execution-evidence.md",
+      "sha256": "033e0dfc4afcc649829945c19963b8ac1ef78fe8e25546d04eaa252469b63e3d",
+      "size": 4249
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/references/matrix-module-handoff.md",
+      "sha256": "fe999d2c3cbaaeb6fb057cfa341d418dbb152747fab8f56bb9cf5dadd9824f17",
+      "size": 2194
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/references/open-items.md",
+      "sha256": "fdce5151f00ebb245726d5bfbadce5843dda55597468ae83b4e0fedbd3cd2bd0",
+      "size": 6802
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/references/prd-coverage.md",
+      "sha256": "97ad296df3208852ccb4ef82b4e44d53a6231ca1072787033d47533747a5f61d",
+      "size": 2134
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/references/report-schema.md",
+      "sha256": "ab4a11d80e71d36915bcef5af15042b3acab2d310d415cdda11c0a655176a7ed",
+      "size": 20018
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/references/risk-grading.md",
+      "sha256": "2e6e50eb0c53902747b95b1dcdb2f765c18e02abbac3c817f5722e9faac7daec",
+      "size": 4196
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/references/source-rule-layering.md",
+      "sha256": "978c4d374b7c5747e6376fc3f875b94f9e3da11a38cdf19f93f13cc3a7ad411b",
+      "size": 4873
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/references/testability-assessment.md",
+      "sha256": "146f82f81e61fe120d9324b4be46389c2d7e6a3498211c320665fc0cb7be14a4",
+      "size": 8832
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/references/testpoint-extraction.md",
+      "sha256": "ef15e07336278564cae8d15c99f82613429d3d3a2e6577a42a01e2966b54096f",
+      "size": 9053
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/.pytest_cache/.gitignore",
+      "sha256": "3ed731b65d06150c138e2dadb0be0697550888a6b47eb8c45ecc9adba8b8e9bd",
+      "size": 37
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/.pytest_cache/CACHEDIR.TAG",
+      "sha256": "37dc88ef9a0abeddbe81053a6dd8fdfb13afb613045ea1eb4a5c815a74a3bde4",
+      "size": 191
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/.pytest_cache/README.md",
+      "sha256": "73fd6fccdd802c419a6b2d983d6c3173b7da97558ac4b589edec2dfe443db9ad",
+      "size": 302
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/.pytest_cache/v/cache/lastfailed",
+      "sha256": "6e75eecc629cb1c8fb2214cb7e3e3e4a10714016e780ab1359f27550e6f4f2c3",
+      "size": 12577
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/.pytest_cache/v/cache/nodeids",
+      "sha256": "8b40253fa942b188cd2f85d85945b8d82e2b9ca0f1d6467948b80ac1ba108e80",
+      "size": 35318
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/analysis_decision.py",
+      "sha256": "bf1c79550e96b62d5b4dc4bb9807911a208994583da8e02193d25db751a18caf",
+      "size": 51072
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/extract_tech_gate_context.py",
+      "sha256": "aa5902cf3a547b1b1a810d5181447b0926b0c1834d8148a4e01be9ca5a4c3975",
+      "size": 2931
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/finalize_analysis.py",
+      "sha256": "bb399615d11df20e47966db01f88acc1ebd99d3a43adc018c288e4aea1a9dfcb",
+      "size": 3355
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/gate_input_sync.py",
+      "sha256": "aa34e417d79fc61c76d38327e0cb6d92af90673ecb21c8f7fc1b788b04c3062e",
+      "size": 1935
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/import_gate.py",
+      "sha256": "1ce486eaf504688b6cae0d2c2836818d1c129693660f9c4c4bf9e84d9e687ebf",
+      "size": 6761
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/kb_bundle_sync.py",
+      "sha256": "48eaad2527b6df63ac47e875e6004052e8ab03bbd9e226fbf4eee38e1b0e163c",
+      "size": 3227
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/prd_intake_checks.py",
+      "sha256": "688a75c6f4dce7cba9403746566537e0b11e8e558b400174bb273f1d4738d7ff",
+      "size": 12329
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/render_analysis_report.py",
+      "sha256": "6897377b0f32d2fdebd4513b433bea9f67d2c5ec03cfd290310c621f79ebcc3d",
+      "size": 70404
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/tech_gate_transform.py",
+      "sha256": "d3df2cc4e031513c548ed431d2f479d6e79759c9e1d22957e29e722944d38e31",
+      "size": 74672
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/tests/fixtures/order-status/expected-analysis.json",
+      "sha256": "bc8b2ab790d82789b8312255cd8d1ef9103f9d011e2453e781cb84f6c5b62816",
+      "size": 65776
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/tests/fixtures/order-status/expected-tech-gate.json",
+      "sha256": "ddfee47f473aa943d9c03b8f65985a8c6205a71bef7616b7c3f6d2512cc6bfda",
+      "size": 87731
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/tests/fixtures/order-status/input-analysis.json",
+      "sha256": "ae2462baf0dedbb92a5a43e2ae6c279ab7c21db10f203375c2ab5c97cf2571b1",
+      "size": 26155
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/tests/fixtures/order-status/sample-gate.json",
+      "sha256": "fbf2d2ad8072bc4c88ad58dcf5ce82a0d80e00740129e94d62f2bfd52e90ca14",
+      "size": 8449
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/tests/fixtures/order-status/sample-prd.md",
+      "sha256": "77dacc886e7a3741a8c7ab549fd0f8ee1ac49f1c1edf7460a5124d61695a4222",
+      "size": 1079
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/tests/fixtures/order-status/sample-remote-snapshot.md",
+      "sha256": "16d90159b4efd5593f7b3dac0a5245736aa23669ea1c07935ec23f1c104e1657",
+      "size": 389
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/tests/fixtures/order-status/sample-tech-design.md",
+      "sha256": "14564e0ac050be68804576668b89ecc0974c01ab49d7272b7db226c79f027265",
+      "size": 1727
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/tests/test_analysis_decision.py",
+      "sha256": "b366b8e1607b3609554e920a2f2582aaefea1327e33f846280e58e09c63145f0",
+      "size": 13828
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/tests/test_analysis_scoring.py",
+      "sha256": "d5851c8784a87f4f590411262baeb2c4edaca79fbe5b4c420dcd8ad710bb6379",
+      "size": 36671
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/tests/test_gate_intake.py",
+      "sha256": "72cf8e0f560fb654998bad0b568bf557ff72e00389ada191f07900828bf98d3a",
+      "size": 2499
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/tests/test_import_gate.py",
+      "sha256": "c6c3f3af5dbb68daac43f5c72987d23fa00302a22aa3414f2fbaa15d135a3252",
+      "size": 5052
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/tests/test_json_output_contract.py",
+      "sha256": "34125997d12124dc30fc7c09c57bc01ba5aefcefe6c38959e83dd3800229ff8a",
+      "size": 1966
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/tests/test_kb_bundle_sync.py",
+      "sha256": "a34a6d8b135a77215a304441eddfccb3ba9f0b29c243d18cca9e002a31c9403d",
+      "size": 2508
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/tests/test_open_item_basis.py",
+      "sha256": "dfb983f8047f8840aabb5efbb71d580547da2bb75668c01fda5f03c00b0461d3",
+      "size": 2193
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/tests/test_order_status_fixture_semantics.py",
+      "sha256": "96901c6587fc7b86073209229277f1d4c7aacd6b858cd2dba687c6e9fb597510",
+      "size": 51709
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/tests/test_prd_intake_checks.py",
+      "sha256": "b8345e2315095997f9a04111ebb427d87d511e76a94b7e63e9c4ef7cc7b3c03e",
+      "size": 2239
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/tests/test_solution_compliance.py",
+      "sha256": "544e7faaa8433a8f16997e9e5ea171b696ea76c3c3f5a5a4c47b3dae93af08d6",
+      "size": 84470
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/tests/test_tech_gate_consumption.py",
+      "sha256": "56d98641a3856b9c7cd0a33c89259adac9cc5466593c179230e6827de161f599",
+      "size": 9629
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/tests/test_tech_gate_transform.py",
+      "sha256": "1a857d2f3ea676b1ac1d0aa40d5fff2a405660fd8d6a8db3fdcbd31ad4115192",
+      "size": 64102
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/tests/test_validate_analysis_counterexamples.py",
+      "sha256": "951fd98b36e1d5ae3d6927181641329512ad84fd9bedc53348461b4eff3c5d02",
+      "size": 38709
+    },
+    {
+      "path": "qa-mainflow/requirements-analysis/scripts/validate_analysis.py",
+      "sha256": "cec3a66c0a7dfe2fe29bd6e463f8c61f1d77851959a91b541c0ad9efe2ec7a9f",
+      "size": 158429
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/.pytest_cache/.gitignore",
+      "sha256": "3ed731b65d06150c138e2dadb0be0697550888a6b47eb8c45ecc9adba8b8e9bd",
+      "size": 37
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/.pytest_cache/CACHEDIR.TAG",
+      "sha256": "37dc88ef9a0abeddbe81053a6dd8fdfb13afb613045ea1eb4a5c815a74a3bde4",
+      "size": 191
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/.pytest_cache/README.md",
+      "sha256": "73fd6fccdd802c419a6b2d983d6c3173b7da97558ac4b589edec2dfe443db9ad",
+      "size": 302
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/.pytest_cache/v/cache/nodeids",
+      "sha256": "b898932c1fe820a1ec946a41cfd19dc45d95dddfb6a5e7fb50e6dd9110c26e44",
+      "size": 9775
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/SKILL.md",
+      "sha256": "512e6911ce74f690a5944bb8720cfdbeb240e770cd43766b2c3bdbfda796c69a",
+      "size": 3858
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/assets/tech-gate-shell.html",
+      "sha256": "f45a2cdd46c4b5c06d2c7ba417994ea6b9fdb63efad697bf444a9538706f633f",
+      "size": 14129
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/assets/tech-gate-template.md",
+      "sha256": "effe219596b0755fb79cb6488235c61ca54e21a4245f43c75feff7d4597e5a6c",
+      "size": 7512
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/docs/archive/tech-design-quality-gate-enhancement-completion-remediation.md",
+      "sha256": "a63034edd8f690e8f60f2849bec6c02f8bb7c6cbfd9d5818a013944567d5fe4f",
+      "size": 32243
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/docs/archive/tech-design-quality-gate-enhancement-design.md",
+      "sha256": "1ebe6e6b3798b066733d1a1e7dc1f51df6890961e07637dbd26ce6faaa3bc5f6",
+      "size": 37078
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/docs/archive/tech-design-quality-gate-enhancement-remediation-design.md",
+      "sha256": "6c2b4e9eabe75b8434237980f2dfb9d5fc8019cc428a87a2669330c4129f7831",
+      "size": 30219
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/docs/archive/tech-design-quality-gate-focused-remediation-design.md",
+      "sha256": "ebe0432a934f4f22aa3c599f0f074a5f09c68824914ee409e37e6169b6facb34",
+      "size": 19619
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/docs/archive/tech-design-quality-gate-minimal-remediation-implementation-spec.md",
+      "sha256": "7f891d9d861337636716d3a22f772bf5bc5bf3e8393be243bd2c51eaca598b61",
+      "size": 28039
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/docs/archive/tech-design-quality-gate-remediation-implementation-spec.md",
+      "sha256": "c5d82f19d73ab4b62707176880bcb5822b9e1d1815161807c041e916e6d4a63b",
+      "size": 41996
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/docs/archive/tech-design-quality-gate-root-cause-remediation-design.md",
+      "sha256": "b6492bbacfed6be2434f6da0f198704d31e1bb80c79d5228f31c76ad7596227f",
+      "size": 24582
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/examples/README.md",
+      "sha256": "0fb20c4c979ebc7d3fddf095a5303941ea1fbfdb8de58bdc17b471647014f36d",
+      "size": 1170
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/examples/generate_examples.py",
+      "sha256": "464619bc74e9603af0ae197b282c007aaa64c973866bbc76c88939d92c07cc1b",
+      "size": 1605
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/examples/order-status/订单状态流转与退款改造-技术方案质检.html",
+      "sha256": "1d86e8c123ab78792daa67c795d2e13dcd62686549ae0819fa8808ae39fd0fc6",
+      "size": 75610
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/references/api-contract-monitor.md",
+      "sha256": "77db905a7cbd1b075224001240089ac3774736920a6aa5282dd00c193ed7c191",
+      "size": 4808
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/references/code-anchor-verification.md",
+      "sha256": "bab12460564e825d5bcb61f4a7bac49701312af1881d43c50e9390da47fa18de",
+      "size": 3247
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/references/compat-rollout-monitor.md",
+      "sha256": "079dfb28c2fbb819b973395cf1be266171b3e4a38171c57db0cb50f48acf56ab",
+      "size": 3926
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/references/defect-taxonomy.md",
+      "sha256": "7426014631e1cb1e670ef36c96841b425f3cd382d8cbb14c08591434d195ccf2",
+      "size": 6295
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/references/delivery-checklist.md",
+      "sha256": "e0b084e295b7f38d6eb7b8fa7993011b96717a394f19ec7adbfeeb792841980f",
+      "size": 8294
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/references/doc-intake.md",
+      "sha256": "69efc3c9d26070e91f9b9968aa251098634a5abd759050c8803619b81483ef3e",
+      "size": 7877
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/references/handoff.md",
+      "sha256": "2d767f65d1a8123f4dbdf1d9d82d0d0d93934c47781b3cb9e86daa264db319e3",
+      "size": 5954
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/references/hub-agent-index.md",
+      "sha256": "50145258e7e48e136c58faeaa3088884bb5c4215f47eb6e3414517ccddca626f",
+      "size": 1942
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/references/idempotency-failure-monitor.md",
+      "sha256": "d6a5e8683f5f5b84874258f8becb3c782e14dc52c6e782719a0cb33fdca36a1e",
+      "size": 3806
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/references/mq-event-monitor.md",
+      "sha256": "5f45f38efd5cc4e53fde028ce4fc48a15f2640740c4ff5ae1ef09ae7e5aaceab",
+      "size": 3925
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/references/qa-knowledge-map-hook.md",
+      "sha256": "60d2a7bcfb3a8584ed16530f39e4da990f80888006f2fb754a9717d35bcfbea0",
+      "size": 741
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/references/quality-rubric.md",
+      "sha256": "a15e43dcfb5194c35c9cb320ea94561f093af87665bc82def82786c3647ebd99",
+      "size": 2451
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/references/report-schema.md",
+      "sha256": "5ffc66f57c5e46a25c25633aac6f0e5fc6c2a47a52efd9f7e11321db9b88544b",
+      "size": 17629
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/references/requirement-crosscheck.md",
+      "sha256": "d943205a9e83368d7460bc161658073ba3b0615c75b56a7a246f24e951ceabec",
+      "size": 5107
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/references/structure-checklist.md",
+      "sha256": "1a3ae86800bdab4dc4bf84782d7a9ab4d8268acd38b0025e3d93fc95148e0f92",
+      "size": 2828
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/references/technical-model-analysis.md",
+      "sha256": "c70669b77557359b02537bf021fa3266e29f82da1399ccfe1cc4e9d9a2bd1698",
+      "size": 15225
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/references/technical-testpoint-seed.md",
+      "sha256": "ee4199740842e6904c80652a6dadf5636d7974818c561b04ad787611814e2b0d",
+      "size": 9177
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/references/verifiability-checklist.md",
+      "sha256": "1a7abd2e8c338d0ba006ed8a7c339a1567048573087dacd3139afc0ef8cfd21e",
+      "size": 4846
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/scripts/.pytest_cache/.gitignore",
+      "sha256": "3ed731b65d06150c138e2dadb0be0697550888a6b47eb8c45ecc9adba8b8e9bd",
+      "size": 37
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/scripts/.pytest_cache/CACHEDIR.TAG",
+      "sha256": "37dc88ef9a0abeddbe81053a6dd8fdfb13afb613045ea1eb4a5c815a74a3bde4",
+      "size": 191
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/scripts/.pytest_cache/README.md",
+      "sha256": "73fd6fccdd802c419a6b2d983d6c3173b7da97558ac4b589edec2dfe443db9ad",
+      "size": 302
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/scripts/.pytest_cache/v/cache/lastfailed",
+      "sha256": "be468fae2ea5b92a0d715ead542b6bb7d2a60cb0fbcb9597f1176221dc9ccf2c",
+      "size": 223
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/scripts/.pytest_cache/v/cache/nodeids",
+      "sha256": "e9aa6f532e84552ac0b6cce5d819017ee4fda5ed6ec4f135bb27cfbafb02c5cb",
+      "size": 9079
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/scripts/kb_context_adapter.py",
+      "sha256": "364aa367be67b73e7173bb7bf862d371849b119e4951c2c977d41bb4539747a9",
+      "size": 10573
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/scripts/render_tech_report.py",
+      "sha256": "62aa577ddb552bed88b90044fc72511bc9594dc0f6d5883a44e610652aa5c086",
+      "size": 38070
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/scripts/tests/fixtures/legacy_tech_gate.json",
+      "sha256": "5de4abe3884ba3f755c4b502fe451da086a66770afb487da7d5b33a0e57b0498",
+      "size": 3530
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/scripts/tests/fixtures/order-status/expected-tech-gate.json",
+      "sha256": "ddfee47f473aa943d9c03b8f65985a8c6205a71bef7616b7c3f6d2512cc6bfda",
+      "size": 87731
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/scripts/tests/fixtures/order-status/sample-prd.md",
+      "sha256": "77dacc886e7a3741a8c7ab549fd0f8ee1ac49f1c1edf7460a5124d61695a4222",
+      "size": 1079
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/scripts/tests/fixtures/order-status/sample-remote-snapshot.md",
+      "sha256": "16d90159b4efd5593f7b3dac0a5245736aa23669ea1c07935ec23f1c104e1657",
+      "size": 389
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/scripts/tests/fixtures/order-status/sample-tech-design.md",
+      "sha256": "14564e0ac050be68804576668b89ecc0974c01ab49d7272b7db226c79f027265",
+      "size": 1727
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/scripts/tests/fixtures/valid_enhanced_tech_gate.json",
+      "sha256": "091d19502de5617621321a1de61e68ff05f270e9ec6497db93f79c75931a819a",
+      "size": 19378
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/scripts/tests/test_end_to_end_flow.py",
+      "sha256": "6e74e7ed43b63611969605468c4d6e95cbade7bea0d243886d9aefdaddf425a8",
+      "size": 13543
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/scripts/tests/test_json_output_contract.py",
+      "sha256": "732039d3864342a58869e7b0b3a565f27c4985b9b71bdfb4ac3199d407ddbd10",
+      "size": 1979
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/scripts/tests/test_kb_context_adapter.py",
+      "sha256": "b6c24a2d1a2f02a1a248e3d130687fd79d0a253d851e5a9ee645a6d2b03a3789",
+      "size": 3971
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/scripts/tests/test_render_tech_report.py",
+      "sha256": "857a968c00a0629494878d543ce12846b7403005f04b6b3cccdbfed95dc00d46",
+      "size": 7838
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/scripts/tests/test_validate_tech_gate.py",
+      "sha256": "88c5f1a5e43b1199629d33bd083e0b70f827945ef00b47a42d6060fc4037a11b",
+      "size": 51846
+    },
+    {
+      "path": "qa-mainflow/tech-design-quality-gate/scripts/validate_tech_gate.py",
+      "sha256": "04752e086949421b6c6eb3a7a01a10e6c344f2dda8b17384c271583526d1fa77",
+      "size": 93294
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/SKILL.md",
+      "sha256": "d9599e297d054e40a8072cb36a1921a7a1fab382eec2c4f1b18f745cffe54c04",
+      "size": 2960
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/assets/qc-report-shell.html",
+      "sha256": "142738f3981e4ae1ef55626d5acaa513a7ea46b42256c71f92b19defb8c61168",
+      "size": 14035
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/examples/README.md",
+      "sha256": "17a81148635d8bc42ee86d453608ac10d50506e9a1eb4d4638cd49461e2d436c",
+      "size": 1079
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/examples/coherence/granularity-conflict.json",
+      "sha256": "1f42272e4a637a8660a6d93482470bf455d125364e9fafdfe8b5d55fc4cfe34b",
+      "size": 612
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/examples/generate_examples.py",
+      "sha256": "04da27dcb6d166a077be922551c283f44d22d05320262472da2498ae661e52a8",
+      "size": 2822
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/examples/order-cancel/订单取消-用例质检报告.html",
+      "sha256": "840a8367df83a3911e35b659b85cba8fead09f3959ff5698effecd1d2af9d6c3",
+      "size": 29551
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/examples/order-cancel/订单取消-用例质检报告.json",
+      "sha256": "a1c0130726a4e4b7f0cbda60184e9f469f5ad28f8913f62180d1585df8d4349c",
+      "size": 7945
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/references/case-title-clarity-qc.md",
+      "sha256": "183589859e8a1b890d96bf0768144a19f4f543b7d48583e114f939e3bab838b7",
+      "size": 2832
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/references/coherence-themes.yaml",
+      "sha256": "cc2dab9c770d2e76544208dd6fd54c08fcb6fd57a41f951fd6763b8a99bb6874",
+      "size": 1756
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/references/defect-taxonomy.md",
+      "sha256": "8e9fbe72dddcb62814965c22586abb165a3bc355f9f6cb03d3289561cd9e74d8",
+      "size": 9519
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/references/delivery.md",
+      "sha256": "1e2689381b5e327e141f06028e5447c0c50cb5d78305e8df3d512d9c24c241ad",
+      "size": 5322
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/references/hub-agent-index.md",
+      "sha256": "daefc441e24978d528ee1e91912964ba92e03a0ea4b44a92324e1dea6e53b35a",
+      "size": 1606
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/references/intake-and-scope.md",
+      "sha256": "fa7de1cb496af322bdbee9db3d26e1944dc6a89f89a3e0cc1bdc23abe64f5445",
+      "size": 4401
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/references/report-schema.md",
+      "sha256": "175f92d25b28af593fff540e3829d351429b66ffeee07cf81b35ff5cf065c6e4",
+      "size": 4062
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/references/scoring.md",
+      "sha256": "47950fbbd825d391d26060e40331f67d976b26e05081cda7600e4362c5a3a3b7",
+      "size": 2712
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/references/semantic-checks.md",
+      "sha256": "f88b8a09a5e392fdcc271530910f78956127003c57e4115f4d64ebbf6bea5ca1",
+      "size": 7819
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/references/writeback.md",
+      "sha256": "3c19e19613abd037ede792c5c6c2d01376204a18c25dd254072aebefb1f841d6",
+      "size": 3670
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/scripts/finalize_qc.py",
+      "sha256": "e11e7600fbf9d462b2d820466dc8c2dcc740db03e7e8060cc99c9321d7642d1c",
+      "size": 5226
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/scripts/import_delivery.py",
+      "sha256": "77c5aa44d42c32a65f39e0ed8cc39d780bd7aea8994f4a0812862d5e91f9e775",
+      "size": 12273
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/scripts/qc_coherence_config.py",
+      "sha256": "fab5376f0b43526881a26f54ba3dbac79397fc3c70781c5e6bf751bbf6b589dc",
+      "size": 3032
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/scripts/qc_coherence_scan.py",
+      "sha256": "5fdf13988c2849a7b95668e79a3995b68519062a99800d502983a36f7447da61",
+      "size": 15477
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/scripts/qc_exp03.py",
+      "sha256": "3c5a97bbd370daf43bf2667b574d8311fca46e1a671fe459f1366d759ba4649d",
+      "size": 2222
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/scripts/qc_scan.py",
+      "sha256": "145e53a70dc282386701cf026f826162cf2d9f019ef9bfec0ecfea822b335a51",
+      "size": 19904
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/scripts/render_qc_report.py",
+      "sha256": "e4614701eee115548c95f1246d31a06a94f80dbe7386663ac5d7babae5fb00f6",
+      "size": 15157
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/scripts/tests/test_finalize_qc.py",
+      "sha256": "19438b349b8abcf6896bb6799295a0807c1cef017bf35cf62ea735398125cab2",
+      "size": 3006
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/scripts/tests/test_import_delivery.py",
+      "sha256": "347c84f0fe011af6c5e98897ae92dae5fcd181e1837e7c5318df091df17e0346",
+      "size": 5772
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/scripts/tests/test_qc_coherence_scan.py",
+      "sha256": "9ce3d07e71d018332d181b626162ec88a078e095d91a56010917095632ac85e9",
+      "size": 3856
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/scripts/tests/test_qc_exp03.py",
+      "sha256": "90304e8c991c1a9cbef16736a5879f194307c502e3a1a1bb316b1fe452e71cf8",
+      "size": 918
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/scripts/tests/test_validate_qc_report.py",
+      "sha256": "a1bcdffba65401f9f590df28457047fcaeb8e831a27207b22af8d7fdf1c6b4a6",
+      "size": 7513
+    },
+    {
+      "path": "qa-mainflow/test-case-quality-review/scripts/validate_qc_report.py",
+      "sha256": "aea9f931a862616d87929bb5b250d6aac93fe924d84877b5069a445117c1c956",
+      "size": 11612
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "1d0420be7962dea0cf3a9963bd9c11100734acbe30ff78adb694be70afba5fd6",
+      "size": 7600
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qa-flow"
+version = "0.1.0"
+description = "QA 全流程受控实现：本地 SQLite、不可变证据与面向任务的命令行"
+readme = "README.md"
+requires-python = ">=3.13"
+# 运行时只依赖标准库；开发与验收依赖见 dependency-lock.txt
+dependencies = []
+
+[project.scripts]
+qa-flow = "qa_flow.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+qa_flow = ["resources/*.json", "resources/lab/*", "resources/lab/**/*"]

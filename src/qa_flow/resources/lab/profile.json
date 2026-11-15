@@ -1,0 +1,65 @@
+{
+  "schema": "qa.project_profile",
+  "profile": "lab",
+  "notice": "合成实验配置：所有地址只指向本机实验资源；不含真实凭证，不代表真实业务。",
+  "project": {"id": "PRJ-LAB-REFUND", "name": "退款实验（合成数据）"},
+  "workspace": {"storage": "sqlite", "source_read_roots": [], "protected_roots": []},
+  "targets": [
+    {"id": "lab-refund", "environment": "lab", "allowed_addresses": ["local-process"],
+     "deployment_check": "lab_probe",
+     "allowed_operations": ["execute.cases", "environment.probe", "deploy.lab_build", "rollback.drill"]},
+    {"id": "lab-platform", "environment": "lab", "allowed_addresses": ["local-file"],
+     "deployment_check": "none",
+     "allowed_operations": ["defect.create", "defect.attach", "defect.transition", "doc.archive", "notify.send"]}
+  ],
+  "rules": {
+    "kind": "builtin_lab",
+    "source": "qa_flow.resources.lab/rules.json",
+    "policy": {
+      "required_smoke": ["SMOKE-1", "SMOKE-2"],
+      "required_regression": ["C1", "C2"],
+      "hard_constraints": ["registered_evidence", "matching_context", "no_unresolved_required_case",
+                           "valid_action_authorization"],
+      "stability_rule": {"minimum_attempts": 3, "same_context_mixed_outcomes": "flaky",
+                         "different_context": "incomparable"},
+      "case_qc_applicable": true,
+      "rollback_drill_required": false,
+      "blocking_severities": ["blocker", "major"],
+      "metric_workday_hours": 8,
+      "authorizer_role": "tester",
+      "standing_grants": [
+        {"target_id": "lab-refund", "environment": "lab",
+         "action_kinds": ["execute.cases", "environment.probe", "deploy.lab_build", "rollback.drill"],
+         "basis": "合成实验策略：本机实验服务的执行、探测、部署与演练"},
+        {"target_id": "lab-platform", "environment": "lab",
+         "action_kinds": ["defect.create", "defect.attach", "defect.transition"],
+         "basis": "合成实验策略：实验平台桩的缺陷写入"}
+      ],
+      "simulated_answers": {
+        "expectation_confirmation": {"role": "product", "actor": "lab-product-stub", "option": "A"}
+      }
+    }
+  },
+  "identity": {"adapter": "lab_stub", "local_trust": "lab_only",
+               "role_map": {"tester": "测试人员", "product": "产品负责人", "developer": "研发负责人",
+                            "admin": "管理员"},
+               "current_role": "tester"},
+  "model": {"provider": "lab_stub", "model": "lab-deterministic-stub", "revision": "unknown",
+            "allowed_fields": ["title", "body"], "review_policy": "lab_auto_reviewed"},
+  "adapters": [
+    {"id": "lab-platform", "kind": "issue", "impl": "fake_platform",
+     "capabilities": ["query", "create", "update", "attach", "link", "transition", "events", "idempotency",
+                      "doc_create", "doc_read", "doc_update_etag"],
+     "scope": "write", "credential_ref": null,
+     "status_mapping": {"OPEN": "created", "IN_PROGRESS": "in_progress", "RESOLVED": "resolved",
+                        "RETEST": "retesting", "CLOSED": "closed", "REOPENED": "reopened",
+                        "REJECTED": "rejected", "DEFERRED": "deferred"}},
+    {"id": "lab-executor", "kind": "executor", "impl": "local_subprocess",
+     "capabilities": ["run_trusted"], "isolation": "none", "scope": "local", "credential_ref": null}
+  ],
+  "timing": {"timezone": "Asia/Shanghai", "source_max_age_hours": 72, "defect_sync_max_age_hours": 24,
+             "reminders": {"enabled": true, "defect_deadline_hours": 24, "notify_authorized": false}},
+  "retention": {"privacy_default": "internal", "retention_days": 90, "backup": "manual"},
+  "budgets": {"max_request_bytes": 1048576, "max_output_bytes": 262144, "exec_timeout_seconds": 60,
+              "max_concurrency": 1, "max_private_storage_mb": 512}
+}

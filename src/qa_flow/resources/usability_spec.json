@@ -1,0 +1,83 @@
+{
+  "notice": "以下是拟定验收条件，尚无人参与实测，不是已达到的易用性指标。",
+  "participants": {
+    "minimum_count": 5,
+    "must_not_have_built_system": true,
+    "must_not_have_read_internal_design": true,
+    "allowed_materials": [
+      "已安装产品的默认帮助",
+      "QUICKSTART.md 对应的一页产品指南",
+      "各任务提供的合成业务说明"
+    ],
+    "record_background": [
+      "QA经历",
+      "终端使用经历"
+    ],
+    "prior_native_platform_access_required": false
+  },
+  "task_definitions": [
+    {
+      "id": "N1",
+      "task": "首次离线实验",
+      "start_state": "软件和依赖已安装，真实网络关闭，无业务凭证",
+      "goal": "启动演示并正确指出结果仅适用于合成实验"
+    },
+    {
+      "id": "N2",
+      "task": "开始一个需求",
+      "start_state": "有效lab项目与一份合成需求文件",
+      "goal": "只提供来源及必要业务名称建立任务，不填内部ID或JSON"
+    },
+    {
+      "id": "N3",
+      "task": "处理业务确认",
+      "start_state": "有依据的业务问题与必要说明",
+      "goal": "理解范围并答复；需要他人审批的项目保持待处理"
+    },
+    {
+      "id": "N4",
+      "task": "从错误恢复",
+      "start_state": "数据准备可修复错误，已有其他有效结果",
+      "goal": "根据提示修正业务输入并继续；不改源码、JSON或门禁"
+    },
+    {
+      "id": "N5",
+      "task": "中断续做与交付",
+      "start_state": "一项动作已提交但响应中断，后续尚未完成",
+      "goal": "恢复正确任务、不重复副作用、导出可打开的本地报告"
+    }
+  ],
+  "proposed_acceptance": {
+    "required_participants": 5,
+    "required_tasks_per_participant": 5,
+    "required_independent_completions": 25,
+    "max_implementation_help_events": 0,
+    "max_manual_json_or_source_edits": 0,
+    "max_unsafe_or_duplicate_side_effects": 0,
+    "max_repeated_question_same_valid_scope": 0,
+    "timing_threshold_seconds": null
+  },
+  "observation_fields": [
+    "participant_pseudonym",
+    "task_id",
+    "started_at",
+    "finished_at",
+    "independently_completed",
+    "help_events",
+    "resume_success",
+    "decision_understanding",
+    "manual_json_or_source_edits",
+    "unsafe_or_duplicate_effects",
+    "repeated_question_same_valid_scope",
+    "notes"
+  ],
+  "timing_rule": "逐项记录实际耗时，报告原始值、中位数和最大值；尚无基线，不虚构分钟数或改善比例。",
+  "limitations": "5人样本只支持本轮任务与参与者范围的结论；失败修正后应使用新的未参与人员复验。",
+  "sample_incomplete_trial": {
+    "participants": 5,
+    "tasks_per_participant": 5,
+    "independent_completions": 24,
+    "implementation_help_events": 1,
+    "expected_pass": false
+  }
+}
