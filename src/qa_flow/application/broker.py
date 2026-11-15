@@ -92,6 +92,7 @@ def _set_state(tx: Tx, a: dict[str, Any], state: str, **fields: Any) -> None:
 
 def plan_action(tx: Tx, ctx: Ctx, story_id: str, kind: str, target_id: str, request: dict[str, Any],
                 input_refs: list[str], logical_key: str | None = None) -> dict[str, Any]:
+    _require_supported_location(ctx)
     target = resolve_target(ctx.config, target_id, kind)
     environment = target["environment"]
     plan = {"kind": kind, "target_id": target_id, "environment": environment, "request": request,
@@ -124,12 +125,22 @@ def plan_action(tx: Tx, ctx: Ctx, story_id: str, kind: str, target_id: str, requ
     return get_action(tx, aid)
 
 
+def _require_supported_location(ctx: Ctx) -> None:
+    """工作区位于同步网盘或网络文件系统时只允许只读查看，不登记或执行任何操作。"""
+    from qa_flow.security.resources import check_workspace_location
+
+    problems = check_workspace_location(ctx.ws.root)
+    if problems:
+        raise QAError("WORKSPACE_INVALID", "；".join(problems) + "；该位置只允许只读查看，不调度执行或外部写入。"
+                      "请把工作区移到本机磁盘后继续")
+
+
 def authorize(tx: Tx, ctx: Ctx, a: dict[str, Any]) -> str | None:
     grant = _grant_for(ctx, a["target_id"], a["environment"], a["kind"])
     if grant:
         _set_state(tx, a, "ready", authorization_ref=grant)
         return grant
-    ref = _decision_for(tx, a)
+    ref = _decision_for(tx, a, ctx.policy.get("authorizer_role", "tester"))
     if ref:
         _set_state(tx, a, "ready", authorization_ref=ref)
         return ref
@@ -149,7 +160,7 @@ def authorize(tx: Tx, ctx: Ctx, a: dict[str, Any]) -> str | None:
     return None
 
 
-def _decision_for(tx: Tx, a: dict[str, Any]) -> str | None:
+def _decision_for(tx: Tx, a: dict[str, Any], authorizer_role: str = "tester") -> str | None:
     rows = tx.conn.execute("SELECT id FROM decisions WHERE plan_sha256=? AND result='approve' AND revoked_at IS NULL",
                            (a["plan_sha256"],)).fetchall()
     for r in rows:
@@ -158,6 +169,8 @@ def _decision_for(tx: Tx, a: dict[str, Any]) -> str | None:
         d["scope"] = json.loads(d["scope"])
         problems = authorization_applies(d, plan_sha256=a["plan_sha256"], environment=a["environment"],
                                          target_id=a["target_id"], action_kind=a["kind"])
+        if d.get("role") != authorizer_role:
+            problems.append(f"决定角色 {d.get('role')} 不是策略规定的授权角色 {authorizer_role}")
         if not problems and decision_valid(tx, r["id"])["valid"]:
             return r["id"]
     return None
@@ -188,6 +201,9 @@ def _authorization_still_valid(tx: Tx, ctx: Ctx, a: dict[str, Any]) -> list[str]
     d["scope"] = json.loads(d["scope"])
     problems = authorization_applies(d, plan_sha256=a["plan_sha256"], environment=a["environment"],
                                      target_id=a["target_id"], action_kind=a["kind"])
+    role = ctx.policy.get("authorizer_role", "tester")
+    if d.get("role") != role:
+        problems.append(f"决定角色 {d.get('role')} 不是策略规定的授权角色 {role}")
     st = decision_valid(tx, ref)
     return problems + st["reasons"]
 
@@ -197,6 +213,7 @@ def dispatch(ctx: Ctx, action_id: str, *, worker: str | None = None) -> dict[str
     _load_handlers()
     worker = worker or worker_id()
     lease_s = float(ctx.budgets.get("exec_timeout_seconds", 60)) * 3
+    _require_supported_location(ctx)
     with ctx.ws.transaction(new_id("CMD")) as tx:
         a = get_action(tx, action_id)
         if a["state"] in ("succeeded",):
@@ -254,6 +271,14 @@ def dispatch(ctx: Ctx, action_id: str, *, worker: str | None = None) -> dict[str
     try:
         outcome = h["perform"](ctx, a, plan)
         outcome.setdefault("state", "succeeded")
+    except QAError as err:
+        # 执行前的业务校验未通过（例如脚本评审不覆盖当前内容）：没有产生外部效果，释放租约，修正后可继续
+        with ctx.ws.transaction(new_id("CMD")) as tx:
+            a2 = get_action(tx, action_id)
+            if a2["lease_epoch"] == epoch and a2["state"] == "running":
+                _finish_attempt(tx, action_id, epoch, "rejected_before_send", {"code": err.code, "error": err.message})
+                _set_state(tx, a2, "ready", lease_owner=None, lease_expires_at=None, last_error=err.message)
+        raise
     except OutcomeUnknown as exc:
         outcome = {"state": "unknown", "error": str(exc)}
     except RateLimited as exc:

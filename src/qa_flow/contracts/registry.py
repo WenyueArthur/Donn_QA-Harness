@@ -142,6 +142,7 @@ CONTRACTS: dict[str, dict[str, Any]] = {
         "plan_ref": "str", "worker_receipt": "str", "origin": E(*ORIGINS), "target": "str", "build": "str",
         "dataset": "str", "attempt_refs": "list", "started_at": "str", "finished_at": "str?",
         "purpose": E("smoke", "execution", "regression", "retest", "stability", "rollback_drill"),
+        "ci_ref": "str?",
     },
     "case_attempt": {
         "tc_ref": "str", "script_ref": "str?", "attempt_no": "int", "context_sha256": "str",
@@ -208,6 +209,7 @@ CONTRACTS: dict[str, dict[str, Any]] = {
         "prompt": {"template_ref": "str", "template_sha256": "str", "expanded_sha256": "str"},
         "params": "dict", "input_sha256": "str", "rules_sha256": "str", "knowledge_sha256": "str",
         "code_sha256": "str", "tools": "list", "imported": "bool", "replayable": "bool",
+        "config_sha256": "str?", "knowledge_ref": "str?", "skill_ref": "str?", "skill_sha256": "str?",
     },
     "sanitized_input": {"allowed_fields": ["str"], "fields": "dict", "placeholder_count": "int",
                         "review": {"state": E("done", "pending"), "by": "str?"}, "blocked_reasons": "list"},

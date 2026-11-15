@@ -26,6 +26,7 @@ class Ctx:
         self.project_name = self.config["project"]["name"]
         self.policy = configuration.policy(self.config)
         self.budgets = self.config.get("budgets") or {}
+        self.config_problem = configuration.applied_rules_problem(ws, self.config)
 
     @property
     def is_lab(self) -> bool:
@@ -119,8 +120,14 @@ def execute(ctx: Ctx, name: str, payload: dict[str, Any], handler: Callable[[Tx]
     """
     cid = command_id or new_id("CMD")
     req_sha = sha256_obj({"name": name, "payload": payload})
+    if ctx.config_problem and name != "admin.setup":
+        err = QAError("CONFIG_INVALID", ctx.config_problem, path="rules")
+        _audit_rejection(ctx, cid, name, req_sha, err)
+        raise err
     try:
         with ctx.ws.transaction(cid) as tx:
+            faults.crash_point("after_begin")
+            faults.crash_point(f"after_begin:{name}")
             row = tx.command_lookup(cid)
             if row is not None:
                 if row["request_sha256"] != req_sha:

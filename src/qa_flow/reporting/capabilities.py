@@ -79,7 +79,7 @@ IMPLEMENTED: dict[str, list[str]] = {
 PARTIAL: dict[str, str] = {
     "SYS-12": "已实现旧规则冻结清单与只读桥接；逐块提取为新模块需在等价验收通过后进行",
     "FLOW-27": "已实现生产证据校验；尚无获准的生产只读连接器",
-    "FLOW-15": "执行器无凭证/网络/文件隔离能力，只运行已审可信脚本",
+    "FLOW-15": "macOS 上以 sandbox-exec 隔离网络与凭证；文件系统只是部分隔离，其他平台无隔离；只运行已审可信脚本",
     "SYS-10": "已提供打包元数据；干净环境安装与多操作系统支持未验证",
 }
 
@@ -90,26 +90,41 @@ def requirements() -> list[dict[str, Any]]:
 
 
 def report(verification_file: Path | None = None) -> dict[str, Any]:
-    verified: dict[str, dict[str, Any]] = {}
+    """按注册的需求—场景对应关系计入验收结果。
+
+    - 记录自称覆盖、但不在该需求注册场景中的结果不计入；
+    - 失败、未知或未执行的结果逐条列出，同层存在失败时该层不算已验证。
+    """
+    reqs = requirements()
+    registered = {r["id"]: set(r["test_ids"]) for r in reqs}
+    results: dict[str, dict[str, str]] = {}
+    layers: dict[str, dict[str, str]] = {}
     if verification_file and Path(verification_file).is_file():
         data = json.loads(Path(verification_file).read_text(encoding="utf-8"))
         for r in data.get("cases", []):
             for req in r.get("requirements", []):
-                verified.setdefault(req, {"offline": [], "external": []})
-                if r.get("result") == "pass":
-                    key = "external" if r.get("layer") in ("external", "model") else "offline"
-                    verified[req][key].append(r["id"])
+                if r.get("id") not in registered.get(req, set()):
+                    continue
+                results.setdefault(req, {})[r["id"]] = r.get("result") or "not_run"
+                layers.setdefault(req, {})[r["id"]] = "external" if r.get("layer") in ("external", "model") \
+                    else "offline"
     items = []
-    for r in requirements():
-        v = verified.get(r["id"], {"offline": [], "external": []})
+    for r in reqs:
+        res = results.get(r["id"], {})
+        lay = layers.get(r["id"], {})
+        v = {"offline": [], "external": []}
+        bad = {"offline": [], "external": []}
+        for cid, outcome in sorted(res.items()):
+            (v if outcome == "pass" else bad)[lay[cid]].append(cid)
         items.append({
             "id": r["id"], "title": r["title"], "milestone": r["milestone"],
             "planned": True,
             "implemented": r["id"] in IMPLEMENTED,
             "implementation_refs": IMPLEMENTED.get(r["id"], []),
             "limitation": PARTIAL.get(r["id"]),
-            "offline_verified": bool(v["offline"]), "offline_evidence": v["offline"],
-            "external_verified": bool(v["external"]), "external_evidence": v["external"],
+            "offline_verified": bool(v["offline"]) and not bad["offline"], "offline_evidence": v["offline"],
+            "external_verified": bool(v["external"]) and not bad["external"], "external_evidence": v["external"],
+            "not_passed": {cid: res[cid] for cid in bad["offline"] + bad["external"]},
             "test_ids": r["test_ids"],
         })
     totals = {"planned": len(items), "implemented": sum(i["implemented"] for i in items),

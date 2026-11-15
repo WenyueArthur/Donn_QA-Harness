@@ -83,10 +83,17 @@ def _git_state(root: Path) -> tuple[str, bool | None]:
 
 def verify_manifest(manifest_path: Path, expected_sha: str | None) -> dict[str, Any]:
     problems: list[str] = []
-    data = Path(manifest_path).read_bytes()
+    try:
+        data = Path(manifest_path).read_bytes()
+    except OSError as exc:
+        raise QAError("CONFIG_INVALID", f"配置指向的冻结规则清单不存在或不可读：{manifest_path}；"
+                      "不会改用其他目录下的同名文件", path="rules.manifest") from exc
     if expected_sha and sha256_bytes(data) != expected_sha:
         problems.append("冻结清单本身的摘要与配置不符")
-    manifest = json.loads(data)
+    try:
+        manifest = json.loads(data)
+    except ValueError as exc:
+        raise QAError("CONFIG_INVALID", f"冻结规则清单无法解析：{manifest_path}", path="rules.manifest") from exc
     root = Path(manifest["legacy_root"])
     if not root.is_dir():
         problems.append(f"旧仓库根不可访问：{root}")

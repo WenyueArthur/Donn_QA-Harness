@@ -70,9 +70,11 @@ def environment_ready(check: dict[str, Any], evidence_origins: dict[str, str]) -
         items.append({"id": c["id"], "kind": c["kind"], "method_provided": c["method_provided"],
                       "measured": c["observed"] if origin in WORKER_ORIGINS else "not_run",
                       "ready": measured})
-    build_ok = check["build"].get("observed") == check["build"]["expected"]
+    observed_build = check["build"].get("observed")
+    build_measured = observed_build not in (None, "", "not_run")
+    build_ok = build_measured and observed_build == check["build"]["expected"]
     ready = bool(items) and all(i["ready"] for i in items) and build_ok
-    return {"ready": ready, "build_match": build_ok, "items": items,
+    return {"ready": ready, "build_match": build_ok, "build_measured": build_measured, "items": items,
             "material_status": "provided" if any(i["method_provided"] for i in items) else "missing",
             "runtime_status": "verified" if ready else "not_verified"}
 
@@ -105,9 +107,11 @@ def regression_items(analysis: dict[str, Any], design: dict[str, Any],
         items.append({"reg_id": reg["id"], "tp_ids": reg["tp_ids"], "tc_ids": tcs,
                       "required": any(t in required_tc for t in tcs) or reg.get("required", True)})
     listed = {t for i in items for t in i["tc_ids"]}
+    case_tps = {c["id"]: list(c.get("tp_ids") or []) for c in design["cases"]}
     for t in required_tc:
         if t not in listed:
-            items.append({"reg_id": f"REG-POLICY-{t}", "tp_ids": [], "tc_ids": [t], "required": True})
+            items.append({"reg_id": f"REG-POLICY-{t}", "tp_ids": case_tps.get(t, []), "tc_ids": [t],
+                          "required": True})
     return items
 
 
@@ -124,7 +128,9 @@ def regression_gate(items: list[dict[str, Any]], latest: dict[str, dict[str, Any
                 status = "not_run"
             else:
                 status = a["outcome"]
-            rows.append({"reg_id": it["reg_id"], "tc": tc, "required": it["required"], "status": status,
+            rows.append({"reg_id": it["reg_id"], "tp_ids": it.get("tp_ids") or [], "tc": tc,
+                         "required": it["required"], "status": status,
+                         "script_ref": a.get("script_ref") if a else None,
                          "attempt_ref": a["id"] if a else None})
     required = [r for r in rows if r["required"]]
     passed = [r for r in required if r["status"] == "pass"]

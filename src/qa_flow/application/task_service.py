@@ -25,7 +25,7 @@ from qa_flow.errors import QAError
 from qa_flow.ids import new_id, stable_id
 from qa_flow.reporting import render
 from qa_flow.security.sanitize import build_sanitized_input
-from qa_flow.storage.store import Tx, Workspace, atomic_write
+from qa_flow.storage.store import Tx, Workspace, atomic_write, lineage_key
 
 ROOT_DIRNAME = ".qa-workspaces"
 LAB_WS_NAME = "lab-demo"
@@ -83,6 +83,36 @@ def _set_active(root: Path, ws: Workspace, task_id: str) -> None:
                                                 ensure_ascii=False).encode())
 
 
+def guard_output(root: Path, target: str | Path, *, is_dir: bool = False) -> None:
+    """接受输出路径的命令：目标（及目录内将写入的位置）不得是任何工作区登记的受保护原文，符号链接按真实路径判断。"""
+    out = Path(target).expanduser()
+    real = os.path.realpath(out)
+    protected: set[str] = set()
+    for ws in workspaces(root):
+        try:
+            with ws.reader() as rtx:
+                protected |= {a["state"]["identity"] for a in rtx.aggs("protected_resource")}
+        except QAError:
+            continue
+    if f"file:{real}" in protected:
+        raise QAError("PROTECTED_RESOURCE", f"输出目标是受保护的原始资料，禁止写入：{out}", path="output",
+                      related_refs=[f"file:{real}"])
+    if is_dir:
+        prefix = real.rstrip(os.sep) + os.sep
+        inside = sorted(p for p in protected if p.startswith("file:" + prefix))
+        if inside:
+            raise QAError("PROTECTED_RESOURCE", f"输出目录包含受保护的原始资料，禁止写入：{out}", path="output",
+                          related_refs=inside[:5])
+
+
+_CONTEXT_SELECTION = {"allowed": False}
+
+
+def allow_context_selection(allowed: bool) -> None:
+    """命令行入口设置：是否允许按本目录的“当前需求”上下文选择（非交互调用一律不允许）。"""
+    _CONTEXT_SELECTION["allowed"] = bool(allowed)
+
+
 def select_task(root: Path, task: str | None, interactive: bool) -> dict[str, Any]:
     tasks = all_tasks(root)
     if not tasks:
@@ -96,11 +126,14 @@ def select_task(root: Path, task: str | None, interactive: bool) -> dict[str, An
                       details={"candidates": [_candidate(t) for t in (matches or tasks)]})
     if len(tasks) == 1:
         return tasks[0]
-    act = _active(root)
-    if act:
-        for t in tasks:
-            if t["ws"].root.name == act.get("workspace") and t["task"]["task_id"] == act.get("task_id"):
-                return t
+    # 多个需求时：--non-interactive（Agent/脚本调用）从不按“最近使用”猜测；
+    # 人在命令行直接使用时，沿用本目录最近一次 start/选择的需求，并在输出中标明当前需求
+    if _CONTEXT_SELECTION["allowed"]:
+        act = _active(root)
+        if act:
+            for t in tasks:
+                if t["ws"].root.name == act.get("workspace") and t["task"]["task_id"] == act.get("task_id"):
+                    return t
     if interactive:
         print("存在多个需求，请选择：")
         for i, t in enumerate(tasks, 1):
@@ -144,11 +177,12 @@ def start(root: Path, sources: list[str], *, project: str | None = None, title: 
     ctx = Ctx(ws)
     abs_sources = [str(Path(s).expanduser().resolve()) if "://" not in s else s for s in sources]
     with ws.reader() as rtx:
-        for a in rtx.aggs("task"):
-            if a["state"]["source_uris"] == abs_sources:
-                _set_active(root, ws, a["state"]["task_id"])
-                out = advance(ctx, a["state"]) if auto_advance else {}
-                return {"task": a["state"], "existing": True, **out}
+        existing = next((a["state"] for a in rtx.aggs("task") if a["state"]["source_uris"] == abs_sources), None)
+    if existing is not None:
+        # 先结束只读事务再续做：在读事务内写入会与自身的读锁冲突
+        _set_active(root, ws, existing["task_id"])
+        out = advance(ctx, existing) if auto_advance else {}
+        return {"task": existing, "existing": True, **out}
     task_id = new_id("TASK")
     story_id = new_id("STORY")
     op = stable_id("CMD", task_id, "start")
@@ -220,7 +254,8 @@ def _generate(ctx: Ctx, task: dict[str, Any], kind: str, refs: dict[str, str], *
     if san["payload"]["blocked_reasons"]:
         return None
     gen = model.generate(kind, san["payload"], refs)
-    op = _op(task, f"gen:{kind}", sha256_obj(gen["payload"]))
+    # 命令 ID 同时绑定生成内容与所依据的上游引用：上游变化后即使内容相同也要重新登记
+    op = _op(task, f"gen:{kind}", sha256_obj(gen["payload"]), sha256_obj(refs))
 
     def h(tx: Tx) -> dict[str, Any]:
         mapping_ev = tx.register_evidence(json.dumps(san["mapping"], ensure_ascii=False).encode(), origin="local_lab"
@@ -230,8 +265,16 @@ def _generate(ctx: Ctx, task: dict[str, Any], kind: str, refs: dict[str, str], *
                                    producer={"kind": "process", "name": "sanitizer", "verification": "process"},
                                    provenance={"mapping_ref": mapping_ev["id"], "dropped_fields": san["dropped_fields"],
                                                "injection_hints": san["injection_hints"]}, privacy="internal")
+        from qa_flow import fingerprints
+
         prov = dict(gen["provenance"])
-        prov.update({"rules_sha256": ctx.rules_sha, "knowledge_sha256": "unknown", "code_sha256": "unknown",
+        kb = tx.lineage_current(lineage_key("knowledge_snapshot", None, ctx.project_id))
+        kb_snap = tx.get_snapshot(kb) if kb else None
+        prov.update({"rules_sha256": ctx.rules_sha, "config_sha256": ctx.config_sha,
+                     # 尚无知识快照时记录“空知识集”的摘要，而不是 unknown
+                     "knowledge_sha256": kb_snap["sha256"] if kb_snap else sha256_obj({"entries": []}),
+                     "knowledge_ref": kb or "none",
+                     "code_sha256": fingerprints.code_sha256(), **fingerprints.skill(),
                      "tools": [], "sanitized_input_ref": san_snap["id"]})
         tx.put_snapshot("run_provenance", prov, story_id=story, project_id=ctx.project_id,
                         producer={"kind": "process", "name": "model_adapter", "verification": "process"})
@@ -287,6 +330,8 @@ def advance(ctx: Ctx, task: dict[str, Any], max_rounds: int = 40) -> dict[str, A
     for a in unknown:
         r = broker.reconcile(ctx, a["id"])
         notes.append(f"已核对结果未知的操作“{broker.describe_kind(a['kind'])}”：{r['state']}")
+    task = dict(task)
+    task["_redo_left"] = 1  # 每次续做最多重做一层已失效的产物，逐层呈现变更影响
     for _ in range(max_rounds):
         progressed = _round(ctx, task, notes)
         if not progressed:
@@ -382,25 +427,31 @@ def _round_inner(ctx: Ctx, task: dict[str, Any], notes: list[str]) -> bool:
             return True
         notes.append("需求质检需要由 Agent 按 qa-flow Skill 生成并提交；本机未配置模型")
         return False
-    if st["req_gate"] == "completed" and not tr_ok and tech_src:
+    if st["req_gate"] == "completed" and not tr_ok and tech_src and _may_redo(task, tr):
         if _generate(ctx, task, "technical_review", refs):
+            _used_redo(task, tr)
             notes.append("已生成并校验技术方案质检（实验模型桩）")
             return True
-    if st["req_analysis"] in ("pending",) and st["tech_gate"] in ("completed", "waived") and not ta_ok:
+    if st["req_analysis"] in ("pending",) and st["tech_gate"] in ("completed", "waived") and not ta_ok \
+            and _may_redo(task, ta):
         if _generate(ctx, task, "test_analysis", refs):
+            _used_redo(task, ta)
             notes.append("已生成需求测试分析；受阻测试点保留但不进入可执行交接")
             return True
     if st["req_analysis"] == "completed" and ta_ok:
         refs["analysis"] = ta["id"]
-        if not plan_ok and _generate(ctx, task, "test_plan", refs):
+        if not plan_ok and _may_redo(task, plan) and _generate(ctx, task, "test_plan", refs):
+            _used_redo(task, plan)
             notes.append("已生成测试计划（估算区间，不是实测工时）")
             progressed = True
-        if not design_ok and _generate(ctx, task, "case_design", refs):
+        if not design_ok and _may_redo(task, design) and _generate(ctx, task, "case_design", refs):
+            _used_redo(task, design)
             notes.append("已生成用例设计；设计用例不自动成为可执行脚本")
             return True
-    if st["case_design"] == "completed" and design_ok and not cqr_ok:
+    if st["case_design"] == "completed" and design_ok and not cqr_ok and _may_redo(task, cqr):
         refs["design"] = design["id"]
         if _generate(ctx, task, "case_quality_review", refs):
+            _used_redo(task, cqr)
             notes.append("已完成用例质检（L1/L2/L3）")
             return True
     if progressed:
@@ -409,6 +460,16 @@ def _round_inner(ctx: Ctx, task: dict[str, Any], notes: list[str]) -> bool:
     if not ctx.is_lab:
         return False
     return _lab_execution(ctx, task, st, notes)
+
+
+def _may_redo(task: dict[str, Any], existing: dict[str, Any] | None) -> bool:
+    """首次生成不受限；重做已失效的旧产物时，每次续做只做一层，其余留到下一次续做。"""
+    return existing is None or task.get("_redo_left", 1) > 0
+
+
+def _used_redo(task: dict[str, Any], existing: dict[str, Any] | None) -> None:
+    if existing is not None:
+        task["_redo_left"] = task.get("_redo_left", 1) - 1
 
 
 def _answered(rtx: Tx, story: str, question_ref: str) -> bool:
@@ -523,7 +584,9 @@ def _lab_execution(ctx: Ctx, task: dict[str, Any], st: dict[str, str], notes: li
             ds = defects.all_defects(rtx, story)
             atts = execution.attempts(rtx, story)
         for d in [x for x in ds if x["status"] not in ("closed", "rejected", "deferred", "accepted_risk")]:
-            retests = [a for a in atts if a["tc_ref"] == d["tc_ref"] and a["build"] == build and a["effective"]]
+            retests = [a for a in atts if a["tc_ref"] == d["tc_ref"] and a["build"] == build and a["effective"]
+                       and d.get("fix_build") == build and a["purpose"] != "smoke"
+                       and a["id"] != (d.get("actual_ref") or {}).get("attempt_ref")]
             if not retests:
                 continue
             def link(tx: Tx, d=d, r=retests[-1]) -> dict[str, Any]:
@@ -634,7 +697,7 @@ def view(ctx: Ctx, task: dict[str, Any]) -> dict[str, Any]:
             s = dict(s)
             if s.get("evaluation_ref"):
                 rs = stale_reasons(rtx, ctx, s)
-                if rs and s["status"] != "stale":
+                if rs:
                     s["status"] = "stale"
                     s["reasons"] = rs
             st_list.append(s)
@@ -651,6 +714,21 @@ def view(ctx: Ctx, task: dict[str, Any]) -> dict[str, Any]:
         san = [s for s in rtx.snapshots(story, "sanitized_input")]
         injection = sorted({h for s in san for h in s["envelope"]["provenance"].get("injection_hints", [])})
         kb = learning.search(rtx, ctx, "幂等")
+        cur_sources = [s for s in rtx.snapshots(story, "source_revision") if rtx.is_current(s["id"])]
+        unsupported = sorted({Path(s["payload"]["uri"]).name for s in cur_sources
+                              if s["payload"].get("extraction_method") == "未支持"})
+        admin_items = []
+        for s in cur_sources:
+            reason = s["payload"].get("failure_reason") or ""
+            if s["payload"].get("read_status") != "available" and "连接器" in reason:
+                admin_items.append(f"来源 {s['payload']['uri']} 读取受阻（{reason}）；需要管理员用 admin setup "
+                                   "配置并核验文档连接器")
+        needs_native = [i for i in review.items(rtx, story) if i["kind"] in ("action_authorization", "exit_confirmation",
+                                                                              "plan_approval")
+                        and i["environment"] not in ("lab", "offline")]
+        if needs_native and (ctx.config.get("identity") or {}).get("adapter") in (None, "", "none"):
+            admin_items.append(f"{len(needs_native)} 项真实环境批准需要原生审批身份核验，但项目未接入原生审批；"
+                               "需要管理员用 admin setup 接入原生审批适配器")
     first_open = next((s for s in st_list if s["status"] not in ("completed", "waived")
                        and s["stage"] not in ("release_verify",)), None)
     done_all = first_open is None
@@ -678,11 +756,17 @@ def view(ctx: Ctx, task: dict[str, Any]) -> dict[str, Any]:
     if done_all or exit_s["status"] == "completed":
         next_actions.append({"command": "export --output <目录>", "effect": "导出本地交付报告", "scope": "当前需求",
                              "risk": "只写本地文件，不归档、不写平台"})
-    unverified = ["新人可用性尚未验证（未进行新人实测）"]
+    unverified = [f"附件 {n} 格式不支持自动读取，内容未进入分析，需人工处理" for n in unsupported]
+    unverified.append("新人可用性尚未验证（未进行新人实测）")
     if ctx.is_lab:
         unverified.insert(0, "全部结果来自合成实验，不代表真实环境、真实业务或生产通过")
     unverified.append("上线验证：没有获准的生产只读连接器与实际部署，未验证")
-    unverified.append("执行器不具备网络/凭证/文件隔离，只运行已审可信脚本")
+    from qa_flow.adapters import local_executor
+
+    if local_executor.isolation()["network"]:
+        unverified.append("执行器有操作系统级网络与凭证隔离，但文件系统只是部分隔离，只运行已审可信脚本")
+    else:
+        unverified.append("执行器不具备网络/凭证/文件隔离，只运行已审可信脚本")
     return {
         "task": task, "lab": ctx.is_lab, "revision": revision, "stages": st_list,
         "summary": {"headline": headline, "reasons": reasons, "have": have, "next_actions": next_actions},
@@ -693,6 +777,7 @@ def view(ctx: Ctx, task: dict[str, Any]) -> dict[str, Any]:
         "defects": ds, "test_report": tr_snap["payload"] if tr_snap else None,
         "deployment": dep_snap["payload"] if dep_snap else None,
         "worker_last_tick_at": last_tick, "injection_hints": injection, "unverified": unverified,
+        "admin_items": admin_items,
         "knowledge_hits": len(kb["results"]),
         "verdict": exit_s["verdict"] if exit_s["status"] != "stale" else "indeterminate",
         "last_verified_at": max((s.get("evaluated_at") or "" for s in st_list), default="") or None,
@@ -742,9 +827,15 @@ def review_task(root: Path, task_name: str | None, answers: list[str], transfers
     for h, opt in planned:
         def h_answer(tx: Tx, h=h, opt=opt) -> dict[str, Any]:
             return review.answer(tx, ctx, story, h, opt, notes.get(h))
-        r = execute(ctx, "review.answer", {"task": task["task_id"], "handle": h, "option": opt, "note": notes.get(h)},
-                    h_answer, command_id=_op(task, "answer", h, opt, notes.get(h)))
+        # 命令 ID 绑定事项当前修订：事项变化（已答复、过期或被新版本取代）后，同一条命令不会回放旧回执
+        with ctx.ws.reader() as rtx:
+            item = review.find_item(rtx, story, h)
+        r = execute(ctx, "review.answer", {"task": task["task_id"], "handle": h, "option": opt, "note": notes.get(h),
+                                           "item": item["object_id"], "rev": item["revision"]},
+                    h_answer, command_id=_op(task, "answer", h, opt, notes.get(h), item["object_id"], item["revision"]))
         results.append(r["result"])
+    if planned:
+        _evaluate(ctx, task)  # 答复后重新判定，摘要原因反映当前事实
     for kv in transfers:
         h, role = kv.split("=", 1) if "=" in kv else (kv, "")
         results.append(_transfer(ctx, task, h.strip(), role.strip()))

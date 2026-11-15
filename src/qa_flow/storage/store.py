@@ -391,20 +391,33 @@ class Tx:
         rel = f"evidence/{sub}/{digest[:2]}/{digest}"
         target = self.ws.root / rel
         if not target.exists():
-            self.ws.tmp_dir.mkdir(parents=True, exist_ok=True)
-            tmp = self.ws.tmp_dir / f"ev-{new_id('T')}"
-            with open(tmp, "wb") as f:
-                f.write(data)
-                f.flush()
-                os.fsync(f.fileno())
-            os.chmod(tmp, 0o600)
+            from qa_flow import faults
             from qa_flow.canonical import sha256_file
-            if sha256_file(tmp) != digest:
-                tmp.unlink(missing_ok=True)
-                raise QAError("IO_ERROR", "证据落盘后摘要不符")
-            target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
-            os.replace(tmp, target)
-            _fsync_dir(target.parent)
+
+            tmp = self.ws.tmp_dir / f"ev-{new_id('T')}"
+            try:
+                self.ws.tmp_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
+                with open(tmp, "wb") as f:
+                    f.write(data)
+                    f.flush()
+                    os.fsync(f.fileno())
+                os.chmod(tmp, 0o600)
+                faults.crash_point("evidence_tmp")  # 证据临时文件已写出、尚未移入内容寻址目录
+                if sha256_file(tmp) != digest:
+                    tmp.unlink(missing_ok=True)
+                    raise QAError("IO_ERROR", "证据落盘后摘要不符")
+                target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+                os.replace(tmp, target)
+                _fsync_dir(target.parent)
+            except OSError as exc:
+                try:
+                    tmp.unlink(missing_ok=True)
+                except OSError:
+                    pass
+                raise QAError("IO_ERROR", f"证据文件写入失败（{exc.strerror or exc}）；本次未提交任何记录，"
+                              "修复目录权限或磁盘空间后重试", path=str(getattr(exc, "filename", "") or "")) from exc
+        if not retention:
+            retention = self._default_retention()
         eid = new_id("EV")
         self.conn.execute(
             "INSERT INTO evidence(id, sha256, rel_path, size, media_type, origin, source, privacy, retention, "
@@ -412,7 +425,25 @@ class Tx:
             (eid, digest, rel, len(data), media_type, origin, source, privacy, retention, redacted_of, self.now))
         self.event(eid, "evidence_registered", {"sha256": digest, "origin": origin, "source": source,
                                                 "privacy": privacy})
-        return {"id": eid, "sha256": digest, "origin": origin}
+        out = {"id": eid, "sha256": digest, "origin": origin}
+        if redacted_of is None and source.startswith("worker:"):
+            # 执行证据：原始字节保留在 raw/，另存一份脱敏展示件供查看与导出
+            from qa_flow.security.sanitize import scrub_for_display
+
+            shown = scrub_for_display(data.decode("utf-8", errors="replace")).encode("utf-8")
+            red = self.register_evidence(shown, origin=origin, source=f"redacted:{source}", media_type=media_type,
+                                         privacy="internal", retention=retention, redacted_of=eid)
+            out["redacted_ref"] = red["id"]
+        return out
+
+    def _default_retention(self) -> str:
+        """未显式指定时，按配置的保留组生成保留标签，例如 retention_days=90 → "days:90"。"""
+        try:
+            cfg = json.loads((self.ws.config_dir / "qa-flow.json").read_text(encoding="utf-8"))
+            days = (cfg.get("retention") or {}).get("retention_days")
+        except (OSError, ValueError, AttributeError):
+            days = None
+        return f"days:{int(days)}" if isinstance(days, int) and days > 0 else "unspecified"
 
     def get_evidence(self, eid: str) -> dict[str, Any] | None:
         row = self.conn.execute("SELECT * FROM evidence WHERE id=?", (eid,)).fetchone()
@@ -432,6 +463,21 @@ class Tx:
         if sha256_bytes(data) != ev["sha256"]:
             raise QAError("EVIDENCE_INVALID", f"证据摘要不符: {eid}", related_refs=[eid])
         return data
+
+    def evidence_problem(self, eid: str) -> str | None:
+        """证据不可用的具体原因：不存在、已销毁、文件缺失或摘要不符；可用时返回 None。"""
+        ev = self.get_evidence(eid)
+        if ev is None:
+            return "证据不存在"
+        if ev["state"] != "active":
+            return f"证据已{ev['state']}" + (f"（{ev['destroy_reason']}）" if ev.get("destroy_reason") else "")
+        try:
+            data = (self.ws.root / ev["rel_path"]).read_bytes()
+        except OSError:
+            return "证据文件缺失"
+        if sha256_bytes(data) != ev["sha256"]:
+            return "证据摘要不符（文件内容与登记摘要冲突）"
+        return None
 
     def evidence_valid(self, eid: str) -> bool:
         try:

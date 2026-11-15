@@ -56,7 +56,8 @@ def propose(tx: Tx, ctx: Ctx, story_id: str, attempt_id: str, *, root_cause: str
         raise QAError("PRECONDITION_FAILED", "只有断言失败的尝试才能形成产品缺陷提案；执行错误需先分析",
                       related_refs=[attempt_id])
     for d in all_defects(tx, story_id):
-        if d["tc_ref"] == p["tc_ref"] and d["status"] not in ddef.TERMINAL:
+        # 未结缺陷，或已由产品有效处置（延期/不修/接受风险）的缺陷：同一用例的失败不再重复建单
+        if d["tc_ref"] == p["tc_ref"] and (d["status"] not in ddef.TERMINAL or d["status"] in ddef.DISPOSITIONS):
             return {"defect_id": d["id"], "existing": True}
     design = None
     for dref in att["envelope"]["depends_on"]:
@@ -239,7 +240,7 @@ def sync(ctx: Ctx, story_id: str) -> dict[str, Any]:
                             "applied) VALUES(?,?,?,?,?)", (ev["event_id"], d["id"], ev["revision"], tx.now,
                                                           1 if res["applied"] else 0))
             if res["applied"]:
-                st = res["state"]
+                st = _guard_disposition(tx, ctx, story_id, res["state"])
                 if st["status"] == "resolved":
                     item = pf.get(d["external_id"])  # 回读修复信息
                     st["fix_commit"] = item["fields"].get("fix_commit")
@@ -257,15 +258,42 @@ def sync(ctx: Ctx, story_id: str) -> dict[str, Any]:
                 st = dict(agg["state"])
                 st.update({"external_status": item["status"], "status": ddef.map_external_status(item["status"], mapping),
                            "platform_revision": item["revision"]})
+                st = _guard_disposition(tx, ctx, story_id, st)
                 _save(tx, agg, st, "defect_readback", {"status": st["status"]})
         tx.meta_set(f"platform_cursor:{story_id}", str(max_seq))
         tx.meta_set(f"defect_synced_at:{story_id}", tx.now)
     return {"applied": applied, "skipped": skipped, "events": len(events)}
 
 
+def retest_problem(state: dict[str, Any], att: dict[str, Any] | None, story_id: str) -> str | None:
+    """复测尝试与缺陷的关系校验：同一需求、同一用例、修复构建上的尝试，且不是发现缺陷的那次尝试。"""
+    if att is None:
+        return "引用的复测对象不存在或不是用例尝试"
+    p = att["payload"]
+    if att.get("story_id") != story_id:
+        return "复测尝试不属于该需求"
+    if p.get("tc_ref") != state["tc_ref"]:
+        return f"复测尝试的用例 {p.get('tc_ref')} 与缺陷用例 {state['tc_ref']} 不符"
+    if not state.get("fix_build"):
+        return "缺陷尚未登记修复构建，不能关联复测"
+    if p.get("build") != state["fix_build"]:
+        return f"复测尝试的构建 {p.get('build')} 不是修复构建 {state['fix_build']}"
+    if att["id"] == (state.get("actual_ref") or {}).get("attempt_ref"):
+        return "发现缺陷的那次失败尝试不能充当复测"
+    if p.get("purpose") == "smoke":
+        return "冒烟尝试不能充当缺陷复测"
+    return None
+
+
 def record_retest(tx: Tx, story_id: str, bug_id: str, attempt_id: str) -> None:
     agg = get(tx, story_id, bug_id)
     st = dict(agg["state"])
+    snap = tx.get_snapshot(attempt_id)
+    att = snap if snap is not None and snap["kind"] == "case_attempt" else None
+    problem = retest_problem(st, att, story_id)
+    if problem:
+        code = "REFERENCE_INVALID" if att is None else "VALIDATION_FAILED"
+        raise QAError(code, problem, path="attempt", related_refs=[attempt_id, bug_id])
     if attempt_id not in st["retests"]:
         st["retests"] = st["retests"] + [attempt_id]
         _save(tx, agg, st, "defect_retest_linked", {"attempt": attempt_id})
@@ -281,6 +309,48 @@ def close_check(tx: Tx, ctx: Ctx, story_id: str, bug_id: str, attempts: list[dic
     res = ddef.close_requirements(d, retests, neighbor_results, neighbors_required, close_decision_valid=True)
     res["authorization"] = "standing_grant" if grant_ok else "decision_required"
     return res
+
+
+def apply_disposition(tx: Tx, story_id: str, bug_id: str, disposition: str | None, decision_ref: str) -> None:
+    """产品负责人的有效处置决定作用到缺陷：记录决定引用，状态改为对应处置。测试失败结果保留不变。"""
+    if disposition not in ddef.DISPOSITIONS:
+        return
+    agg = get(tx, story_id, bug_id)
+    st = dict(agg["state"])
+    st["disposition_refs"] = list(st.get("disposition_refs") or []) + [decision_ref]
+    st["status"] = disposition
+    st["disposition"] = {"status": disposition, "decision_ref": decision_ref}
+    _save(tx, agg, st, "defect_disposed", {"disposition": disposition, "decision_ref": decision_ref})
+
+
+def _has_valid_disposition(tx: Tx, state: dict[str, Any], disposition: str) -> bool:
+    from qa_flow.application.core import decision_valid
+
+    for ref in state.get("disposition_refs") or []:
+        if (state.get("disposition") or {}).get("status") == disposition and decision_valid(tx, ref)["valid"]:
+            return True
+    return False
+
+
+def _guard_disposition(tx: Tx, ctx: Ctx, story_id: str, st: dict[str, Any]) -> dict[str, Any]:
+    """平台上研发标“不修/延期”只是提议：没有产品有效处置前，本地保持待产品处置并提出确认事项。"""
+    proposed = st.get("status")
+    if proposed not in ddef.DISPOSITIONS or _has_valid_disposition(tx, st, proposed):
+        return st
+    st = dict(st)
+    st["status"] = "disposition_pending"
+    st["proposed_disposition"] = proposed
+    from qa_flow.application.review import raise_item
+
+    raise_item(tx, ctx, story_id, kind="disposition", key=f"disp-{st['id']}-{proposed}",
+               question=f"研发在平台上将缺陷“{st['title']}”标为“{proposed}”，是否同意按此处置？",
+               basis=[{"source_ref": st["proposal_ref"], "quote": st["title"]}],
+               affected_scope=f"用例 {st['tc_ref']} 的失败结果仍保留；未处置前阻断缺陷不视为已接受",
+               responsible_role="product",
+               options=[{"key": "A", "label": f"同意按 {proposed} 处置"}, {"key": "reject", "label": "不同意"}],
+               subject_refs=[st["proposal_ref"]], raised_by="defects",
+               extra={"disposition": proposed, "defect_id": st["id"]})
+    return st
 
 
 def request_disposition(tx: Tx, ctx: Ctx, story_id: str, bug_id: str, disposition: str, reason: str) -> dict[str, Any]:

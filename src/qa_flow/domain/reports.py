@@ -10,8 +10,13 @@ OUTCOME_KEYS = ("pass", "fail", "error", "blocked", "not_run", "cancelled", "qua
 
 
 def test_report(scope_tcs: list[str], attempts: list[dict[str, Any]], quarantined: set[str],
-                coverage: dict[str, Any], defects: list[dict[str, Any]]) -> dict[str, Any]:
-    """从冻结范围、全部尝试与缺陷快照计算。未执行、隔离、取消不得从分母消失。"""
+                coverage: dict[str, Any], defects: list[dict[str, Any]],
+                blocked: dict[str, str] | None = None) -> dict[str, Any]:
+    """从冻结范围、全部尝试与缺陷快照计算。未执行、隔离、取消不得从分母消失。
+
+    blocked：已发起执行却被阻断、没有产生尝试的用例（→ 动作 ID），计为 blocked，与从未发起的 not_run 分开。
+    """
+    blocked = blocked or {}
     in_scope = [a for a in attempts if a["tc_ref"] in scope_tcs]
     first = first_by_tc(in_scope)
     latest = latest_by_tc(in_scope)
@@ -24,10 +29,15 @@ def test_report(scope_tcs: list[str], attempts: list[dict[str, Any]], quarantine
                 st = "quarantined"
             elif tc in src:
                 st = src[tc]["outcome"]
+            elif tc in blocked:
+                st = "blocked"
             else:
                 st = "not_run"
             counts[st] += 1
-            rows.append({"tc": tc, "status": st, "attempt_ref": src[tc]["id"] if tc in src else None})
+            row = {"tc": tc, "status": st, "attempt_ref": src[tc]["id"] if tc in src else None}
+            if st == "blocked":
+                row["action_ref"] = blocked[tc]
+            rows.append(row)
         return {"denominator": len(scope_tcs), "counts": counts, "rows": rows}
 
     lat = bucket(latest)

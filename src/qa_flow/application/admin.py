@@ -23,7 +23,8 @@ BOUNDARIES = [
     "本地数据库不能防御同一 OS 用户的恶意篡改；文件摘要只证明字节一致，不证明内容真实或身份可信。",
     "本地答复只是 local_attested，不是已认证的产品角色签字；真实批准需要原生审批身份核验。",
     "外部平台不提供查询或幂等能力时，不能保证结果未知的写操作自动恢复。",
-    "执行器不具备凭证、文件与网络隔离能力，只运行已审可信脚本；不宣称支持不可信脚本。",
+    "执行器在 macOS 上用 sandbox-exec 禁止网络并阻止读取主目录与工作区私有内容；文件系统只是部分隔离，"
+    "其他平台没有隔离；只运行已审可信脚本，不宣称支持不可信脚本。",
     "首轮只验收进程崩溃恢复；断电持久性需在目标文件系统另做测试。",
     "支持的操作系统由验收结果决定；当前未完成任何平台的验收。",
 ]
@@ -83,7 +84,7 @@ def check_workspace_location_issues(root: Path) -> list[dict[str, Any]]:
     return [{"path": "workspace", "message": m} for m in check_workspace_location(root)]
 
 
-def doctor(ctx: Ctx | None) -> dict[str, Any]:
+def doctor(ctx: Ctx | None, root: Path | None = None) -> dict[str, Any]:
     conn = sqlite3.connect(":memory:")
     try:
         sqlite_version = conn.execute("select sqlite_version()").fetchone()[0]
@@ -91,10 +92,18 @@ def doctor(ctx: Ctx | None) -> dict[str, Any]:
         conn.close()
     out: dict[str, Any] = {
         "qa_flow": __version__, "python": sys.version.split()[0], "sqlite": sqlite_version,
-        "platform": platform.platform(), "executor": {"impl": "local_subprocess", "isolation": local_executor.ISOLATION,
+        "platform": platform.platform(), "executor": {"impl": "local_subprocess", "isolation": local_executor.isolation(),
                                                        "untrusted_scripts": "不支持"},
         "boundaries": BOUNDARIES, "checks": [],
     }
+    from qa_flow.security.resources import check_workspace_location
+
+    loc_root = ctx.ws.root if ctx is not None else root
+    if loc_root is not None:
+        loc = check_workspace_location(Path(loc_root))
+        out["checks"].append({"item": "workspace_location", "status": "unsupported" if loc else "ok",
+                              "detail": "；".join(loc) + "；该位置只允许只读查看，不调度执行或外部写入" if loc
+                              else f"{loc_root} 位于本机文件系统"})
     if ctx is None:
         out["workspace"] = None
         out["checks"].append({"item": "workspace", "status": "unavailable", "detail": "未选择工作区"})
@@ -117,6 +126,8 @@ def doctor(ctx: Ctx | None) -> dict[str, Any]:
     else:
         out["checks"].append({"item": "rules", "status": "ok", "detail": f"{rules.get('kind')}（合成实验规则，不是旧项目评分规则）"})
     problems = configuration.validate(ctx.config, ctx.ws.config_dir) + configuration.probe(ctx.config, ctx.ws.config_dir)
+    if ctx.config_problem:
+        problems.append({"path": "rules", "message": ctx.config_problem})
     out["checks"].append({"item": "config", "status": "ok" if not problems else "invalid", "detail": problems})
     for a in ctx.config.get("adapters") or []:
         out["checks"].append({"item": f"adapter:{a['id']}", "status": "ok" if a.get("impl") else "unavailable",
@@ -196,19 +207,28 @@ def expire_evidence(ctx: Ctx, evidence_id: str, reason: str) -> dict[str, Any]:
             raise QAError("NOT_FOUND", f"证据不存在：{evidence_id}")
         if ev["state"] != "active":
             return {"evidence_id": evidence_id, "state": ev["state"], "already": True}
-        shared = tx.conn.execute("SELECT COUNT(*) AS n FROM evidence WHERE rel_path=? AND state='active' AND id<>?",
-                                 (ev["rel_path"], evidence_id)).fetchone()["n"]
-        tx.conn.execute("UPDATE evidence SET state='expired', destroyed_at=?, destroy_reason=? WHERE id=?",
-                        (tx.now, reason, evidence_id))
-        tx.event(evidence_id, "evidence_destroyed", {"sha256": ev["sha256"], "reason": reason})
+        # 原始证据与其脱敏展示件一并销毁：展示件由原始字节派生，原件到期后不能留下可读副本
+        targets = [ev] + [dict(r) for r in tx.conn.execute(
+            "SELECT * FROM evidence WHERE redacted_of=? AND state='active'", (evidence_id,))]
+        ids = [t["id"] for t in targets]
+        files = []
+        for t in targets:
+            tx.conn.execute("UPDATE evidence SET state='expired', destroyed_at=?, destroy_reason=? WHERE id=?",
+                            (tx.now, reason, t["id"]))
+            tx.event(t["id"], "evidence_destroyed", {"sha256": t["sha256"], "reason": reason})
+        for t in targets:
+            shared = tx.conn.execute(
+                f"SELECT COUNT(*) AS n FROM evidence WHERE rel_path=? AND state='active' "
+                f"AND id NOT IN ({','.join('?' * len(ids))})", (t["rel_path"], *ids)).fetchone()["n"]
+            if not shared:
+                files.append(t["rel_path"])
         stories = {r["story_id"] for r in tx.conn.execute("SELECT DISTINCT story_id FROM snapshots WHERE story_id IS NOT NULL")}
         stale = {s: propagate(tx, ctx, s, reason=f"证据 {evidence_id} 已按保留策略销毁") for s in stories}
         return {"evidence_id": evidence_id, "state": "expired", "sha256": ev["sha256"], "stale": stale,
-                "_file": None if shared else ev["rel_path"]}
+                "destroyed_display_copies": ids[1:], "_files": sorted(set(files))}
 
     res = execute(ctx, "evidence.expire", {"id": evidence_id, "reason": reason}, h)
-    rel = res["result"].pop("_file", None)
-    if rel:
+    for rel in res["result"].pop("_files", None) or []:
         p = ctx.ws.root / rel
         if p.is_file():
             p.unlink()

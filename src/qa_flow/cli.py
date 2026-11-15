@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sqlite3
 import sys
 from pathlib import Path
 from typing import Any
@@ -128,6 +129,8 @@ def _print_view(v: dict[str, Any], details: bool, footer: str = "本次：只读
         print(f"结果未知：{u['kind']}（{u.get('error') or '待核对'}）——不会重发，继续时先核对。")
     if v["reviews"]["others"]:
         print("需他人决定：" + "；".join(f"{c['business_question']}（{c['role_label']}）" for c in v["reviews"]["others"]))
+    for item in v.get("admin_items") or []:
+        print(f"需管理员处理：{item}")
     if v.get("injection_hints"):
         print("提示：来源中含诱导性文字（如“" + v["injection_hints"][0] + "”），已仅作为资料处理，不影响授权。")
     for n in s["next_actions"][:3]:
@@ -188,10 +191,22 @@ def _render_error(err: QAError, as_json: bool) -> int:
         if items:
             for c in items:
                 print(f"  [{c['handle']}] {c['business_question']}", file=sys.stderr)
+                for b in c.get("basis") or []:
+                    if b.get("quote"):
+                        loc = f"（{b['location']}）" if b.get("location") else ""
+                        print(f"     依据：{scrub_for_display(b['quote'])}{loc}", file=sys.stderr)
+                if c.get("affected_scope"):
+                    print(f"     影响：{c['affected_scope']}", file=sys.stderr)
                 for o in c["options"]:
                     print(f"     {o['key']}. {o['label']}", file=sys.stderr)
             print("  答复示例：review --answer " + f"{items[0]['handle']}={items[0]['options'][0]['key']}"
                   if items[0]["options"] else "", file=sys.stderr)
+        others = (err.details or {}).get("others")
+        if others:
+            print("  需他人决定（你不能代签，可用 review --transfer 转交）：", file=sys.stderr)
+            for c in others:
+                print(f"  [{c['handle']}] {c['business_question']}（{c.get('role_label') or c.get('responsible_role')}）",
+                      file=sys.stderr)
         issues = (err.details or {}).get("issues")
         if issues:
             for i in issues[:10]:
@@ -239,15 +254,29 @@ def main(argv: list[str] | None = None) -> int:
         return _dispatch(args)
     except QAError as err:
         return _render_error(err, as_json)
+    except sqlite3.DatabaseError as exc:
+        return _render_error(_db_error(exc), as_json)
+    except OSError as exc:
+        return _render_error(QAError("IO_ERROR", f"文件读写失败：{exc.strerror or exc}",
+                                     path=str(getattr(exc, "filename", "") or "")), as_json)
     except KeyboardInterrupt:
         print("已中断；已提交的工作会保留，使用 resume 继续。", file=sys.stderr)
         return 130
+
+
+def _db_error(exc: sqlite3.DatabaseError) -> QAError:
+    text = str(exc).lower()
+    if isinstance(exc, sqlite3.OperationalError) and ("locked" in text or "busy" in text):
+        return QAError("DEPENDENCY_UNAVAILABLE", "工作区数据库正被其他操作占用，稍后重试；本次未写入。")
+    return QAError("WORKSPACE_INVALID", f"工作区数据库损坏或不可读（{exc}）；已停止推进，未写入任何内容。"
+                   "请管理员用 backup verify 核对备份后恢复到新目录。")
 
 
 def _dispatch(args: argparse.Namespace) -> int:
     from qa_flow.application import task_service as ts
 
     interactive = not args.non_interactive and sys.stdin.isatty()
+    ts.allow_context_selection(not args.non_interactive)
     root = ts.find_root(getattr(args, "workspace", None))
     if args.cmd == "demo":
         res = ts.demo(root, interactive)
@@ -327,7 +356,8 @@ def _dispatch(args: argparse.Namespace) -> int:
         from qa_flow import api as api_mod
 
         out = api_mod.run(args, root)
-        print(json.dumps(out, ensure_ascii=False, indent=2, default=str))
+        # 机器回执同样按展示规则脱敏：适配器错误体、校验输出中的密钥不随读取接口原样输出
+        print(json.dumps(_scrub(out), ensure_ascii=False, indent=2, default=str))
         return EXIT_OK
     raise QAError("INVALID_ARGUMENT", "未知命令")
 
@@ -346,9 +376,10 @@ def _admin(args: argparse.Namespace, root: Path) -> int:
         out = admin.setup(root, args.name, Path(args.config), args.apply)
         code = EXIT_OK if not out["problems"] else 6
     elif cmd == "doctor":
-        out = admin.doctor(ctx_or_none())
+        out = admin.doctor(ctx_or_none(), root)
         code = EXIT_OK
     elif cmd == "legacy-freeze":
+        ts.guard_output(root, args.output)
         out = admin.legacy_freeze(Path(args.legacy_root), Path(args.output))
         code = EXIT_OK
     elif cmd in ("parity-record", "parity-check", "expire-evidence"):
@@ -375,7 +406,9 @@ def _admin(args: argparse.Namespace, root: Path) -> int:
                   f"synchronous={ws['synchronous']}，完整性={ws['integrity']}")
         for c in out["checks"]:
             print(f"  - {c['item']}：{c['status']}；{c['detail']}")
-        print("执行器隔离：" + "，".join(f"{k}={'有' if v else '无'}" for k, v in out["executor"]["isolation"].items()))
+        iso = out["executor"]["isolation"]
+        print("执行器隔离：" + "，".join(f"{k}={'有' if v else '无'}" for k, v in iso.items()
+                                       if isinstance(v, bool)) + (f"（{iso.get('note')}）" if iso.get("note") else ""))
         print("边界：")
         for b in out["boundaries"]:
             print(f"  - {b}")

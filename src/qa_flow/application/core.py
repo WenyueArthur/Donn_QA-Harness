@@ -255,6 +255,37 @@ def propagate(tx: Tx, ctx: Ctx, story_id: str, reason: str) -> list[str]:
     return changed
 
 
+def explain_ineffective(tx: Tx, sid: str, seen: set[str] | None = None) -> str | None:
+    """沿依赖查找对象失效的根因：被新版本替代、证据销毁/缺失/摘要不符或所依赖对象内容变化。"""
+    seen = set() if seen is None else seen
+    if sid in seen:
+        return None
+    seen.add(sid)
+    snap = tx.get_snapshot(sid)
+    if snap is None:
+        return f"{sid} 不存在"
+    if not tx.is_current(sid):
+        return f"{sid} 已被新版本替代"
+    for d in snap["envelope"]["depends_on"]:
+        if not d.get("required", True):
+            continue
+        ref = d["ref"]
+        if ref.startswith("EV-"):
+            why = tx.evidence_problem(ref)
+            if why:
+                return f"所依赖的证据 {ref} {why}，不再可读取"
+            continue
+        dsnap = tx.get_snapshot(ref)
+        if dsnap is None:
+            return f"所依赖的 {ref} 不存在"
+        if d.get("sha256") and dsnap["sha256"] != d["sha256"]:
+            return f"所依赖的 {ref} 内容已变化"
+        deeper = explain_ineffective(tx, ref, seen)
+        if deeper:
+            return deeper
+    return None
+
+
 def stale_reasons(tx: Tx, ctx: Ctx, stage_state: dict[str, Any]) -> list[str]:
     reasons = []
     if stage_state.get("rules_sha256") and stage_state["rules_sha256"] != ctx.rules_sha:
@@ -264,11 +295,13 @@ def stale_reasons(tx: Tx, ctx: Ctx, stage_state: dict[str, Any]) -> list[str]:
     memo: dict[str, bool] = {}
     for ref in stage_state.get("inputs", []):
         if ref.startswith("EV-"):
-            if not tx.evidence_valid(ref):
-                reasons.append(f"证据 {ref} 已失效")
+            why = tx.evidence_problem(ref)
+            if why:
+                reasons.append(f"证据 {ref} 已失效：{why}，不再可读取")
             continue
         if not effective_current(tx, ref, memo):
-            reasons.append(f"输入 {ref} 已不是当前有效版本")
+            cause = explain_ineffective(tx, ref)
+            reasons.append(f"输入 {ref} 已不是当前有效版本" + (f"：{cause}" if cause else ""))
     for ref in stage_state.get("decisions", []):
         st = decision_valid(tx, ref)
         if not st["valid"]:
@@ -354,12 +387,32 @@ def validate_payload(tx: Tx, ctx: Ctx, kind: str, payload: dict[str, Any], story
         derived["scope_complete"] = payload["search_scope"]["complete"] and not payload["unknown_scope"]
     elif kind == "flow_model":
         runtime = _evidence_origins(tx, [r for f in payload["flows"] for r in f["evidence_refs"]])
-        dep_agg = tx.get_agg(f"deployment:{story_id}")
-        derived["flows"] = dev.flow_verification(payload["flows"], runtime,
-                                                 dep_agg["state"].get("deployment_id") if dep_agg else None)
+        for r, info in runtime.items():
+            info["deployments"] = sorted(_evidence_deployments(tx, r))
+        current_deps: set[str] = set()
+        for s in tx.snapshots(story_id, "deployment"):
+            if tx.is_current(s["id"]):
+                current_deps |= {s["id"], s["payload"].get("deployment_id")}
+        derived["flows"] = dev.flow_verification(payload["flows"], runtime, current_deps - {None})
     elif kind == "claim":
+        if payload.get("review_state") == "accepted":
+            problems.append(issue("payload.review_state", "“已接受”只能由独立的接受决定产生（记录确认人与方式）；"
+                                  "提交时请使用 pending，再通过 review 登记接受", code="VALIDATION_FAILED"))
         runtime = _evidence_origins(tx, payload.get("runtime_evidence_refs") or [])
-        derived["classification"] = dev.classify_claims([payload], sources, runtime)[0]
+        others = _same_subject_claims(tx, story_id, payload)
+        derived["classification"] = dev.classify_claims([s["payload"] for s in others] + [payload], sources,
+                                                        runtime)[-1]
+        conflicting = [s["id"] for s in others if repr(s["payload"].get("value")) != repr(payload.get("value"))]
+        if conflicting:
+            derived["contradiction"] = {"subject": payload["subject"], "conflicting_refs": conflicting,
+                                        "values": sorted({repr(s["payload"].get("value")) for s in others}
+                                                         | {repr(payload.get("value"))})}
+        elif any(_contradiction_open(tx, s["id"]) for s in others):
+            # 矛盾尚未由人解决：同取值的新结论也不能成为无条件事实
+            c = derived["classification"]
+            if c["accepted_as"] == "fact":
+                c["accepted_as"] = "pending"
+                c["reasons"].append("同一事项存在未解决的矛盾来源，需人工确认")
         if derived["classification"]["accepted_as"] == "rejected":
             problems += [issue("payload.evidence_refs", r, code="CITATION_NOT_FOUND")
                          for r in derived["classification"]["reasons"]]
@@ -370,7 +423,8 @@ def validate_payload(tx: Tx, ctx: Ctx, kind: str, payload: dict[str, Any], story
     elif kind == "knowledge_candidate":
         from qa_flow.domain.learning import knowledge_gate
 
-        derived["gate"] = knowledge_gate(payload)
+        refs = [r for c in payload["claims"] for r in c["evidence_refs"]]
+        derived["gate"] = knowledge_gate(payload, {r: v["origin"] for r, v in _evidence_origins(tx, refs).items()})
     elif kind == "dataset":
         pass
     elif kind == "effort_entry":
@@ -396,12 +450,22 @@ def validate_payload(tx: Tx, ctx: Ctx, kind: str, payload: dict[str, Any], story
         derived["release"] = res
         deps += [dep(tx, r, "evidence") for r in refs if r in origins]
     elif kind == "investigation":
+        builds_by_ev: dict[str, set[str]] = {}
+        for s in tx.snapshots(story_id, "case_attempt"):
+            for r in s["payload"].get("evidence_refs") or []:
+                builds_by_ev.setdefault(r, set()).add(s["payload"].get("build"))
         for i, f in enumerate(payload["facts"]):
             for r in f["evidence_refs"]:
                 ev = tx.get_evidence(r)
                 if ev is None or not tx.evidence_valid(r):
                     problems.append(issue(f"payload.facts[{i}].evidence_refs", "事实缺少有效证据", r,
                                           code="REFERENCE_INVALID"))
+                    continue
+                other = sorted(b for b in builds_by_ev.get(r, set()) if b and b != payload.get("build"))
+                if payload.get("build") and other:
+                    problems.append(issue(f"payload.facts[{i}].evidence_refs",
+                                          f"证据来自构建 {'、'.join(other)} 的执行，与调查声明的构建 "
+                                          f"{payload['build']} 不一致，不能作为该构建的事实", r))
         derived["layers"] = {"facts": len(payload["facts"]), "inferences": len(payload["inferences"]),
                              "pending": len(payload["pending"])}
     elif kind == "environment_check":
@@ -421,6 +485,20 @@ def validate_payload(tx: Tx, ctx: Ctx, kind: str, payload: dict[str, Any], story
     return problems, deps, derived
 
 
+def _evidence_deployments(tx: Tx, ev_ref: str) -> set[str]:
+    """证据产生时所在的部署：登记该证据的执行或探测结果所绑定的部署上下文（快照 ID 与部署 ID）。"""
+    out: set[str] = set()
+    rows = tx.conn.execute("SELECT result_id FROM dependencies WHERE input_id=? AND relation='evidence'",
+                           (ev_ref,)).fetchall()
+    for r in rows:
+        for c in tx.conn.execute("SELECT input_id FROM dependencies WHERE result_id=? AND relation='context'",
+                                 (r["result_id"],)).fetchall():
+            snap = tx.get_snapshot(c["input_id"])
+            if snap and snap["kind"] == "deployment":
+                out |= {snap["id"], snap["payload"].get("deployment_id")}
+    return out - {None}
+
+
 def _evidence_origins(tx: Tx, refs: list[str]) -> dict[str, dict[str, Any]]:
     out = {}
     for r in refs:
@@ -428,6 +506,54 @@ def _evidence_origins(tx: Tx, refs: list[str]) -> dict[str, dict[str, Any]]:
         if ev and tx.evidence_valid(r):
             out[r] = {"origin": ev["origin"]}
     return out
+
+
+def _same_subject_claims(tx: Tx, story_id: str, payload: dict[str, Any]) -> list[dict[str, Any]]:
+    """同一需求下、同一事项（subject）且带取值的当前结论。"""
+    if payload.get("subject") is None or "value" not in payload:
+        return []
+    out = []
+    for s in tx.snapshots(story_id, "claim"):
+        p = s["payload"]
+        if p.get("subject") == payload["subject"] and "value" in p and tx.is_current(s["id"]):
+            out.append(s)
+    return out
+
+
+def _contradiction_open(tx: Tx, claim_id: str) -> bool:
+    d = derived_of(tx, claim_id)
+    return bool(d.get("contradiction")) or any("矛盾" in r for r in (d.get("classification") or {}).get("reasons", []))
+
+
+def _flag_contradiction(tx: Tx, ctx: Ctx, story_id: str, new_id_: str, contradiction: dict[str, Any]) -> None:
+    """矛盾来源：已有事实一并转为待确认，并提出由产品负责人确认的事项；两处证据都保留。"""
+    for ref in contradiction["conflicting_refs"]:
+        agg = tx.get_agg(f"derived:{ref}")
+        if not agg:
+            continue
+        st = dict(agg["state"])
+        c = dict(st.get("classification") or {})
+        if c.get("accepted_as") == "fact":
+            c["accepted_as"] = "pending"
+        c["reasons"] = list(c.get("reasons") or []) + [f"与 {new_id_} 的取值矛盾，需人工确认"]
+        st["classification"] = c
+        st["contradiction"] = {**contradiction, "conflicting_refs": [new_id_]}
+        tx.put_agg(agg["object_id"], "derived", story_id, st, expected_revision=agg["revision"],
+                   event_type="derived_contradiction")
+    from qa_flow.application.review import raise_item
+
+    refs = contradiction["conflicting_refs"] + [new_id_]
+    basis = []
+    for r in refs:
+        snap = tx.get_snapshot(r)
+        for e in (snap["payload"].get("evidence_refs") or [])[:1]:
+            basis.append({"source_ref": e["source_ref"], "quote": e.get("quote", "")})
+    raise_item(tx, ctx, story_id, kind="clarification", key=f"conflict-{contradiction['subject']}",
+               question=f"来源对“{contradiction['subject']}”给出矛盾取值（{'、'.join(contradiction['values'])}），以哪个为准？",
+               basis=basis, affected_scope="依赖该事项的结论在确认前保持待确认，不形成事实",
+               responsible_role="product",
+               options=[{"key": chr(65 + i), "label": f"以 {v} 为准"} for i, v in enumerate(contradiction["values"])],
+               subject_refs=refs, raised_by="claims", extra={"contradiction": contradiction})
 
 
 def submit_artifact(tx: Tx, ctx: Ctx, kind: str, payload: dict[str, Any], story_id: str, *,
@@ -438,10 +564,22 @@ def submit_artifact(tx: Tx, ctx: Ctx, kind: str, payload: dict[str, Any], story_
     _raise_issues(problems)
     lineage = lineage_key(kind, story_id, name)
     current_id = tx.lineage_current(lineage)
-    if current_id and parent_id is None:
+    if current_id:
+        cur = tx.get_snapshot(current_id)
+        if cur and cur["payload"] == payload and parent_id not in (None, current_id) and \
+                effective_current(tx, current_id):
+            # 基于旧版本提交、但内容与当前有效版本完全相同：不是冲突，返回已有版本
+            return {"artifact_id": current_id, "kind": kind, "replaced": False, "unchanged": True,
+                    "derived": derived}
+    if current_id and (parent_id is None or parent_id == current_id):
         cur = tx.get_snapshot(current_id)
         if cur and cur["payload"] == payload:
-            return {"artifact_id": current_id, "kind": kind, "replaced": False, "unchanged": True, "derived": derived}
+            if effective_current(tx, current_id):
+                return {"artifact_id": current_id, "kind": kind, "replaced": False, "unchanged": True,
+                        "derived": derived}
+            # 内容相同但上游已变化：登记一个绑定当前上游的新修订，而不是继续返回已失效的旧版本
+            parent_id = current_id
+    if current_id and parent_id is None:
         raise QAError("REVISION_CONFLICT", "该产物已有当前版本；修订请基于当前版本提交（--parent）",
                       path="parent_id", related_refs=[current_id], details={"current": current_id})
     prov = dict(provenance or {})
@@ -455,6 +593,8 @@ def submit_artifact(tx: Tx, ctx: Ctx, kind: str, payload: dict[str, Any], story_
                            provenance=prov, lineage=lineage, parent_id=parent_id, origin=origin)
     if derived:
         tx.put_agg(f"derived:{snap['id']}", "derived", story_id, derived, event_type="derived_recorded")
+    if kind == "claim" and derived.get("contradiction"):
+        _flag_contradiction(tx, ctx, story_id, snap["id"], derived["contradiction"])
     if parent_id:
         propagate(tx, ctx, story_id, reason=f"{kind} 已修订为 {snap['id']}")
     return {"artifact_id": snap["id"], "kind": kind, "sha256": snap["sha256"], "parent_id": parent_id,

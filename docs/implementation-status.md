@@ -41,3 +41,16 @@
 - 实验模型桩只为退款合成需求准备了内容；对其他需求生成的引文无法通过核对，系统会保持草稿并提示由 Agent 经 Skill 提交。
 - 真实项目（`profile=project`）的任务服务只自动执行确定性步骤；需求质检、分析、用例等内容需通过 `api artifact submit` 提交。
 - 本项目目录尚不是 Git 仓库；依赖锁定文件在首轮验收通过后再写入实测版本。
+
+## 5. 第 1 轮验收后的缺陷修复（2026-11-15）
+
+依据 `artifacts/verification-20261115T195147-80871.json` 的 57 个失败场景修复产品缺陷。修复后本机全量执行
+`pytest -q tests`（macOS arm64，Python 3.13.7，单进程，耗时约 16 分钟）：372 通过、3 失败、10 跳过（blocked）；随后按用户决定修改了下述 2 项用例。修改后于 2026-11-16 重跑全量（同一环境，耗时约 16 分钟）：374 通过、1 失败（AC-103）、10 跳过。
+这是开发者自测，不是独立验收结论；正式结论以下一轮独立验收记录为准。
+
+第一次全量时未通过的 3 项及处理：
+
+- AC-103 `test_new_validators_are_migrated_for_comparison`：旧规则尚未迁入新包。按设计，逐块迁移需在责任人录制并审定旧校验输出基线之后进行，基线尚未审定。
+- AC-108 `test_ac108_subprocess_arguments_are_not_presented_as_sandbox` 与 AC-100 `test_doctor_states_boundaries_without_claiming_platform_acceptance`：原断言执行器“无网络隔离”，与 AC-108 要求隔离的用例直接矛盾。经用户决定，两项用例已改为“报告的隔离能力必须与实际机制一致”：AC-108 以恶意脚本自身的越界观测为准，AC-100 用 `tests/support/isolation_probe.py` 独立探测本机沙箱是否真的拦截网络。文件系统仍须报告为无隔离，不可信脚本仍须报告为不支持。
+
+执行器隔离的实际边界：仅 macOS 且系统提供 `sandbox-exec` 时生效；禁止全部网络，拒绝读取用户主目录与工作区中未授权的内容；文件系统不是独立挂载，因此 `filesystem` 仍报告为无隔离，仍只运行已审可信脚本。

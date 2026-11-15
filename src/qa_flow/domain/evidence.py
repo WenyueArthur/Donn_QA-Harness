@@ -101,12 +101,21 @@ def origin_satisfies(evidence_origin: str, required_environment: str) -> bool:
     return False
 
 
+REPLAY_REQUIRED = ("model.provider", "model.model", "model.revision", "prompt.template_sha256",
+                   "prompt.expanded_sha256", "input_sha256")
+
+
 def provenance_completeness(prov: dict[str, Any]) -> dict[str, Any]:
     """检查运行来源字段；无法取得的标 unknown，不补造，且不可宣称可精确重放。"""
     unknown = []
     for path, value in _walk(prov):
         if value in ("unknown", "", None):
             unknown.append(path)
+    # 模型与提示词字段整体缺失（不是写了 unknown）同样视为未知，不能声称可重放
+    present = {p for p, _ in _walk(prov)}
+    for req in REPLAY_REQUIRED:
+        if req not in present and req not in unknown:
+            unknown.append(req)
     imported = bool(prov.get("imported"))
     replayable = bool(prov.get("replayable")) and not unknown and not imported
     return {"unknown_fields": unknown, "degraded": bool(unknown) or imported, "replayable": replayable}
@@ -125,8 +134,18 @@ def _walk(obj: Any, prefix: str = "") -> list[tuple[str, Any]]:
 
 
 def flow_verification(flows: list[dict[str, Any]], runtime_evidence: dict[str, dict[str, Any]],
-                      current_deployment: str | None) -> list[dict[str, Any]]:
-    """设计流与实测流分开判定。知识检索或错误部署不能证明当前路径。"""
+                      current_deployment: Any) -> list[dict[str, Any]]:
+    """设计流与实测流分开判定。知识检索或错误部署不能证明当前路径。
+
+    current_deployment：当前部署的标识集合（部署快照 ID 与部署 ID 均可）。证据必须产生于流程声明的部署，
+    且该部署是当前部署；把其他部署的证据改标为当前部署不能通过。
+    """
+    if current_deployment is None:
+        current: set[str] = set()
+    elif isinstance(current_deployment, str):
+        current = {current_deployment}
+    else:
+        current = set(current_deployment)
     out = []
     for f in flows:
         status = "design_only" if f["kind"] == "design" else "unverified"
@@ -137,9 +156,13 @@ def flow_verification(flows: list[dict[str, Any]], runtime_evidence: dict[str, d
             if not valid:
                 status = "indeterminate"
                 missing.append(f"缺少 {f['id']} 的运行观测证据")
-            elif current_deployment is None or f.get("deployment_ref") != current_deployment:
+            elif not current or f.get("deployment_ref") not in current:
                 status = "indeterminate"
                 missing.append(f"{f['id']} 的证据部署上下文与当前部署不符")
+            elif not any(e.get("deployments") is None or current & set(e.get("deployments") or [])
+                         for e in valid):
+                status = "indeterminate"
+                missing.append(f"{f['id']} 的证据产生于其他部署，与当前部署不符")
             else:
                 status = "verified"
         out.append({"id": f["id"], "from": f["from"], "to": f["to"], "kind": f["kind"],

@@ -91,7 +91,8 @@ def register(api: argparse.ArgumentParser) -> None:
     op(g, "check", story, ("--target", {"default": "lab-refund"}), ("--dataset", {"default": "DS1"}))
     g = grp("script")
     op(g, "register", story, ("--file", req), ("--tc", {"action": "append", "required": True}), ("--repo", req),
-       ("--commit", req), ("--path", {}))
+       ("--commit", req), ("--path", {}),
+       ("--ci-ref", {"help": "该脚本提交在被测项目 CI 中的结果引用（不能是 qa-flow 自身的测试）"}))
     op(g, "review", story, ("--script", req), ("--result", {"choices": ["approve", "reject"], "required": True}),
        ("--reason", req))
     g = grp("execution")
@@ -118,6 +119,7 @@ def register(api: argparse.ArgumentParser) -> None:
     op(g, "build", story)
     g = grp("metric")
     op(g, "compute", ("--input", req), ("--story", {}))
+    op(g, "compare", ("--before", req), ("--after", req))
     g = grp("knowledge")
     op(g, "propose", story, ("--file", req))
     op(g, "apply", story)
@@ -143,7 +145,8 @@ def register(api: argparse.ArgumentParser) -> None:
     op(g, "evaluate", ("--input", req), ("--spec", {}))
     g = grp("lab")
     op(g, "deploy", story, ("--build", req), ("--dispatch", {"action": "store_true"}))
-    op(g, "fault", ("--name", req), ("--times", {"type": int, "default": 1}))
+    op(g, "fault", ("--name", req), ("--times", {"type": int, "default": None,
+                                                "help": "触发次数；0 清除；不填时持续型故障持续到清除，其余触发一次"}))
     g = grp("task")
     op(g, "list")
 
@@ -173,6 +176,7 @@ def run(args: argparse.Namespace, root: Path) -> dict[str, Any]:
 
         rep = report(Path(args.verification) if args.verification else None)
         if args.output:
+            ts.guard_output(root, args.output)
             Path(args.output).write_text(json.dumps(rep, ensure_ascii=False, indent=2), encoding="utf-8")
         return rep
     if group == "usability":
@@ -186,16 +190,29 @@ def run(args: argparse.Namespace, root: Path) -> dict[str, Any]:
             spec = json.loads(res.files("qa_flow.resources").joinpath("usability_spec.json").read_text("utf-8"))
         return evaluate(obs if isinstance(obs, list) else obs.get("observations", []), spec)
     if group == "metric":
-        from qa_flow.domain.metrics import METRICS
+        from qa_flow.canonical import sha256_obj
+        from qa_flow.domain.metrics import METRICS, compare, describe
 
-        data = _read_json(args.input)
-        name = data.get("metric_name")
-        if name not in METRICS:
-            raise QAError("UNSUPPORTED_CONTRACT", f"未知指标：{name}")
-        try:
-            return METRICS[name](data.get("data") or {})
-        except ValueError as exc:
-            raise QAError("VALIDATION_FAILED", str(exc), path="data") from exc
+        def compute_one(path: str) -> dict[str, Any]:
+            data = _read_json(path)
+            if not isinstance(data, dict):
+                raise QAError("SCHEMA_INVALID", "指标输入必须是对象", path="input")
+            name = data.get("metric_name")
+            if name not in METRICS:
+                raise QAError("UNSUPPORTED_CONTRACT", f"未知指标：{name}")
+            try:
+                rep = METRICS[name](data.get("data") or {})
+            except ValueError as exc:
+                raise QAError("VALIDATION_FAILED", str(exc), path="data") from exc
+            return describe(name, rep, sha256_obj(data.get("data") or {}), Path(path).name)
+
+        if opn == "compare":
+            before, after = compute_one(args.before), compute_one(args.after)
+            res = compare(before, after)
+            res.update({"before": before, "after": after,
+                        "note": res.get("note") or "不可比较时不给出差值或改善比例"})
+            return res
+        return compute_one(args.input)
     if group == "backup" and opn == "verify":
         return bk.verify_backup(Path(args.path))
     if group == "backup" and opn == "restore":
@@ -206,7 +223,7 @@ def run(args: argparse.Namespace, root: Path) -> dict[str, Any]:
         return {"tasks": [ts._candidate(t) | {"task_id": t["task"]["task_id"], "story_id": t["task"]["story_id"]}
                           for t in ts.all_tasks(root)]}
     if group == "doctor":
-        return admin.doctor(Ctx(wss[0]) if len(wss) == 1 else None)
+        return admin.doctor(Ctx(wss[0]) if len(wss) == 1 else None, root)
     story_arg = getattr(args, "story", None)
     if story_arg:
         sel = None
@@ -227,6 +244,7 @@ def run(args: argparse.Namespace, root: Path) -> dict[str, Any]:
         return execute(ctx, name, payload, fn, command_id=cid)
 
     if group == "backup" and opn == "create":
+        ts.guard_output(root, args.output, is_dir=True)
         return bk.create_backup(ctx.ws, Path(args.output))
     if group == "source":
         if opn == "import":
@@ -307,23 +325,30 @@ def run(args: argparse.Namespace, root: Path) -> dict[str, Any]:
             script = rtx.current_of("script_revision", story, "lab/refund_cases.py")
             dep_snap = execution.current_deployment(rtx, story, args.target)
             dataset = rtx.current_of("dataset", story, args.dataset)
+            last_check = rtx.current_of("environment_check", story, args.target)
         if script is None or dep_snap is None:
             raise QAError("PRECONDITION_FAILED", "缺少已登记脚本或实际部署，不能实测环境")
-        build_id = next((k for k, b in execution.LAB_BUILDS.items() if b["build"] == dep_snap["payload"]["build"]), "")
-        a = run_cmd("environment.plan", {"story": story, "target": args.target}, lambda tx: {"action": broker.plan_action(
-            tx, ctx, story, "environment.probe", args.target,
-            {"script_ref": script["id"], "dataset": args.dataset, "expected_build": build_id,
-             "dataset_ref": dataset["id"] if dataset else None},
-            [script["id"], dep_snap["id"]], logical_key=f"probe:{dep_snap['id']}")})["result"]["action"]
+        build = dep_snap["payload"]["build"]
+        build_id = next((k for k, b in execution.LAB_BUILDS.items() if b["build"] == build), build)
+        # 显式重新实测：以最近一次核验为界生成新的逻辑操作，环境修正后可以再次实测，不会被旧结果永久锁住
+        key = f"probe:{dep_snap['id']}" + (f":after:{last_check['id']}" if last_check else "")
+        a = run_cmd("environment.plan", {"story": story, "target": args.target, "after": last_check and last_check["id"]},
+                    lambda tx: {"action": broker.plan_action(
+                        tx, ctx, story, "environment.probe", args.target,
+                        {"script_ref": script["id"], "dataset": args.dataset, "expected_build": build_id,
+                         "dataset_ref": dataset["id"] if dataset else None},
+                        [script["id"], dep_snap["id"]] + ([dataset["id"]] if dataset else []),
+                        logical_key=key)})["result"]["action"]
         return broker.dispatch(ctx, a["id"])
     if group == "script":
         if opn == "register":
             data = Path(args.file).read_bytes()
             return run_cmd("script.register", {"story": story, "sha": __import__("hashlib").sha256(data).hexdigest(),
-                                               "tc": args.tc, "repo": args.repo, "commit": args.commit},
+                                               "tc": args.tc, "repo": args.repo, "commit": args.commit,
+                                               "ci": args.ci_ref},
                            lambda tx: execution.register_script(tx, ctx, story, data=data, path=args.path or Path(args.file).name,
                                                                 tc_refs=args.tc, repo=args.repo, commit=args.commit,
-                                                                dependencies=[]))
+                                                                dependencies=[], ci_ref=args.ci_ref))
         return run_cmd("script.review", {"story": story, "script": args.script, "result": args.result},
                        lambda tx: execution.review_script(tx, ctx, story, args.script, args.result, args.reason))
     if group == "execution":
@@ -351,6 +376,15 @@ def run(args: argparse.Namespace, root: Path) -> dict[str, Any]:
         build_id = next((k for k, b in execution.LAB_BUILDS.items() if b["build"] == dep_snap["payload"]["build"]),
                         dep_snap["payload"]["build"])
         cases = [c.strip() for c in args.cases.split(",") if c.strip()]
+        if args.purpose == "execution":
+            with ctx.ws.reader() as rtx:
+                exp = stages.expectations_status(rtx, ctx, story, raise_items=False)
+                by_id = {c["id"]: c for c in design["payload"]["cases"]}
+                blocked = sorted(tc for tc in set(exp["pending"]) & set(cases)
+                                 if not (tc in by_id and stages.expectation_ever_confirmed(rtx, ctx, story, by_id[tc])))
+            if blocked:
+                raise QAError("PRECONDITION_FAILED", f"用例 {'、'.join(blocked)} 的关键业务预期尚未由产品负责人有效确认，"
+                              "提测准入受阻，不能开始正式执行", related_refs=blocked)
         a = run_cmd("execution.plan", {"story": story, "cases": cases, "purpose": args.purpose},
                     lambda tx: {"action": broker.plan_action(
                         tx, ctx, story, "execute.cases", args.target,
@@ -451,8 +485,10 @@ def run(args: argparse.Namespace, root: Path) -> dict[str, Any]:
         return run_cmd("release.external", {"story": story, "text": args.text}, ext)
     if group == "lab":
         if opn == "fault":
+            from qa_flow.adapters.fake_platform import default_times
+
             ctx.platform().set_fault(args.name, args.times)
-            return {"fault": args.name, "times": args.times}
+            return {"fault": args.name, "times": args.times if args.times is not None else default_times(args.name)}
         a = run_cmd("lab.deploy.plan", {"story": story, "build": args.build},
                     lambda tx: {"action": broker.plan_action(tx, ctx, story, "deploy.lab_build", "lab-refund",
                                                              {"build_id": args.build}, [], logical_key=f"deploy:{args.build}:api")}

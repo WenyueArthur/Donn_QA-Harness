@@ -9,8 +9,10 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import sqlite3
+import stat
 from pathlib import Path
 from typing import Any
 
@@ -31,6 +33,13 @@ def create_backup(ws: Workspace, output: Path) -> dict[str, Any]:
     if _is_within(output, ws.root):
         raise QAError("INVALID_ARGUMENT", "备份目录不能位于工作区内部")
     output.mkdir(parents=True, exist_ok=True, mode=0o700)
+    with ws.connect() as probe:
+        try:
+            ic = probe.execute("PRAGMA integrity_check").fetchone()[0]
+        except sqlite3.DatabaseError as exc:
+            ic = str(exc)
+    if ic != "ok":
+        raise QAError("INTERNAL_INCONSISTENCY", f"工作区数据库完整性检查未通过（{ic}），拒绝生成备份")
     with ws.connect() as lock, ws.connect() as conn:
         lock.execute("BEGIN IMMEDIATE")  # 持有写锁：暂停其他写命令，等正在提交的短事务结束
         conn.execute("BEGIN DEFERRED")  # 独立的只读连接作为备份源
@@ -68,6 +77,7 @@ def create_backup(ws: Workspace, output: Path) -> dict[str, Any]:
         shutil.copy2(ws.root / name, output / name)
     if ws.config_dir.is_dir():
         shutil.copytree(ws.config_dir, output / "config", dirs_exist_ok=True)
+    _mirror_modes(ws.root, output)
     manifest = {
         "schema": "qa.backup_manifest",
         "id": new_id("BAK"),
@@ -82,6 +92,10 @@ def create_backup(ws: Workspace, output: Path) -> dict[str, Any]:
     }
     atomic_write(output / MANIFEST, json.dumps(manifest, ensure_ascii=False, indent=2).encode())
     report = verify_backup(output)
+    if not report["ok"]:
+        (output / MANIFEST).unlink(missing_ok=True)  # 不留下可被当作就绪的清单
+        raise QAError("INTERNAL_INCONSISTENCY", "备份核验未通过，已删除清单，该目录不可用于恢复",
+                      details={"problems": report["problems"]})
     return {"backup_dir": str(output), "manifest_id": manifest["id"], "verification": report}
 
 
@@ -107,8 +121,13 @@ def verify_backup(path: Path) -> dict[str, Any]:
         bad("database", "数据库文件摘要与清单不符")
     if not (path / WORKSPACE_MARKER).is_file():
         bad("marker", "缺少工作区标记")
-    conn = sqlite3.connect(f"file:{dbp}?mode=ro", uri=True)
+    try:
+        conn = sqlite3.connect(f"file:{dbp}?mode=ro", uri=True)
+    except sqlite3.Error as exc:
+        bad("integrity", f"数据库无法打开：{exc}")
+        return {"ok": False, "problems": problems, "manifest_id": manifest.get("id")}
     conn.row_factory = sqlite3.Row
+    db_evidence: dict[str, dict[str, Any]] = {}
     try:
         ic = conn.execute("PRAGMA integrity_check").fetchone()[0]
         if ic != "ok":
@@ -130,6 +149,10 @@ def verify_backup(path: Path) -> dict[str, Any]:
                 except ValueError:
                     bad("snapshot", "快照规范字节无法解析", r["id"])
         db_evidence = {r["id"]: dict(r) for r in conn.execute("SELECT * FROM evidence")}
+    except sqlite3.Error as exc:
+        # 头部损坏、只复制了一半等情况：数据库不可读，备份不可用
+        bad("integrity", f"数据库损坏或不完整：{exc}")
+        return {"ok": False, "problems": problems, "manifest_id": manifest.get("id")}
     finally:
         conn.close()
     listed = {e["id"]: e for e in manifest.get("evidence", [])}
@@ -191,6 +214,22 @@ def restore_backup(backup: Path, target: Path) -> dict[str, Any]:
     finally:
         conn.close()
     return {"restored_to": str(target), "verification": again}
+
+
+def _mirror_modes(src_root: Path, dst_root: Path) -> None:
+    """备份副本的权限不宽于原工作区：对应路径沿用原权限，其余目录 0700、文件 0600。"""
+    for dirpath, dirnames, filenames in os.walk(dst_root):
+        for name in dirnames + filenames:
+            dst = Path(dirpath) / name
+            rel = dst.relative_to(dst_root)
+            src = src_root / rel
+            default = 0o700 if dst.is_dir() else 0o600
+            try:
+                mode = stat.S_IMODE(src.stat().st_mode) if src.exists() else default
+            except OSError:
+                mode = default
+            os.chmod(dst, mode)
+    os.chmod(dst_root, 0o700)
 
 
 def _is_within(child: Path, parent: Path) -> bool:

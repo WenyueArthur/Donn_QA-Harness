@@ -80,7 +80,11 @@ def _deploy_record(tx: Tx, ctx: Ctx, action: dict[str, Any], plan: dict[str, Any
 # ---------------------------------------------------------------------------
 
 def register_script(tx: Tx, ctx: Ctx, story_id: str, *, data: bytes, path: str, tc_refs: list[str], repo: str,
-                    commit: str, dependencies: list[str], trusted_review: dict[str, Any] | None = None) -> dict[str, Any]:
+                    commit: str, dependencies: list[str], trusted_review: dict[str, Any] | None = None,
+                    ci_ref: str | None = None) -> dict[str, Any]:
+    if ci_ref and ("qa-flow" in ci_ref.lower() or "qa_flow" in ci_ref.lower()):
+        raise QAError("VALIDATION_FAILED", "CI 结果引用必须指向被测项目的脚本提交，不能引用 qa-flow 自身的测试",
+                      path="ci_ref")
     ev = tx.register_evidence(data, origin="imported", source=f"{repo}@{commit}:{path}", media_type="text/x-python")
     lineage = lineage_key("script_revision", story_id, path)
     cur = tx.lineage_current(lineage)
@@ -90,6 +94,8 @@ def register_script(tx: Tx, ctx: Ctx, story_id: str, *, data: bytes, path: str, 
             return {"script_ref": cur, "unchanged": True}
     payload = {"tc_refs": tc_refs, "repo": repo, "commit": commit, "path": path, "file_sha256": ev["sha256"],
                "dependencies": dependencies, "content_ref": ev["id"], "trusted": False}
+    if ci_ref:
+        payload["ci_ref"] = ci_ref
     snap = tx.put_snapshot("script_revision", payload, story_id=story_id, project_id=ctx.project_id,
                            producer={"kind": "operator", "name": ctx.actor, "verification": "local_os_user"},
                            depends_on=[dep(tx, ev["id"], "content")], lineage=lineage, parent_id=cur)
@@ -176,12 +182,17 @@ def _observed_build(target: Path) -> str | None:
 
 
 def _run_script(ctx: Ctx, data: bytes, args: list[str]) -> dict[str, Any]:
+    targets = [Path(args[i + 1]) for i, a in enumerate(args[:-1]) if a == "--target-dir"]
     with tempfile.TemporaryDirectory(prefix="qa-exec-", dir=str(ctx.ws.tmp_dir)) as tmp:
         script = Path(tmp) / "script.py"
         script.write_bytes(data)
+        # 只放行脚本自身的临时目录与被测目标目录；用户主目录与工作区其余内容（配置、证据、数据库）不可读
+        sandbox = {"read_write": targets, "read_only": [],
+                   "deny": local_executor.default_denied(ctx.ws.root)}
         return local_executor.run([sys.executable, "-I", "-B", str(script), *args], cwd=Path(tmp),
                                   timeout_s=float(ctx.budgets.get("exec_timeout_seconds", 60)),
-                                  max_output_bytes=int(ctx.budgets.get("max_output_bytes", 262144)))
+                                  max_output_bytes=int(ctx.budgets.get("max_output_bytes", 262144)),
+                                  sandbox=sandbox)
 
 
 def _execute_perform(ctx: Ctx, action: dict[str, Any], plan: dict[str, Any]) -> dict[str, Any]:
@@ -260,6 +271,11 @@ def _execute_record(tx: Tx, ctx: Ctx, action: dict[str, Any], plan: dict[str, An
                    "target": plan["target_id"], "build": outcome["observed_build"], "dataset": req["dataset"],
                    "attempt_refs": attempt_refs, "started_at": outcome["results"][0]["started_at"] if outcome["results"] else tx.now,
                    "finished_at": tx.now, "purpose": req["purpose"]}
+    script = tx.get_snapshot(req["script_ref"])
+    sp = script["payload"] if script else {}
+    # CI 结果引用：脚本登记时提供的外部 CI 引用；否则为本次受控 worker 运行（绑定脚本仓库、提交与摘要）
+    run_payload["ci_ref"] = sp.get("ci_ref") or (
+        f"worker-run:{action['id']}:{sp.get('repo')}@{sp.get('commit')}:{(sp.get('file_sha256') or '')[:12]}")
     tx.put_snapshot("execution_run", run_payload, story_id=story, project_id=ctx.project_id,
                     producer={"kind": "worker", "name": action.get("lease_owner") or "worker",
                               "verification": "worker_receipt"},
@@ -341,10 +357,17 @@ def _rollback_perform(ctx: Ctx, action: dict[str, Any], plan: dict[str, Any]) ->
         finally:
             c.close()
 
-    before = {"build": _observed_build(drill), "ledger": ledger()}
+    def config() -> dict[str, Any]:
+        # 实验服务的部署配置：版本描述文件（构建号、构建名与提交）
+        try:
+            return json.loads((drill / "version.json").read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return {}
+
+    before = {"build": _observed_build(drill), "ledger": ledger(), "config": config()}
     fake_plan["request"]["build_id"] = req["from_build"]
     _deploy_perform(ctx, action, fake_plan)
-    after = {"build": _observed_build(drill), "ledger": ledger()}
+    after = {"build": _observed_build(drill), "ledger": ledger(), "config": config()}
     health = _run_script(ctx, data, ["--target-dir", str(drill), "--case", "SMOKE-1", "--dataset", "DS1"])
     return {"state": "succeeded", "before": before, "after": after, "health_exit": health["exit_code"],
             "health_stdout": health["stdout"], "remote_object_id": f"drill:{action['id']}"}
@@ -369,6 +392,10 @@ def _rollback_record(tx: Tx, ctx: Ctx, action: dict[str, Any], plan: dict[str, A
          "result": "pass" if outcome["after"]["ledger"] == outcome["before"]["ledger"] else "fail"},
         {"name": "health", "before": None, "after": health_ok, "expected": True, "result": "pass" if health_ok else "fail"},
     ]
+    want_cfg = {"build_id": req["from_build"], **LAB_BUILDS.get(req["from_build"], {})}
+    got_cfg = outcome["after"].get("config")
+    checks.insert(2, {"name": "config", "before": outcome["before"].get("config"), "after": got_cfg,
+                      "expected": want_cfg, "result": "pass" if got_cfg == want_cfg else "fail"})
     payload = {"plan_ref": req["plan_ref"], "environment": plan["environment"], "from_build": req["from_build"],
                "to_build": req["to_build"], "restore_point": f"drill:{action['id']}", "before_after_checks": checks,
                "authorization_ref": action.get("authorization_ref") or "", "outcome":

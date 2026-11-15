@@ -133,8 +133,16 @@ def answer(tx: Tx, ctx: Ctx, story_id: str, handle: str, option: str | None, tex
            role: str | None = None, actor: str | None = None, verification: str | None = None,
            expires_at: str | None = None, expected_revision: int | None = None) -> dict[str, Any]:
     item = find_item(tx, story_id, handle)
+    if expected_revision is not None and expected_revision != item["revision"]:
+        raise QAError("REVISION_CONFLICT", f"对象修订冲突：期望 {expected_revision}，当前 {item['revision']}",
+                      path="expected_revision", related_refs=[item["object_id"]],
+                      details={"current_revision": item["revision"]})
     if item["status"] == "answered":
-        return {"handle": handle, "decision_ref": item["decision_ref"], "reused": True}
+        # 已有有效答复：复用原决定，不新增记录（并发提交由预期修订号区分，见上）
+        prev = _recorded_answer(tx, item["decision_ref"]) or {}
+        return {"handle": handle, "decision_ref": item["decision_ref"], "reused": True,
+                "recorded_answer": prev.get("option") or prev.get("text"),
+                "note": "该事项已有有效答复，本次未新增记录"}
     if item["status"] in ("stale", "superseded"):
         raise QAError("PRECONDITION_FAILED", "该事项所依据的内容已变化，请查看新版本问题", related_refs=[handle])
     role = role or ctx.user_role
@@ -157,7 +165,10 @@ def answer(tx: Tx, ctx: Ctx, story_id: str, handle: str, option: str | None, tex
         raise QAError("AUTHORIZATION_INVALID", "本地命令行不能产生外部核验的决定；请使用原生审批入口")
     if item["kind"] in ("action_authorization", "exit_confirmation", "plan_approval") and \
             item["environment"] not in ("lab", "offline") and verification != "external_verified":
-        raise QAError("AUTHORIZATION_REQUIRED", "真实环境的批准需要原生审批身份核验；本地答复不能代替",
+        native = (ctx.config.get("identity") or {}).get("adapter") not in (None, "", "none")
+        raise QAError("AUTHORIZATION_REQUIRED", "真实环境的批准需要原生审批身份核验；本地答复不能代替" +
+                      ("；请责任人在原生审批中批准" if native else
+                       "；项目尚未接入原生审批，需要管理员用 admin setup 接入原生审批适配器"),
                       related_refs=[handle])
     result = _result_for(item, option)
     for s in item["subject_refs"]:
@@ -180,8 +191,23 @@ def answer(tx: Tx, ctx: Ctx, story_id: str, handle: str, option: str | None, tex
     tx.put_agg(item["object_id"], "review_item", story_id, st,
                expected_revision=expected_revision if expected_revision is not None else item["revision"],
                event_type="review_item_answered", event_payload={"decision_ref": decision["decision_ref"]})
+    extra = item.get("extra") or {}
+    if item["kind"] == "disposition" and extra.get("defect_id") and result != "reject":
+        from qa_flow.application import defects as app_defects
+
+        app_defects.apply_disposition(tx, story_id, extra["defect_id"], extra.get("disposition"),
+                                      decision["decision_ref"])
     return {"handle": handle, "decision_ref": decision["decision_ref"], "verification": verification,
             "note": "本地答复只代表本机操作者的记录，不是已认证的产品角色签字" if verification == "local_attested" else ""}
+
+
+def _recorded_answer(tx: Tx, decision_ref: str | None) -> dict[str, Any] | None:
+    if not decision_ref:
+        return None
+    snap = tx.get_snapshot(decision_ref)
+    if not snap:
+        return None
+    return (snap.get("payload") or {}).get("answer") or {}
 
 
 def _result_for(item: dict[str, Any], option: str | None) -> str:
@@ -191,7 +217,23 @@ def _result_for(item: dict[str, Any], option: str | None) -> str:
         return "reject"
     return {"plan_approval": "approve", "expectation_confirmation": "confirm", "exit_confirmation": "approve",
             "knowledge_confirmation": "confirm", "action_authorization": "approve", "applicability": "waive",
-            "disposition": (item.get("extra") or {}).get("disposition", "defer")}.get(item["kind"], "confirm")
+            "disposition": _DISPOSITION_RESULT.get((item.get("extra") or {}).get("disposition"), "confirm"),
+            }.get(item["kind"], "confirm")
+
+
+# 处置事项的答复结果：与决定契约的取值对应
+_DISPOSITION_RESULT = {"deferred": "defer", "accepted_risk": "accept_risk", "rejected": "accept_risk",
+                       "confirm_escape": "confirm"}
+
+
+def identity_trusted(ctx: Ctx, decision_row: dict[str, Any]) -> bool:
+    """决定角色是否可信：实验审批桩或外部核验；本地记录只有在本机操作者确实担任该角色时才可信。
+
+    Agent 或本机操作者在命令里自填其他角色（例如 --role product）只是自述，不能当作该角色的签字。
+    """
+    if decision_row.get("verification") in ("simulated", "external_verified"):
+        return True
+    return decision_row.get("role") == ctx.user_role
 
 
 def transfer(tx: Tx, ctx: Ctx, story_id: str, handle: str, to_role: str) -> dict[str, Any]:
@@ -229,7 +271,35 @@ def record_decision(tx: Tx, ctx: Ctx, story_id: str | None, payload: dict[str, A
         (snap["id"], story_id, payload["role"], payload["actor"], payload["verification"], payload["result"],
          payload.get("plan_sha256"), json.dumps(payload["subject_refs"]), json.dumps(payload["scope"]),
          payload.get("expires_at"), tx.now))
+    if payload["result"] == "confirm" and story_id:
+        _confirm_root_cause(tx, story_id, payload, snap["id"])
     return {"decision_ref": snap["id"], "verification": payload["verification"]}
+
+
+def _confirm_root_cause(tx: Tx, story_id: str, payload: dict[str, Any], decision_ref: str) -> None:
+    """责任人确认了证据完整的调查：把确认结果关联到缺陷根因（保留调查与决定引用）。"""
+    from qa_flow.application import defects as app_defects
+
+    for s in payload["subject_refs"]:
+        inv = tx.get_snapshot(s["ref"])
+        if inv is None or inv["kind"] != "investigation" or not inv["payload"].get("defect_ref"):
+            continue
+        p = inv["payload"]
+        if not p.get("facts") or p.get("pending"):
+            continue  # 事实缺失或仍有待查项：不确认根因
+        try:
+            agg = app_defects.get(tx, story_id, p["defect_ref"])
+        except QAError:
+            continue
+        st = dict(agg["state"])
+        st["root_cause"] = {"status": "confirmed",
+                            "text": "；".join(x["text"] for x in p.get("inferences") or []) or st["root_cause"]["text"],
+                            "investigation_ref": inv["id"], "decision_ref": decision_ref,
+                            "confirmed_by": f"{payload['role']}:{payload['actor']}",
+                            "verification": payload["verification"]}
+        tx.put_agg(agg["object_id"], "defect", story_id, st, expected_revision=agg["revision"],
+                   event_type="defect_root_cause_confirmed", event_payload={"investigation_ref": inv["id"],
+                                                                            "decision_ref": decision_ref})
 
 
 def revoke(tx: Tx, ctx: Ctx, decision_id: str, reason: str) -> dict[str, Any]:

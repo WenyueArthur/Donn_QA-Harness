@@ -76,6 +76,20 @@ def _src_ok(e: Eval, tx: Tx, ctx: Ctx, story_id: str, refs: list[str]) -> bool:
     return ok
 
 
+def _explain_sources(e: Eval, tx: Tx, refs: list[str]) -> None:
+    """来源的最新快照读取受阻时，明确说明“读取受阻”及原因，而不只是“已变化”。"""
+    for r in refs:
+        snap = tx.get_snapshot(r)
+        if snap is None or not snap.get("lineage"):
+            continue
+        cur_id = tx.lineage_current(snap["lineage"])
+        cur = tx.get_snapshot(cur_id) if cur_id else None
+        if cur and cur["payload"].get("read_status") not in (None, "available"):
+            name = cur["payload"].get("title") or cur["payload"].get("uri")
+            e.reasons.append(f"来源 {name} 读取受阻（{cur['payload']['read_status']}："
+                             f"{cur['payload'].get('failure_reason') or '原因未知'}）；恢复读取后刷新来源再继续")
+
+
 def _validation_for(tx: Tx, subject_ref: str) -> dict[str, Any] | None:
     for s in reversed(tx.snapshots(None, "validation_report")):
         if s["payload"]["subject_ref"] == subject_ref and effective_current(tx, s["id"]):
@@ -93,6 +107,7 @@ def _req_gate(e: Eval, tx: Tx, ctx: Ctx, story_id: str) -> None:
     e.inputs.append(qr["id"])
     if not effective_current(tx, qr["id"]):
         e.need("需求质检报告依赖的来源已变化，需要重新质检")
+        _explain_sources(e, tx, qr["payload"]["source_refs"])
         return
     if not _src_ok(e, tx, ctx, story_id, qr["payload"]["source_refs"]):
         return
@@ -115,7 +130,12 @@ def _rule_verdict(e: Eval, tx: Tx, ctx: Ctx, snap: dict[str, Any], stage: str, l
             e.need("旧规则校验结果缺失；执行 api stage evaluate 时会调用冻结的旧校验器", blocked=False)
             return
         e.inputs.append(v["id"])
-        e.verdict = v["payload"]["structure"].get("verdict", "indeterminate")
+        structure = v["payload"]["structure"]
+        e.verdict = structure.get("verdict", "indeterminate")
+        if structure.get("error") or v["payload"].get("validator") == "unavailable":
+            e.verdict = "indeterminate"
+            e.need(f"旧规则校验器不可用：{structure.get('error') or '未知原因'}；阶段不可判定，不能视为通过")
+            return
         if e.verdict != "pass":
             e.reasons.append(f"旧规则校验结论：{e.verdict}")
         return
@@ -154,6 +174,7 @@ def _tech_gate(e: Eval, tx: Tx, ctx: Ctx, story_id: str) -> None:
     if not effective_current(tx, tr["id"]) or not _src_ok(e, tx, ctx, story_id, tr["payload"]["source_refs"]):
         if not e.reasons:
             e.need("技术质检依赖的来源已变化")
+        _explain_sources(e, tx, tr["payload"]["source_refs"])
         return
     results = [c["result"] for c in tr["payload"]["checks"]]
     if "fail" in results:
@@ -213,7 +234,7 @@ def _req_analysis(e: Eval, tx: Tx, ctx: Ctx, story_id: str) -> None:
         return
     e.inputs.append(ta["id"])
     if not effective_current(tx, ta["id"]):
-        e.need("测试分析依赖的上游已变化，需要重新分析")
+        e.need("测试分析依赖的上游已变化，需要重新分析", blocked=False)
         return
     seed = derived_of(tx, ta["id"]).get("handoff_seed") or {}
     e.extra["handoff_seed"] = seed
@@ -315,6 +336,29 @@ def _case_qc(e: Eval, tx: Tx, ctx: Ctx, story_id: str) -> None:
         e.reasons.append("用例质检通过不代替产品对关键预期的确认")
 
 
+def _trusted_role(tx: Tx, ctx: Ctx, decision_ref: str) -> bool:
+    row = tx.conn.execute("SELECT role, verification FROM decisions WHERE id=?", (decision_ref,)).fetchone()
+    return bool(row) and review.identity_trusted(ctx, dict(row))
+
+
+def expectation_ever_confirmed(tx: Tx, ctx: Ctx, story_id: str, case: dict[str, Any]) -> bool:
+    """该用例相同的关键预期是否曾由可信角色确认（设计修订只改动其他用例时，原确认对未变的预期仍然成立）。"""
+    for a in tx.aggs("review_item", story_id):
+        s = a["state"]
+        if s["kind"] != "expectation_confirmation" or s["status"] != "answered" or not s.get("decision_ref"):
+            continue
+        if not s["key"].endswith(f"-{case['id']}"):
+            continue
+        row = tx.conn.execute("SELECT * FROM decisions WHERE id=?", (s["decision_ref"],)).fetchone()
+        if row is None or row["revoked_at"] or row["result"] == "reject" or not review.identity_trusted(ctx, dict(row)):
+            continue
+        old = tx.get_snapshot(s["subject_refs"][0]["ref"]) if s["subject_refs"] else None
+        old_case = next((c for c in (old["payload"].get("cases") or []) if c["id"] == case["id"]), None) if old else None
+        if old_case and old_case.get("expected_text") == case.get("expected_text"):
+            return True
+    return False
+
+
 def expectations_status(tx: Tx, ctx: Ctx, story_id: str, raise_items: bool = True) -> dict[str, Any]:
     d = current(tx, "case_design", story_id)
     if d is None:
@@ -327,7 +371,7 @@ def expectations_status(tx: Tx, ctx: Ctx, story_id: str, raise_items: bool = Tru
         for a in tx.aggs("review_item", story_id):
             s = a["state"]
             if s["key"] == key and s["status"] == "answered" and s.get("decision_ref") and \
-                    decision_valid(tx, s["decision_ref"])["valid"]:
+                    decision_valid(tx, s["decision_ref"])["valid"] and _trusted_role(tx, ctx, s["decision_ref"]):
                 found = s["decision_ref"]
         if found:
             decisions.append(found)
@@ -366,7 +410,8 @@ def _env_ready(e: Eval, tx: Tx, ctx: Ctx, story_id: str, target_id: str = "lab-r
         e.verdict = "pass"
         return
     failed = [i["id"] for i in res["items"] if i["measured"] == "fail"]
-    if failed or not res["build_match"]:
+    build_mismatch = res.get("build_measured", True) and not res["build_match"]
+    if failed or build_mismatch:
         e.verdict = "fail"
         e.reasons.append("环境实测未通过：" + "、".join(failed or ["构建版本不符"]))
     else:
@@ -499,17 +544,44 @@ def _test_execution(e: Eval, tx: Tx, ctx: Ctx, story_id: str) -> None:
         e.verdict = "pass"
 
 
-def defect_snapshot(tx: Tx, ctx: Ctx, story_id: str) -> dict[str, Any]:
+def defect_snapshot(tx: Tx, ctx: Ctx, story_id: str, has_failures: bool = False) -> dict[str, Any]:
+    """缺陷状态快照。存在失败结果却从未取得缺陷状态时，空列表不代表“没有阻断缺陷”。"""
     from qa_flow.application.defects import all_defects
 
     ds = all_defects(tx, story_id)
     synced = tx.meta_get(f"defect_synced_at:{story_id}")
     max_age = float((ctx.config.get("timing") or {}).get("defect_sync_max_age_hours") or 24)
     external = [d for d in ds if d.get("external_id")]
-    fresh = (not external) or bool(synced and clock.hours_between(synced, tx.now) <= max_age)
+    recent = bool(synced and clock.hours_between(synced, tx.now) <= max_age)
+    fresh = recent or (not external and not has_failures)
     return {"defects": [{"id": d["id"], "status": d["status"], "severity": d["severity"], "tc": d["tc_ref"],
                          "external_id": d.get("external_id")} for d in ds],
             "synced_at": synced, "fresh": fresh}
+
+
+def _evidence_problems(tx: Tx, attempts: list[dict[str, Any]]) -> list[tuple[str, str]]:
+    """已登记执行证据当前不可用（摘要冲突、缺失或销毁）的清单。被篡改的尝试不再有效，但问题必须明确指出。"""
+    out: list[tuple[str, str]] = []
+    seen: set[str] = set()
+    for a in attempts:
+        for r in a["evidence_refs"]:
+            if r in seen:
+                continue
+            seen.add(r)
+            why = tx.evidence_problem(r)
+            if why:
+                out.append((r, why))
+    return out
+
+
+def _audit_evidence(tx: Tx, problems: list[tuple[str, str]]) -> None:
+    if getattr(tx, "read_only", False):
+        return
+    for ref, why in problems:
+        done = tx.conn.execute("SELECT 1 FROM events WHERE object_id=? AND event_type='evidence_integrity_failed' "
+                               "AND payload LIKE ?", (ref, f"%{why[:6]}%")).fetchone()
+        if not done:
+            tx.event(ref, "evidence_integrity_failed", {"reason": why, "code": "EVIDENCE_INVALID"})
 
 
 def _test_exit(e: Eval, tx: Tx, ctx: Ctx, story_id: str) -> None:
@@ -532,8 +604,15 @@ def _test_exit(e: Eval, tx: Tx, ctx: Ctx, story_id: str) -> None:
         required_all_pass = all(latest[tc]["outcome"] == "pass" for tc in scope)
     evidence_ok = all(all(tx.evidence_valid(r) for r in a["evidence_refs"]) and a["origin"] == want_origin
                       for a in latest.values())
+    bad_evidence = _evidence_problems(tx, [a for a in v["attempts"] if a["tc_ref"] in scope])
+    if bad_evidence:
+        evidence_ok = False
+        for ref, why in bad_evidence:
+            e.reasons.append(f"结果证据 {ref} 不可用：{why}")
+        _audit_evidence(tx, bad_evidence)
     context_ok = bool(v["build"]) and all(a["build"] == v["build"] and a["effective"] for a in latest.values())
-    snap = defect_snapshot(tx, ctx, story_id)
+    snap = defect_snapshot(tx, ctx, story_id,
+                           has_failures=any(a["outcome"] != "pass" for a in latest.values()))
     blocking = set(ctx.policy.get("blocking_severities") or ["blocker", "major"])
     open_blocking = [d["id"] for d in snap["defects"] if d["severity"] in blocking and d["status"] not in TERMINAL]
     accepted = [d["id"] for d in snap["defects"] if d["status"] == "accepted_risk"]
@@ -593,14 +672,55 @@ def _test_exit(e: Eval, tx: Tx, ctx: Ctx, story_id: str) -> None:
     e.verdict = "pass"
 
 
+def _bound_to_design(tx: Tx, atts: list[dict[str, Any]], design: dict[str, Any] | None) -> list[dict[str, Any]]:
+    """只保留按当前设计（或与当前设计中该用例内容完全相同的旧设计）预期执行的尝试。
+
+    用例预期修订后，按旧预期得到的结果不能算作新设计下的结果。
+    """
+    if design is None:
+        return atts
+    cur_cases = {c["id"]: c for c in design["payload"]["cases"]}
+    cache: dict[str, dict[str, Any]] = {}
+    out = []
+    for a in atts:
+        snap = tx.get_snapshot(a["id"])
+        exp_ref = next((d["ref"] for d in snap["envelope"]["depends_on"] if d["relation"] == "expected"), None)
+        if exp_ref is None or exp_ref == design["id"]:
+            out.append(a)
+            continue
+        if exp_ref not in cache:
+            old = tx.get_snapshot(exp_ref)
+            cache[exp_ref] = {c["id"]: c for c in (old["payload"].get("cases") or [])} if old else {}
+        if cache[exp_ref].get(a["tc_ref"]) == cur_cases.get(a["tc_ref"]):
+            out.append(a)
+    return out
+
+
+def _blocked_cases(tx: Tx, story_id: str) -> dict[str, str]:
+    """已发起执行但被阻断（动作失败、未产生尝试）的用例 → 动作 ID。与从未发起的用例分开计数。"""
+    out: dict[str, str] = {}
+    for a in broker.actions(tx, story_id, ("failed",)):
+        if a["kind"] != "execute.cases":
+            continue
+        plan = tx.get_snapshot(a["plan_ref"])
+        req = (plan["payload"].get("request") or {}) if plan else {}
+        if req.get("purpose") == "smoke":
+            continue
+        for tc in req.get("cases") or []:
+            out[tc] = a["id"]
+    return out
+
+
 def test_report_payload(tx: Tx, ctx: Ctx, story_id: str, v: dict[str, Any]) -> dict[str, Any]:
     from qa_flow.application.defects import all_defects
 
     scripts = [s["payload"] for s in tx.snapshots(story_id, "script_revision") if tx.is_current(s["id"])]
-    cov = dcases.coverage(v["design"]["payload"], v["analysis"]["payload"], scripts, v["attempts"]) \
+    bound = _bound_to_design(tx, v["attempts"], v["design"])
+    cov = dcases.coverage(v["design"]["payload"], v["analysis"]["payload"], scripts, bound) \
         if v["design"] and v["analysis"] else {}
-    rep = drep.test_report(v["scope"], v["attempts"], v["quarantined"], cov,
-                           [{"id": d["id"]} for d in all_defects(tx, story_id)])
+    rep = drep.test_report(v["scope"], bound, v["quarantined"], cov,
+                           [{"id": d["id"]} for d in all_defects(tx, story_id)],
+                           blocked=_blocked_cases(tx, story_id))
     return {"scope_ref": v["design"]["id"] if v["design"] else "", "counts": rep["latest"]["counts"],
             "first_run": rep["first_run"], "latest": rep["latest"], "coverage": cov, "unexecuted": rep["unexecuted"],
             "defect_refs": rep["defect_refs"], "build": v["build"], "attempt_total": rep["attempt_total"],

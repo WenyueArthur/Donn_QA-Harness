@@ -88,6 +88,11 @@ def online_defect_ratio(data: dict[str, Any]) -> dict[str, Any]:
         missing.append("缺少发布范围")
     if missing:
         return _report("online_defect_ratio", release or "", None, None, None, "ratio", "not_computable", missing)
+    undetermined = [d.get("id", "?") for d in data.get("defects") or [] if d.get("valid") is None]
+    if undetermined:
+        # 有效性未判定的缺陷不能当作无效而静默排除
+        return _report("online_defect_ratio", release, None, None, None, "ratio", "incomplete",
+                       [f"缺陷 {i} 有效性未判定" for i in undetermined], filters={"window": window})
     valid = [d for d in data.get("defects") or [] if d.get("valid") and not d.get("duplicate_of")]
     if not valid:
         return _report("online_defect_ratio", release, 0, 0, None, "ratio", "not_applicable", [],
@@ -174,6 +179,24 @@ METRICS = {
 }
 
 
+# 计算口径：分子、分母与排除规则（随报告输出，便于回查）
+METHODS = {
+    "ai_adoption": "被明确采纳的原始 AI 用例 ID 数 ÷ 冻结生成集合的原始 ID 数；每个原始 ID 最多计一次，人工新增用例不计入",
+    "human_modification": "有已核验人工语义修改的原始 AI 用例 ID 数 ÷ 同一冻结生成集合的原始 ID 数；纯格式修改不计",
+    "online_defect_ratio": "发现窗口内生产发现的有效去重缺陷数 ÷ 同一发布范围内全部有效去重缺陷数；无效与重复缺陷排除",
+    "confirmed_escapes": "经确认归因为漏测的有效去重缺陷计数；不换算为通用漏测率",
+    "elapsed_time": "准出决定时刻 − 提测接收时刻（日历小时）；暂停区间取并集后另列",
+    "effort": "按事件 ID 去重后的投入工时之和（人时）；人天 = 人时 ÷ 配置的日工时",
+}
+
+
+def describe(name: str, report: dict[str, Any], input_sha256: str, input_ref: str | None = None) -> dict[str, Any]:
+    out = dict(report)
+    out["method"] = METHODS.get(name, "")
+    out["source"] = {"input_sha256": input_sha256, "input_ref": input_ref}
+    return out
+
+
 def compare(before: dict[str, Any] | None, after: dict[str, Any] | None) -> dict[str, Any]:
     """效果比较：任一侧不完整或范围不一致时输出不可比较，不给出改善百分比。"""
     problems = []
@@ -184,6 +207,11 @@ def compare(before: dict[str, Any] | None, after: dict[str, Any] | None) -> dict
             problems.append(f"{label} 数据不完整")
     if not problems and before["metric_name"] != after["metric_name"]:
         problems.append("指标不同，不可比较")
+    for label, r in (("before", before), ("after", after)):
+        if r is not None and r.get("metric_name") in ("ai_adoption", "human_modification") and not r.get("cohort"):
+            problems.append(f"{label} 缺少模型批次（cohort），样本范围不明")
+    if before is not None and after is not None and not problems and before.get("unit") != after.get("unit"):
+        problems.append("单位不同，不可比较")
     if problems:
         return {"comparable": False, "problems": problems, "delta": None}
     return {"comparable": True, "problems": [], "delta": after["value"] - before["value"],

@@ -23,6 +23,15 @@ FAULTS = {
     "unknown_status", "rate_limited", "approval_revoked", "etag_conflict", "partial_document_write",
 }
 
+# 未指定 --times 时的默认次数：持续型故障（平台长时间不可关联、限流、远端被他人修改）持续到显式清除（-1），
+# 一次性故障（响应丢失、重复/乱序事件等）只触发一次
+PERSISTENT_FAULTS = {"attachment_uploaded_link_failed", "rate_limited", "etag_conflict"}
+
+
+def default_times(name: str) -> int:
+    return -1 if name in PERSISTENT_FAULTS else 1
+
+
 SCHEMA = [
     "CREATE TABLE IF NOT EXISTS items(id TEXT PRIMARY KEY, idem_key TEXT UNIQUE, fields TEXT NOT NULL,"
     " status TEXT NOT NULL, revision INTEGER NOT NULL, attachments TEXT NOT NULL, created_at TEXT NOT NULL)",
@@ -74,11 +83,13 @@ class FakePlatform:
             conn.execute("UPDATE faults SET remaining=remaining-1 WHERE name=?", (name,))
         return True
 
-    def set_fault(self, name: str, times: int = 1) -> None:
+    def set_fault(self, name: str, times: int | None = None) -> None:
         if not clock.test_mode():
             raise QAError("AUTHORIZATION_INVALID", "故障注入只能在测试进程中启用")
         if name not in FAULTS:
             raise QAError("INVALID_ARGUMENT", f"未知故障模式: {name}")
+        if times is None:
+            times = default_times(name)
         with self._db() as conn:
             conn.execute("INSERT INTO faults(name, remaining) VALUES(?, ?) "
                          "ON CONFLICT(name) DO UPDATE SET remaining=excluded.remaining", (name, times))
@@ -108,9 +119,12 @@ class FakePlatform:
 
     def create(self, fields: dict[str, Any], idem_key: str) -> dict[str, Any]:
         with self._db() as conn:
-            if self._take_fault(conn, "rate_limited"):
+            limited = self._take_fault(conn, "rate_limited")
+            if limited:
                 self._call(conn, "create", idem_key, fields, "rate_limited")
-                raise RateLimited("平台限流")
+        if limited:
+            raise RateLimited("平台限流")
+        with self._db() as conn:
             row = conn.execute("SELECT * FROM items WHERE idem_key=?", (idem_key,)).fetchone()
             if row:  # 平台支持幂等键：同键返回已有对象
                 self._call(conn, "create", idem_key, fields, "idempotent_hit")
@@ -140,10 +154,14 @@ class FakePlatform:
             return fid
 
     def link(self, item_id: str, file_id: str) -> None:
+        # 故障注入的失败调用要先提交到账本并消耗次数，再向调用方报告失败（不能随事务回滚而“消失”）
         with self._db() as conn:
-            if self._take_fault(conn, "attachment_uploaded_link_failed"):
+            failed = self._take_fault(conn, "attachment_uploaded_link_failed")
+            if failed:
                 self._call(conn, "link", item_id, {"file_id": file_id}, "failed")
-                raise RemoteFailed("附件关联失败")
+        if failed:
+            raise RemoteFailed("附件关联失败")
+        with self._db() as conn:
             row = conn.execute("SELECT * FROM items WHERE id=?", (item_id,)).fetchone()
             if not row:
                 raise RemoteFailed("工作项不存在")
@@ -221,9 +239,12 @@ class FakePlatform:
             row = conn.execute("SELECT * FROM docs WHERE id=?", (doc_id,)).fetchone()
             if not row:
                 raise RemoteFailed("文档不存在")
-            if self._take_fault(conn, "etag_conflict") or row["etag"] != if_match:
+            conflict = self._take_fault(conn, "etag_conflict") or row["etag"] != if_match
+            if conflict:
                 self._call(conn, "doc_update", doc_id, {"if_match": if_match}, "rejected")
-                raise RemoteFailed("ETag 冲突：远端文档已被修改")
+        if conflict:
+            raise RemoteFailed("ETag 冲突：远端文档已被修改")
+        with self._db() as conn:
             etag = sha256_bytes(content.encode())[:16]
             conn.execute("UPDATE docs SET content=?, etag=?, complete=1 WHERE id=?", (content, etag, doc_id))
             self._call(conn, "doc_update", doc_id, {"if_match": if_match}, "ok")

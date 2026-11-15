@@ -14,6 +14,7 @@ from typing import Any
 
 from qa_flow.canonical import sha256_obj
 from qa_flow.errors import QAError
+from qa_flow.storage import db
 from qa_flow.storage.store import Workspace, atomic_write
 
 CONFIG_FILE = "qa-flow.json"
@@ -152,9 +153,40 @@ def diff(old: dict[str, Any] | None, new: dict[str, Any]) -> list[dict[str, Any]
     return out
 
 
+APPLIED_RULES_KEY = "applied_rules_sha256"
+
+
+def rules_group_sha(cfg: dict[str, Any]) -> str:
+    """规则与准出策略组（rules）的摘要：只能经 admin setup 改变。"""
+    return sha256_obj(cfg.get("rules") or {})
+
+
 def apply(ws: Workspace, cfg: dict[str, Any]) -> str:
     atomic_write(ws.config_dir / CONFIG_FILE, json.dumps(cfg, ensure_ascii=False, indent=2).encode("utf-8"))
+    if ws.db_path.is_file():
+        # 记录经正式入口应用的规则组摘要；之后在 setup 之外直接改动规则或策略会被识别为未授权
+        conn = db.connect(ws.db_path)
+        try:
+            conn.execute("BEGIN IMMEDIATE")
+            conn.execute("INSERT INTO meta(key, value) VALUES(?, ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+                         (APPLIED_RULES_KEY, rules_group_sha(cfg)))
+            conn.execute("COMMIT")
+        finally:
+            conn.close()
     return config_sha(cfg)
+
+
+def applied_rules_problem(ws: Workspace, cfg: dict[str, Any]) -> str | None:
+    if not ws.db_path.is_file():
+        return None
+    conn = db.connect(ws.db_path)
+    try:
+        row = conn.execute("SELECT value FROM meta WHERE key=?", (APPLIED_RULES_KEY,)).fetchone()
+    finally:
+        conn.close()
+    if row is None or row[0] == rules_group_sha(cfg):
+        return None
+    return "规则或准出策略在 admin setup 之外被直接改动，未经授权的改动不能用于判定；请管理员通过 admin setup 预览并应用"
 
 
 def target(cfg: dict[str, Any], target_id: str) -> dict[str, Any] | None:
