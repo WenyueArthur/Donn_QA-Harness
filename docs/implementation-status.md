@@ -54,3 +54,19 @@
 - AC-108 `test_ac108_subprocess_arguments_are_not_presented_as_sandbox` 与 AC-100 `test_doctor_states_boundaries_without_claiming_platform_acceptance`：原断言执行器“无网络隔离”，与 AC-108 要求隔离的用例直接矛盾。经用户决定，两项用例已改为“报告的隔离能力必须与实际机制一致”：AC-108 以恶意脚本自身的越界观测为准，AC-100 用 `tests/support/isolation_probe.py` 独立探测本机沙箱是否真的拦截网络。文件系统仍须报告为无隔离，不可信脚本仍须报告为不支持。
 
 执行器隔离的实际边界：仅 macOS 且系统提供 `sandbox-exec` 时生效；禁止全部网络，拒绝读取用户主目录与工作区中未授权的内容；文件系统不是独立挂载，因此 `filesystem` 仍报告为无隔离，仍只运行已审可信脚本。
+
+## 6. 飞书需求来源（2026-11-16）
+
+业务需求通常是飞书项目工作项及其挂载的飞书文档。按用户决定，qa-flow 不直接连接飞书：
+Cursor、Codex、Claude Code 已配置飞书项目 MCP，由 Agent 读取并保存工具原始输出，写成来源包（`qa.source_bundle`）后登记。
+
+- 新增 `start --bundle`、`api source import --bundle`、`api source inspect`（预检，不写入）。
+- qa-flow 把工作项渲染为 Markdown（不含邮箱），从字段与评论中抽取挂载的飞书文档链接，按字段名推断用途。
+- 漏读挂载文档、分页未读完、工作项 ID 不符、读取失败未写原因、读取时间晚于当前时间时拒绝登记，工作区不写入。
+- 来源生产者记为 `agent_reported`；`resume`、`api source refresh` 与 worker 不会把 Agent 登记的来源改写为读取受阻，过期时提示 Agent 重新读取。
+- 同一工作项再次登记复用原任务，只为内容变化的文档生成新快照并触发失效传播；挂载文档增减时同步来源列表。
+- 边界：qa-flow 只核对来源包完整性与读取时间，不能证明内容与飞书原文一致。
+
+验证：新增 `tests/feishu/`（16 个用例，合成工具输出，不访问网络）。用真实需求（飞书项目工作项 7075114327 及其产品文档）在临时项目工作区端到端登记，
+引文逐字核对对真实摘录通过、对编造摘录拒绝。全量 `scripts/run-tests.sh tests`（macOS arm64，Python 3.13.7，单进程，耗时 12 分 16 秒）：
+390 通过、1 失败（AC-103，与此前相同）、10 跳过。这是开发者自测，不是独立验收结论。

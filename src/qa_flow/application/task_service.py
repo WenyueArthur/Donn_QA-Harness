@@ -15,15 +15,17 @@ from pathlib import Path
 from typing import Any
 
 from qa_flow import clock
+from qa_flow.adapters import feishu_bundle
 from qa_flow.application import broker, configuration, defects, execution, learning, review, stages
 from qa_flow.application.context import Ctx, execute, open_ctx
-from qa_flow.application.core import (current, effective_current, import_source, source_map, stale_reasons,
-                                      submit_artifact)
+from qa_flow.application.core import (current, effective_current, import_source, propagate, source_map, source_state,
+                                      stale_reasons, submit_artifact)
 from qa_flow.canonical import sha256_obj
 from qa_flow.domain import workflow
 from qa_flow.errors import QAError
 from qa_flow.ids import new_id, stable_id
 from qa_flow.reporting import render
+from qa_flow.security.resources import resolve_identity
 from qa_flow.security.sanitize import build_sanitized_input
 from qa_flow.storage.store import Tx, Workspace, atomic_write, lineage_key
 
@@ -171,10 +173,25 @@ def _choose_workspace(root: Path, project: str | None) -> Workspace:
 # 开始
 # ---------------------------------------------------------------------------
 
-def start(root: Path, sources: list[str], *, project: str | None = None, title: str | None = None,
-          interactive: bool = False, auto_advance: bool = True) -> dict[str, Any]:
+BUNDLE_GUIDE = ("飞书需求由已配置飞书项目 MCP 的 Agent（Cursor、Codex、Claude Code 等）读取：按 qa-flow Skill "
+                "保存工作项、评论和挂载文档的原始输出并写成来源包，再执行 start --bundle <来源包>。")
+
+
+def start(root: Path, sources: list[str] | None, *, project: str | None = None, title: str | None = None,
+          interactive: bool = False, auto_advance: bool = True, bundle: str | None = None) -> dict[str, Any]:
+    sources = sources or []
+    if bundle and sources:
+        raise QAError("INVALID_ARGUMENT", "--source 与 --bundle 只能二选一", path="bundle")
+    if not bundle and not sources:
+        raise QAError("INVALID_ARGUMENT", "需要 --source <需求文件> 或 --bundle <飞书来源包>", path="source")
+    feishu = [s for s in sources if feishu_bundle.is_feishu_url(s)]
+    if feishu:
+        raise QAError("PRECONDITION_FAILED", "飞书链接不能直接作为来源：qa-flow 不直接连接飞书。" + BUNDLE_GUIDE,
+                      path="source", details={"links": feishu})
     ws = _choose_workspace(root, project)
     ctx = Ctx(ws)
+    if bundle:
+        return _start_bundle(root, ws, ctx, bundle, title, auto_advance)
     abs_sources = [str(Path(s).expanduser().resolve()) if "://" not in s else s for s in sources]
     with ws.reader() as rtx:
         existing = next((a["state"] for a in rtx.aggs("task") if a["state"]["source_uris"] == abs_sources), None)
@@ -210,6 +227,90 @@ def start(root: Path, sources: list[str], *, project: str | None = None, title: 
     _set_active(root, ws, task_id)
     out = advance(ctx, task) if auto_advance else {}
     return {"task": task, "sources": res["result"]["sources"], **out}
+
+
+def _bundle_max_bytes(ctx: Ctx) -> int:
+    return int(ctx.budgets.get("max_request_bytes", 1 << 20)) * 8
+
+
+def _start_bundle(root: Path, ws: Workspace, ctx: Ctx, bundle_path: str, title: str | None,
+                  auto_advance: bool) -> dict[str, Any]:
+    """按飞书来源包开始需求；同一工作项再次登记时更新原任务的来源，不新建任务。"""
+    b = feishu_bundle.load(Path(bundle_path), max_bytes=_bundle_max_bytes(ctx))
+    root_identity = resolve_identity(b["root"]["uri"])
+    items = b["items"]
+    digest = sha256_obj([{k: (sha256_obj(v.decode("utf-8")) if isinstance(v, bytes) else v) for k, v in i.items()}
+                         for i in items])
+    with ws.reader() as rtx:
+        existing = next((a["state"] for a in rtx.aggs("task") if a["state"].get("root_identity") == root_identity), None)
+    notes: list[str] = []
+    if existing is not None:
+        task_id = existing["task_id"]
+
+        def update(tx: Tx) -> dict[str, Any]:
+            agg = tx.get_agg(f"task:{task_id}")
+            st = dict(agg["state"])
+            imported = [import_source(tx, ctx, st["story_id"], i["uri"], provided=i) for i in items]
+            removed = [u for u in st["source_uris"] if u not in [i["uri"] for i in items]]
+            added = [i["uri"] for i in items if i["uri"] not in st["source_uris"]]
+            if removed or added:
+                propagate(tx, ctx, st["story_id"], reason="需求来源列表变化："
+                          + "；".join(x for x in ("新增挂载 " + "、".join(added) if added else "",
+                                                  "不再挂载 " + "、".join(removed) if removed else "") if x))
+            st.update({"sources": [feishu_bundle.display_name(i) for i in items], "source_uris": [i["uri"] for i in items],
+                       "source_refs": [r["source_ref"] for r in imported], "bundle_digest": digest})
+            if title:
+                st["display_title"] = title
+            tx.put_agg(agg["object_id"], "task", st["story_id"], st, expected_revision=agg["revision"],
+                       event_type="task_sources_updated")
+            return {"task": st, "imported": imported, "removed": removed, "added": added}
+
+        res = execute(ctx, "task.bundle_refresh", {"task": task_id, "bundle": digest}, update,
+                      command_id=stable_id("CMD", task_id, "bundle", digest))["result"]
+        task = res["task"]
+        for item, r in zip(items, res["imported"]):
+            if r["changed"]:
+                notes.append(f"来源已变化：{feishu_bundle.display_name(item)}；依赖旧内容的结论与确认已过期，只重新确认受影响部分")
+        for u in res["removed"]:
+            notes.append(f"工作项不再挂载：{u}；相关结论已重新核验")
+        for u in res["added"]:
+            notes.append(f"工作项新增挂载：{u}；相关结论已重新核验")
+        if not notes:
+            notes.append("飞书来源与已登记内容一致，已更新读取时间")
+        _set_active(root, ws, task_id)
+        out = advance(ctx, task) if auto_advance else {}
+        out["notes"] = notes + out.get("notes", [])
+        return {"task": task, "existing": True, "bundle": feishu_bundle.describe(b), **out}
+
+    task_id = new_id("TASK")
+    story_id = new_id("STORY")
+    op = stable_id("CMD", task_id, "start")
+
+    def handler(tx: Tx) -> dict[str, Any]:
+        imported = [import_source(tx, ctx, story_id, i["uri"], provided=i) for i in items]
+        req = {"task_kind": "start", "project_ref": ctx.project_id, "source_refs": [i["source_ref"] for i in imported],
+               "requested_scope": "full", "operation_id": op}
+        snap = tx.put_snapshot("task_request", req, story_id=story_id, project_id=ctx.project_id,
+                               producer={"kind": "operator", "name": ctx.actor, "verification": "local_os_user"})
+        state = {"task_id": task_id, "story_id": story_id, "display_title": title or b["title"],
+                 "sources": [feishu_bundle.display_name(i) for i in items], "source_uris": [i["uri"] for i in items],
+                 "source_refs": req["source_refs"], "environment": "lab（合成实验）" if ctx.is_lab else "test",
+                 "project": ctx.project_name, "lab": ctx.is_lab, "created_at": tx.now, "request_ref": snap["id"],
+                 "root_identity": root_identity, "bundle_digest": digest, "source_kind": "feishu_bundle",
+                 "checkpoint": {"completed_steps": [], "pending_steps": [], "last_operation_ref": op, "counter": 0}}
+        tx.put_agg(f"task:{task_id}", "task", story_id, state, expected_revision=0, event_type="task_started")
+        return {"task": state, "sources": imported}
+
+    res = execute(ctx, "task.start", {"bundle": digest, "title": title, "task": task_id}, handler, command_id=op)
+    task = res["result"]["task"]
+    _set_active(root, ws, task_id)
+    for item in items:
+        if item["read_status"] != "available":
+            notes.append(f"{feishu_bundle.display_name(item)} 读取受阻：{item['failure_reason']}；"
+                         "该文档内容未进入分析，结论会标注未验证范围")
+    out = advance(ctx, task) if auto_advance else {}
+    out["notes"] = notes + out.get("notes", [])
+    return {"task": task, "sources": res["result"]["sources"], "bundle": feishu_bundle.describe(b), **out}
 
 
 # ---------------------------------------------------------------------------
@@ -348,6 +449,11 @@ def _refresh_sources(ctx: Ctx, task: dict[str, Any], notes: list[str]) -> list[d
                         lambda tx, uri=uri: import_source(tx, ctx, task["story_id"], uri))["result"]
         except QAError as exc:
             notes.append(f"来源刷新失败：{exc.message}")
+            continue
+        if r.get("needs_agent_fetch"):
+            if r["read_status"] == "stale":
+                notes.append(f"飞书来源《{r.get('title') or uri}》已超过新鲜度期限；请让 Agent 重新读取后执行 "
+                             "start --bundle 更新，期间不形成新结论")
             continue
         if r["changed"]:
             changes.append(r)
@@ -717,6 +823,11 @@ def view(ctx: Ctx, task: dict[str, Any]) -> dict[str, Any]:
         cur_sources = [s for s in rtx.snapshots(story, "source_revision") if rtx.is_current(s["id"])]
         unsupported = sorted({Path(s["payload"]["uri"]).name for s in cur_sources
                               if s["payload"].get("extraction_method") == "未支持"})
+        agent_sources = [s for s in cur_sources if (s["payload"].get("fetched_by") or {}).get("agent")]
+        stale_agent = [s["payload"].get("title") or s["payload"]["uri"] for s in agent_sources
+                       if source_state(rtx, ctx, s) == "stale"]
+        unreadable_agent = [f"{s['payload'].get('title') or s['payload']['uri']}（{s['payload'].get('failure_reason')}）"
+                            for s in agent_sources if s["payload"].get("read_status") != "available"]
         admin_items = []
         for s in cur_sources:
             reason = s["payload"].get("failure_reason") or ""
@@ -740,6 +851,10 @@ def view(ctx: Ctx, task: dict[str, Any]) -> dict[str, Any]:
     reasons = (first_open or {}).get("reasons") or []
     have = [s["title"] for s in st_list if s["status"] in ("completed", "waived")]
     next_actions = []
+    if stale_agent:
+        next_actions.append({"command": "start --bundle <来源包>", "effect": "让 Agent 重新读取飞书工作项与挂载文档后更新来源",
+                             "scope": "、".join(stale_agent[:3]) + (" 等" if len(stale_agent) > 3 else ""),
+                             "risk": "只读取飞书，不写入飞书"})
     if unknown:
         next_actions.append({"command": "resume", "effect": "先核对结果未知的操作，不会重发", "scope": f"{len(unknown)} 项操作",
                              "risk": "无新的外部写入"})
@@ -757,6 +872,11 @@ def view(ctx: Ctx, task: dict[str, Any]) -> dict[str, Any]:
         next_actions.append({"command": "export --output <目录>", "effect": "导出本地交付报告", "scope": "当前需求",
                              "risk": "只写本地文件，不归档、不写平台"})
     unverified = [f"附件 {n} 格式不支持自动读取，内容未进入分析，需人工处理" for n in unsupported]
+    if agent_sources:
+        unverified.append("飞书来源内容由 Agent 读取后登记（agent_reported），qa-flow 未直接核对飞书原文")
+    unverified += [f"飞书文档读取受阻，内容未进入分析：{x}" for x in unreadable_agent]
+    if stale_agent:
+        unverified.append("飞书来源已超过新鲜度期限，需 Agent 重新读取：" + "、".join(stale_agent))
     unverified.append("新人可用性尚未验证（未进行新人实测）")
     if ctx.is_lab:
         unverified.insert(0, "全部结果来自合成实验，不代表真实环境、真实业务或生产通过")

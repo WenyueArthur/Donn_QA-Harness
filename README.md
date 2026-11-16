@@ -48,7 +48,8 @@ python3 -m venv .venv
 
 | 想做什么 | 命令 |
 |---|---|
-| 开始一个需求 | `python -m qa_flow start --source "./需求.md"` |
+| 开始一个飞书需求 | Agent 读取飞书后生成来源包，`python -m qa_flow start --bundle "<来源包>"` |
+| 开始一个本地文件需求 | `python -m qa_flow start --source "./需求.md"` |
 | 继续未完成工作 | `python -m qa_flow resume` |
 | 处理业务确认 | `python -m qa_flow review` |
 | 查看或交付 | `python -m qa_flow status`；`python -m qa_flow export --output "./交付"` |

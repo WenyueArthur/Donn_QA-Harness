@@ -39,8 +39,13 @@ def _read_roots_ok(ctx: Ctx, path: Path) -> bool:
     return False
 
 
-def import_source(tx: Tx, ctx: Ctx, story_id: str, uri: str) -> dict[str, Any]:
-    """登记来源快照。读取受阻与不存在不同；同名不合并；字节不变时复用当前快照。"""
+def import_source(tx: Tx, ctx: Ctx, story_id: str, uri: str,
+                  provided: dict[str, Any] | None = None) -> dict[str, Any]:
+    """登记来源快照。读取受阻与不存在不同；同名不合并；字节不变时复用当前快照。
+
+    provided 是 Agent 读取的远端内容（如飞书来源包中的一项）：qa-flow 不直接连接该系统，
+    只登记 Agent 交来的字节，生产者记为 agent_reported，读取时间取 Agent 的读取时间。
+    """
     identity = resolve_identity(uri)
     lineage = lineage_key("source_revision", story_id, identity)
     current_id = tx.lineage_current(lineage)
@@ -48,7 +53,37 @@ def import_source(tx: Tx, ctx: Ctx, story_id: str, uri: str) -> dict[str, Any]:
     payload: dict[str, Any] = {"uri": uri, "fetched_at": tx.now, "freshness_policy": {"max_age_hours": max_age},
                                "read_scope": "full"}
     data: bytes | None = None
-    if identity.startswith("file:"):
+    producer = {"kind": "adapter", "name": "local_source_reader", "verification": "process"}
+    media = None
+    if provided is not None:
+        payload.update({"kind": "remote_doc", "fetched_at": provided["fetched_at"] or tx.now,
+                        "read_status": provided["read_status"], "source_type": provided["kind"],
+                        "role": provided["role"], "found_in": provided["found_in"],
+                        "fetched_by": {"agent": provided["agent"], "tool": provided["tool"]}})
+        if provided.get("failure_reason"):
+            payload["failure_reason"] = provided["failure_reason"]
+        data = provided.get("data")
+        media = "text/markdown"
+        producer = {"kind": "agent", "name": provided["agent"], "verification": "agent_reported"}
+        if data is None and current_id:
+            cp = (tx.get_snapshot(current_id) or {}).get("payload") or {}
+            if (cp.get("fetched_by") and cp.get("read_status") == provided["read_status"]
+                    and cp.get("failure_reason") == provided.get("failure_reason")):
+                # 同一读取失败再次登记：不是新内容，不生成新快照，也不触发失效传播
+                return {"source_ref": current_id, "changed": False, "read_status": cp["read_status"],
+                        "title": cp.get("title"), "identity": identity, "failure_reason": cp.get("failure_reason")}
+    elif current_id and not identity.startswith("file:"):
+        cur = tx.get_snapshot(current_id)
+        cp = (cur or {}).get("payload") or {}
+        if cp.get("fetched_by"):
+            # Agent 读取的远端来源：qa-flow 不能自行重读，刷新不得改写 Agent 登记的快照（含如实登记的读取失败）
+            state = source_state(tx, ctx, cur)
+            out = {"source_ref": current_id, "changed": False, "read_status": state, "title": cp.get("title"),
+                   "identity": identity, "needs_agent_fetch": True}
+            if state == "stale":
+                out["failure_reason"] = "已超过新鲜度期限；需要 Agent 重新读取后用 start --bundle 登记"
+            return out
+    if provided is None and identity.startswith("file:"):
         path = Path(identity[len("file:"):])
         payload["kind"] = "local_file"
         if not path.exists():
@@ -67,36 +102,48 @@ def import_source(tx: Tx, ctx: Ctx, story_id: str, uri: str) -> dict[str, Any]:
             except OSError as exc:
                 payload["read_status"] = "unreadable"
                 payload["failure_reason"] = f"读取失败：{exc.__class__.__name__}"
-    else:
+    elif provided is None:
+        from qa_flow.adapters import feishu_bundle
+
         payload["kind"] = "remote_doc"
         payload["read_status"] = "unreadable"
-        payload["failure_reason"] = "没有已配置并核验的文档连接器；不会改用其他工具或账号"
+        if feishu_bundle.is_feishu_url(uri):
+            payload["failure_reason"] = ("飞书内容由已配置飞书 MCP 的 Agent 读取；请按 qa-flow Skill 生成来源包后用 "
+                                         "start --bundle 登记，qa-flow 不直接连接飞书")
+        else:
+            payload["failure_reason"] = "没有已配置并核验的文档连接器；不会改用其他工具或账号"
     max_bytes = int(ctx.budgets.get("max_request_bytes", 1 << 20)) * 8
     if data is not None and len(data) > max_bytes:
         payload["read_status"] = "unreadable"
         payload["failure_reason"] = f"来源超过私有存储限额（{len(data)} 字节）"
         data = None
     if data is not None:
-        media = TEXT_SUFFIXES.get(Path(identity).suffix.lower(), "application/octet-stream")
+        media = media or TEXT_SUFFIXES.get(Path(identity).suffix.lower(), "application/octet-stream")
         ev = tx.register_evidence(data, origin="imported", source=uri, media_type=media, privacy="private")
         payload["content_ref"] = ev["id"]
         payload["content_sha256"] = ev["sha256"]
-        payload["extraction_method"] = "utf-8 原文" if media.startswith("text/") or media.endswith("json") else "未支持"
-        payload["title"] = _title(data) or Path(identity).name
+        if provided is not None:
+            payload["extraction_method"] = f"Agent 读取（{provided['tool']}）"
+            payload["title"] = provided.get("title") or _title(data) or uri
+        else:
+            payload["extraction_method"] = "utf-8 原文" if media.startswith("text/") or media.endswith("json") else "未支持"
+            payload["title"] = _title(data) or Path(identity).name
         if current_id:
             cur = tx.get_snapshot(current_id)
             if cur and cur["payload"].get("content_sha256") == ev["sha256"] and cur["payload"]["read_status"] == "available":
-                touch_source(tx, current_id)
+                touch_source(tx, current_id, at=payload["fetched_at"] if provided is not None else None)
                 return {"source_ref": current_id, "changed": False, "read_status": "available",
                         "title": cur["payload"].get("title"), "identity": identity}
     elif current_id:
         # 读取失败：保留旧快照为历史，新状态如实登记，不把失败当作“未变更”
         payload["title"] = (tx.get_snapshot(current_id) or {}).get("payload", {}).get("title")
+    if data is None and provided is not None and not payload.get("title"):
+        payload["title"] = provided.get("title")
     shape_problems = shape.check(payload, payload_spec("source_revision"))
     if shape_problems:
         raise ValidationIssues("SCHEMA_INVALID", shape_problems)
     snap = tx.put_snapshot("source_revision", payload, story_id=story_id, project_id=ctx.project_id,
-                           producer={"kind": "adapter", "name": "local_source_reader", "verification": "process"},
+                           producer=producer,
                            lineage=lineage, parent_id=current_id, privacy="private", origin="imported",
                            provenance={"identity": identity})
     tx.put_agg(f"protected:{identity}", "protected_resource", story_id,
@@ -107,9 +154,9 @@ def import_source(tx: Tx, ctx: Ctx, story_id: str, uri: str) -> dict[str, Any]:
             "title": payload.get("title"), "identity": identity, "failure_reason": payload.get("failure_reason")}
 
 
-def touch_source(tx: Tx, source_id: str) -> None:
+def touch_source(tx: Tx, source_id: str, at: str | None = None) -> None:
     tx.put_agg(f"freshness:{source_id}", "source_freshness", tx.get_snapshot(source_id)["story_id"],
-               {"source_ref": source_id, "verified_at": tx.now}, event_type="source_verified")
+               {"source_ref": source_id, "verified_at": at or tx.now}, event_type="source_verified")
 
 
 def _title(data: bytes) -> str | None:

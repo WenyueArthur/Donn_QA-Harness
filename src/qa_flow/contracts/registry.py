@@ -34,6 +34,8 @@ CONTRACTS: dict[str, dict[str, Any]] = {
         "fetched_at": "str", "freshness_policy": {"max_age_hours": "num?"},
         "title": "str?", "read_scope": "str?", "omitted": "list?", "failure_reason": "str?",
         "extraction_method": "str?",
+        # Agent 读取的远端来源（如飞书来源包）：来源类型、用途、发现位置、读取者与工具
+        "source_type": "str?", "role": "str?", "found_in": "str?", "fetched_by": "dict?",
     },
     "claim": {
         "text": "str", "claim_type": E("fact", "inference", "assumption"),

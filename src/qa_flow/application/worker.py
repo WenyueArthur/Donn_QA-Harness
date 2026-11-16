@@ -17,14 +17,19 @@ from qa_flow.ids import stable_id
 
 
 def tick(ctx: Ctx, dispatch_ready: bool = True) -> dict[str, Any]:
-    report: dict[str, Any] = {"refreshed": [], "synced": [], "reminders": [], "reconciled": [], "dispatched": [],
-                              "errors": []}
+    report: dict[str, Any] = {"refreshed": [], "agent_fetch_required": [], "synced": [], "reminders": [],
+                              "reconciled": [], "dispatched": [], "errors": []}
     with ctx.ws.reader() as rtx:
         stories = sorted({a["story_id"] for a in rtx.aggs("task")})
         due_sources = []
         for sid in stories:
             for s in rtx.snapshots(sid, "source_revision"):
                 if rtx.is_current(s["id"]) and source_state(rtx, ctx, s) == "stale":
+                    if (s["payload"].get("fetched_by") or {}).get("agent"):
+                        # Agent 读取的飞书来源：worker 不能自行重读，只登记需要 Agent 重新读取
+                        report["agent_fetch_required"].append({"story": sid, "uri": s["payload"]["uri"],
+                                                               "title": s["payload"].get("title")})
+                        continue
                     due_sources.append((sid, s["payload"]["uri"]))
     for sid, uri in due_sources:
         try:

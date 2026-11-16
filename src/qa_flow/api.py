@@ -7,13 +7,13 @@ import json
 from pathlib import Path
 from typing import Any
 
-from qa_flow.canonical import loads_strict
+from qa_flow.canonical import loads_strict, sha256_obj
 from qa_flow.errors import QAError
 
 GROUPS = {
     "init": "私有工作区初始化（等同 admin setup --apply）",
     "doctor": "能力检查",
-    "source": "来源与新鲜度：import / refresh",
+    "source": "来源与新鲜度：import / refresh / inspect（飞书来源包预检，不写入）",
     "artifact": "产物与关系校验：submit / validate / show",
     "clarification": "问题与答复：propose / answer",
     "decision": "决定与范围核验：record / verify / revoke",
@@ -66,7 +66,8 @@ def register(api: argparse.ArgumentParser) -> None:
     p = sub.add_parser("doctor", help=GROUPS["doctor"])
     _common(p)
     g = grp("source")
-    op(g, "import", story, ("--uri", req))
+    op(g, "import", story, ("--uri", {}), ("--bundle", {"help": "飞书来源包"}))
+    op(g, "inspect", ("--bundle", req))
     op(g, "refresh", story)
     g = grp("artifact")
     op(g, "submit", story, ("--kind", req), ("--file", req), ("--name", {}), ("--parent", {}),
@@ -213,6 +214,13 @@ def run(args: argparse.Namespace, root: Path) -> dict[str, Any]:
                         "note": res.get("note") or "不可比较时不给出差值或改善比例"})
             return res
         return compute_one(args.input)
+    if group == "source" and opn == "inspect":
+        from qa_flow.adapters import feishu_bundle
+
+        b = feishu_bundle.load(Path(args.bundle), max_bytes=8 << 20, strict=False)
+        out = feishu_bundle.describe(b)
+        out["note"] = "预检只读取来源包文件，不写入工作区；complete=false 时 start --bundle 会拒绝"
+        return out
     if group == "backup" and opn == "verify":
         return bk.verify_backup(Path(args.path))
     if group == "backup" and opn == "restore":
@@ -248,6 +256,17 @@ def run(args: argparse.Namespace, root: Path) -> dict[str, Any]:
         return bk.create_backup(ctx.ws, Path(args.output))
     if group == "source":
         if opn == "import":
+            if bool(args.uri) == bool(args.bundle):
+                raise QAError("INVALID_ARGUMENT", "需要 --uri 或 --bundle 其中之一", path="uri")
+            if args.bundle:
+                from qa_flow.adapters import feishu_bundle
+
+                b = feishu_bundle.load(Path(args.bundle), max_bytes=int(ctx.budgets.get("max_request_bytes", 1 << 20)) * 8)
+                digest = sha256_obj([{k: (sha256_obj(v.decode("utf-8")) if isinstance(v, bytes) else v)
+                                      for k, v in i.items()} for i in b["items"]])
+                return run_cmd("source.import_bundle", {"story": story, "bundle": digest},
+                               lambda tx: {"imported": [import_source(tx, ctx, story, i["uri"], provided=i)
+                                                        for i in b["items"]]})
             return run_cmd("source.import", {"story": story, "uri": args.uri},
                            lambda tx: import_source(tx, ctx, story, args.uri))
         with ctx.ws.reader() as rtx:

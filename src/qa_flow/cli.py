@@ -17,11 +17,12 @@ from qa_flow.errors import EXIT_OK, QAError
 from qa_flow.security.sanitize import scrub_for_display
 
 DAILY_HELP = """日常只需四类任务：
-  开始一个需求      start --source <需求文件或链接>
+  开始一个需求      start --source <需求文件>；飞书需求：start --bundle <飞书来源包>
   继续未完成工作    resume
   处理业务确认      review
   查看或交付        status；export --output <目录>
 首次体验：demo（合成实验，不需要账号或网络）
+飞书需求由已配置飞书 MCP 的 Agent 读取并生成来源包（见 qa-flow Skill）；qa-flow 不直接连接飞书
 
 管理员命令：admin --help；开发与排障的机器接口：api --help
 """
@@ -48,7 +49,8 @@ def build_parser() -> argparse.ArgumentParser:
     _common(d)
     s = sub.add_parser("start", help="开始一个需求")
     _common(s)
-    s.add_argument("--source", action="append", required=True, help="需求文件或链接，可重复")
+    s.add_argument("--source", action="append", help="本地需求文件，可重复")
+    s.add_argument("--bundle", help="飞书来源包（Agent 读取飞书项目工作项与挂载文档后生成的 bundle.json 或其目录）")
     s.add_argument("--title", help="来源无法识别名称时提供业务名称")
     s.add_argument("--project", help="存在多个项目时按名称选择")
     r = sub.add_parser("resume", help="继续未完成工作")
@@ -226,7 +228,8 @@ def _scrub(obj: Any) -> Any:
 
 
 def _view_receipt(v: dict[str, Any], extra: dict[str, Any] | None = None) -> dict[str, Any]:
-    result = {"task": {k: v["task"][k] for k in ("task_id", "display_title", "sources", "environment", "project")},
+    result = {"task": {**{k: v["task"][k] for k in ("task_id", "display_title", "sources", "environment", "project")},
+                       "source_refs": list(v["task"].get("source_refs") or [])},
               "lab": v["lab"], "verdict": v["verdict"], "summary": v["summary"],
               "stages": [{"stage": s["stage"], "title": s["title"], "status": s["status"], "verdict": s["verdict"],
                           "reasons": s["reasons"], "evaluation_ref": s.get("evaluation_ref")} for s in v["stages"]],
@@ -290,15 +293,24 @@ def _dispatch(args: argparse.Namespace) -> int:
             _print_view(v, args.details, _act_footer(v))
         return EXIT_OK
     if args.cmd == "start":
-        res = ts.start(root, args.source, project=args.project, title=args.title, interactive=interactive)
+        res = ts.start(root, args.source, project=args.project, title=args.title, interactive=interactive,
+                       bundle=args.bundle)
         sel = ts.select_task(root, res["task"]["task_id"], False)
         v = ts.view(sel["ctx"], sel["task"])
         if args.json:
-            print(json.dumps(_view_receipt(v, {"notes": res.get("notes", []), "existing": res.get("existing", False)}),
-                             ensure_ascii=False, indent=2))
+            extra = {"notes": res.get("notes", []), "existing": res.get("existing", False)}
+            if res.get("bundle"):
+                extra["bundle"] = res["bundle"]
+            print(json.dumps(_view_receipt(v, extra), ensure_ascii=False, indent=2))
         else:
             if res.get("existing"):
                 print("该来源已有任务，继续使用原任务。\n")
+            if res.get("bundle"):
+                print("已登记飞书来源（Agent 读取，qa-flow 未直接连接飞书）：")
+                for it in res["bundle"]["items"]:
+                    state = "已读取" if it["read_status"] == "available" else f"读取受阻：{it['failure_reason']}"
+                    print(f"  - {it['role']}《{it['title']}》（{it['found_in']}；{state}）")
+                print()
             _print_notes(res.get("notes", []))
             _print_view(v, args.details, _act_footer(v))
         return EXIT_OK

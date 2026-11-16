@@ -12,6 +12,7 @@
 | `parity/` | 冻结旧规则等价比较 |
 | `integration/` | 真实平台与模型接入（默认禁用网络） |
 | `fixtures/` | `build_lab.py` 夹具工厂 |
+| `feishu/` | 飞书来源包：解析、完整性校验、登记、再次登记与新鲜度（合成工具输出，不访问网络） |
 
 执行测试统一用 `scripts/run-tests.sh [pytest 参数...]`，它加载 `tools/pytest_progress.py`：
 
